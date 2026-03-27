@@ -1,3 +1,74 @@
-# Fichier à remplacer
+# Projet IF36 - DataSquad : Analyse des Données Olympiques (1896-2024)
 
-Ce README est à remplacer par votre proposition de dataset.
+## Présentation des données
+Les données exploitées dans le cadre de ce projet proviennent d'un jeu de données extrait de la plateforme Kaggle, dans un format en `.csv`. Il contient les informations d’athlètes pendant les Jeux Olympiques de 1896 à 2024.
+
+Nous avons choisi ce set de données car cela nous paraissait très intéressant, nous aimons bien le sport, extraire des statistiques de ce dataset peut-être très instructif. Nous avons vu un potentiel dans ce dataset, il nous permet de nous poser les bonnes questions, qui nous amèneront des graphiques et statistiques pertinents.
+
+Nous avons donc une base de données de 8500 athlètes, avec des données sur 30 catégories. Ces variables couvrent à la fois les résultats sportifs des individus (répartition des médailles, records, valeur des résultats) et leurs profils biométriques et identitaires (pays d'origine, taille, poids, etc.).
+
+## Types de données
+
+| # | Nom de la colonne | Format donnée | Description | Type |
+|---|---|---|---|---|
+| 1 | `athlete_id` | String | ID unique (format ATH-00001 à ATH-08500) | Discrète (Identifiant) |
+| 2 | `athlete_name` | String | Nom complet (Prénom + Nom) | Discrète (Nominale) |
+| 3 | `gender` | String | Sexe de l'athlète (Male/Female) | Discrète (Nominale) |
+| 4 | `age` | Integer | Âge au moment de l'événement (15–42) | Discrète |
+| 5 | `date_of_birth` | Date | Date de naissance (YYYY-MM-DD) | Continue (Temporelle) |
+| 6 | `nationality` | String | Code CIO du pays sur 3 lettres (ex: USA, FRA) | Discrète (Nominale) |
+| 7 | `country_name` | String | Nom complet du pays | Discrète (Nominale) |
+| 8 | `sport` | String | Discipline (ex: Athlétisme, Natation) | Discrète (Nominale) |
+| 9 | `event` | String | Épreuve spécifique (ex: 100m Sprint) | Discrète (Nominale) |
+| 10 | `games_type` | String | Type de jeux (Summer / Winter) | Discrète (Nominale) |
+| 11 | `year` | Integer | Année des JO (1896–2024) | Discrète (Temporelle) |
+| 12 | `host_city` | String | Ville hôte des Jeux | Discrète (Nominale) |
+| 13 | `team_or_individual` | String | Épreuve par équipe ou individuelle | Discrète (Nominale) |
+| 14 | `medal` | String | Médaille : Gold, Silver, Bronze ou None | Discrète (Ordinale) |
+| 15 | `result_value` | Float | Résultat chiffré (temps, distance, score) | Continue |
+| 16 | `result_unit` | String | Unité du résultat (seconds, metres, points, kg) | Discrète (Nominale) |
+| 17 | `total_olympics` | Integer | Nombre total de JO fréquentés (1–5) | Discrète |
+| 18 | `total_medals_won` | Integer | Total de médailles en carrière | Discrète |
+| 19 | `gold_medals` | Integer | Nombre de médailles d'or en carrière | Discrète |
+| 20 | `silver_medals` | Integer | Nombre de médailles d'argent en carrière | Discrète |
+| 21 | `bronze_medals` | Integer | Nombre de médailles de bronze en carrière | Discrète |
+| 22 | `country_total_gold` | Integer | Total historique d'or du pays (jusqu'en 2024) | Discrète |
+| 23 | `country_total_medals` | Integer | Total historique de médailles du pays | Discrète |
+| 24 | `country_first_part` | Integer | Année de la première participation du pays | Discrète (Temporelle) |
+| 25 | `country_best_rank` | Integer | Meilleur classement historique du pays | Discrète (Ordinale) |
+| 26 | `is_record_holder` | String | Record : World Record / Olympic Record / No | Discrète (Nominale) |
+| 27 | `coach_name` | String | Nom de l'entraîneur | Discrète (Nominale) |
+| 28 | `height_cm` | Float | Taille de l'athlète en centimètres | Continue |
+| 29 | `weight_kg` | Float | Poids de l'athlète en kilogrammes | Continue |
+| 30 | `notes` | String | Contexte supplémentaire (ex: "Personal Best") | Discrète (Texte libre) |
+
+## Plan d’analyse
+
+### Questions de recherche
+*   **Performance et Morphologie** : Est-ce que la taille/poids d'un athlète influence sa performance ?
+*   **Temporalité** : Quelles sont les saisons qui sont marquées par un grand nombre de compétitions ?
+*   **Succès national** : Quels pays remportent le plus de compétitions ?
+*   **Genre** : Y’a-t-il un genre mis en avant plus qu’un autre ?
+*   **Représentativité** : Quelles sont les nationalités les plus / moins représentées ?
+
+### Interrogations et objectifs
+Notre analyse gravite autour d'une problématique centrale : **L'influence de la morphologie (taille et poids) sur la performance athlétique.** Nous cherchons à déterminer si des caractéristiques physiques spécifiques constituent un avantage déterminant pour l'obtention d'une médaille ou d'un record.
+
+**Objectifs secondaires :**
+*   Existe-t-il une "taille idéale" par discipline sportive ?
+*   Le rapport poids/taille (IMC) est-il plus corrélé à la performance que la taille seule ?
+*   Cette influence morphologique a-t-elle évolué entre les premiers Jeux Olympiques et les éditions récentes (spécialisation des corps) ?
+
+### Informations attendues
+Nous espérons identifier des clusters d'athlètes performants par sport. Par exemple, nous anticipons une corrélation positive forte entre la taille et la performance en basketball ou en natation, tandis qu'elle pourrait être négative ou inexistante en gymnastique ou en équitation.
+
+### Variables comparées et méthodes
+Pour valider nos hypothèses, nous allons croiser les variables suivantes :
+1.  **Taille (height_cm) vs Performance (result_value)** : Utilisation de nuages de points pour visualiser la dispersion et calcul du coefficient de corrélation de Pearson ($r$).
+2.  **Poids (weight_kg) vs Sport (sport)** : Comparaison des distributions via des boîtes à moustaches (boxplots) pour voir la variabilité du poids selon la discipline.
+3.  **Médaille (medal) vs Morphologie** : Analyse par groupes pour voir si les médaillés d'or présentent des caractéristiques physiques distinctes du reste des participants.
+
+## Défis et limites potentiels
+*   **Hétérogénéité des unités** : La variable `result_value` mélange des secondes, des mètres et des points. Il faudra normaliser ces données ou filtrer l'analyse sport par sport.
+*   **Données manquantes** : Les données historiques comportent souvent des valeurs de poids ou de taille manquantes, ce qui pourrait biaiser l'analyse temporelle.
+*   **Variables confondantes** : La performance dépend aussi de l'âge, de l'expérience (`total_olympics`) et des infrastructures du pays d'origine.
