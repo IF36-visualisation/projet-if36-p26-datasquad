@@ -238,3 +238,88 @@ L’analyse de ces trois graphiques montre que la représentativité des nationa
 Le premier graphique permet d’identifier les pays dominants avec des valeurs précises. Le deuxième montre que de nombreux pays occupent une place marginale. Enfin, le troisième met directement en évidence l’écart entre ces deux groupes. L’ensemble confirme donc une structure déséquilibrée de la répartition des nationalités.
 
 
+# Influence de la morphologie sur la performance
+
+Cette partie analyse si la corpulence d'un athlète (mesurée par l'Indice de Masse Corporelle - IMC) constitue un avantage déterminant pour ses performances.
+
+```{r cleaning_morpho, include=FALSE}
+# Nettoyage spécifique pour l'analyse IMC
+df_morpho <- olympics %>%
+  mutate(
+    weight_kg = as.numeric(weight_kg),
+    height_cm = as.numeric(height_cm),
+    result_value = as.numeric(result_value),
+    imc = weight_kg / (height_cm / 100)^2
+  ) %>%
+  filter(!is.na(imc) & !is.na(result_value))
+```
+
+## Force de l'influence de l'IMC par discipline
+Ce graphique permet d'identifier les disciplines où la corpulence a l'influence la plus forte sur le résultat (chrono, points, distance).
+
+```{r correlation_sport}
+corelation_globale <- df_morpho %>%
+    group_by(sport) %>%
+    summarise(
+        correlation = cor(imc, result_value, use = "complete.obs"),
+        nb_athletes = n()
+    ) %>%
+    filter(nb_athletes >= 20) %>% 
+    arrange(desc(abs(correlation)))
+
+ggplot(corelation_globale, aes(x = reorder(sport, abs(correlation)), y = correlation, fill = correlation > 0)) +
+    geom_col() +
+    coord_flip() + 
+    scale_fill_manual(values = c("TRUE" = "#2ecc71", "FALSE" = "#e74c3c"), 
+                      labels = c("Influence Négative", "Influence Positive")) +
+    labs(
+        title = "Intensité de la corrélation IMC / Performance",
+        x = "Discipline Sportive",
+        y = "Coefficient de corrélation (r)",
+        fill = "Direction de l'influence"
+    ) +
+    theme_minimal()
+```
+
+## Zoom sur les sports clés
+Pour comprendre l'impact réel, nous isolons deux sports aux tendances opposées.
+
+### Archery (Tir à l'arc) : Une corrélation positive
+En tir à l'arc, le résultat est en **points** (plus c'est haut, mieux c'est).
+
+```{r zoom_archery}
+df_morpho %>%
+  filter(sport == "Archery") %>%
+  ggplot(aes(x = imc, y = result_value)) +
+  geom_point(alpha = 0.5, color = "#2ecc71") +
+  geom_smooth(method = "lm", color = "black") +
+  labs(title = "Archery : IMC vs Points",
+       x = "IMC", y = "Points obtenus") +
+  theme_minimal()
+```
+
+**Interprétation :** On observe une pente montante. Cela signifie qu'un IMC plus élevé est globalement associé à un meilleur score en points. Une plus grande masse corporelle pourrait offrir une meilleure assise et stabilité face au vent ou lors de la tension de l'arc.
+
+### Swimming (Natation) : Une corrélation négative
+En natation, le résultat est souvent en **secondes** (plus c'est bas, mieux c'est).
+
+```{r zoom_swimming}
+df_morpho %>%
+  filter(sport == "Swimming") %>%
+  ggplot(aes(x = imc, y = result_value)) +
+  geom_point(alpha = 0.5, color = "#e74c3c") +
+  geom_smooth(method = "lm", color = "black") +
+  labs(title = "Swimming : IMC vs Chrono (secondes)",
+       x = "IMC", y = "Secondes") +
+  theme_minimal()
+```
+
+**Interprétation :** La pente est descendante. Comme le résultat est exprimé en secondes, une baisse du temps signifie une amélioration. On peut en conclure qu'un IMC plus élevé est souvent un avantage pour la propulsion et la puissance dans l'eau chez les nageurs Olympiques.
+
+### Conclusion sur la morphologie
+En conclusion, notre analyse confirme que l'influence de l'IMC est bien réelle, mais qu'elle est spécifique à chaque discipline. Il est important de noter que les athlètes Olympiques sont, par définition, déjà à leur **poids de forme** optimal pour leur sport. Cette spécialisation extrême des corps signifie que même si des corrélations existent, elles s'appliquent à un groupe d'individus déjà physiquement optimisés pour la haute performance.
+
+Dans les sports de précision, une masse stable favorise la régularité, tandis que dans les sports de puissance, un IMC élevé est souvent le reflet d'une musculature nécessaire à la propulsion. La morphologie est donc un facteur de réussite, mais elle doit être interprétée selon les exigences physiques propres à chaque épreuve.
+
+
+

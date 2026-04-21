@@ -1,0 +1,462 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Rapport},
+  pdfauthor={data-squad},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Rapport}
+\author{data-squad}
+\date{2026-04-21}
+
+\begin{document}
+\maketitle
+
+\section{Projet IF36 - DataSquad : Analyse des Données Olympiques
+(1896-2024)}\label{projet-if36---datasquad-analyse-des-donnuxe9es-olympiques-1896-2024}
+
+\subsection{Présentation des
+données}\label{pruxe9sentation-des-donnuxe9es}
+
+Les données exploitées dans le cadre de ce projet proviennent d'un jeu
+de données extrait de la plateforme Kaggle, dans un format en
+\texttt{.csv}. Il contient les informations d'athlètes pendant les Jeux
+Olympiques de 1896 à 2024.
+
+Nous avons choisi ce set de données car cela nous paraissait très
+intéressant, nous aimons bien le sport, extraire des statistiques de ce
+dataset peut-être très instructif. Nous avons vu un potentiel dans ce
+dataset, il nous permet de nous poser les bonnes questions, qui nous
+amèneront des graphiques et statistiques pertinents.
+
+Nous avons donc une base de données de 8500 athlètes, avec des données
+sur 30 catégories. Ces variables couvrent à la fois les résultats
+sportifs des individus (répartition des médailles, records, valeur des
+résultats) et leurs profils biométriques et identitaires (pays
+d'origine, taille, poids, etc.).
+
+\subsection{Types de données}\label{types-de-donnuxe9es}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nom de la colonne
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Format donnée
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \texttt{athlete\_id} & String & ID unique (format ATH-00001 à
+ATH-08500) & Discrète (Identifiant) \\
+2 & \texttt{athlete\_name} & String & Nom complet (Prénom + Nom) &
+Discrète (Nominale) \\
+3 & \texttt{gender} & String & Sexe de l'athlète (Male/Female) &
+Discrète (Nominale) \\
+4 & \texttt{age} & Integer & Âge au moment de l'événement (15--42) &
+Discrète \\
+5 & \texttt{date\_of\_birth} & Date & Date de naissance (YYYY-MM-DD) &
+Continue (Temporelle) \\
+6 & \texttt{nationality} & String & Code CIO du pays sur 3 lettres (ex:
+USA, FRA) & Discrète (Nominale) \\
+7 & \texttt{country\_name} & String & Nom complet du pays & Discrète
+(Nominale) \\
+8 & \texttt{sport} & String & Discipline (ex: Athlétisme, Natation) &
+Discrète (Nominale) \\
+9 & \texttt{event} & String & Épreuve spécifique (ex: 100m Sprint) &
+Discrète (Nominale) \\
+10 & \texttt{games\_type} & String & Type de jeux (Summer / Winter) &
+Discrète (Nominale) \\
+11 & \texttt{year} & Integer & Année des JO (1896--2024) & Discrète
+(Temporelle) \\
+12 & \texttt{host\_city} & String & Ville hôte des Jeux & Discrète
+(Nominale) \\
+13 & \texttt{team\_or\_individual} & String & Épreuve par équipe ou
+individuelle & Discrète (Nominale) \\
+14 & \texttt{medal} & String & Médaille : Gold, Silver, Bronze ou None &
+Discrète (Ordinale) \\
+15 & \texttt{result\_value} & Float & Résultat chiffré (temps, distance,
+score) & Continue \\
+16 & \texttt{result\_unit} & String & Unité du résultat (seconds,
+metres, points, kg) & Discrète (Nominale) \\
+17 & \texttt{total\_olympics} & Integer & Nombre total de JO fréquentés
+(1--5) & Discrète \\
+18 & \texttt{total\_medals\_won} & Integer & Total de médailles en
+carrière & Discrète \\
+19 & \texttt{gold\_medals} & Integer & Nombre de médailles d'or en
+carrière & Discrète \\
+20 & \texttt{silver\_medals} & Integer & Nombre de médailles d'argent en
+carrière & Discrète \\
+21 & \texttt{bronze\_medals} & Integer & Nombre de médailles de bronze
+en carrière & Discrète \\
+22 & \texttt{country\_total\_gold} & Integer & Total historique d'or du
+pays (jusqu'en 2024) & Discrète \\
+23 & \texttt{country\_total\_medals} & Integer & Total historique de
+médailles du pays & Discrète \\
+24 & \texttt{country\_first\_part} & Integer & Année de la première
+participation du pays & Discrète (Temporelle) \\
+25 & \texttt{country\_best\_rank} & Integer & Meilleur classement
+historique du pays & Discrète (Ordinale) \\
+26 & \texttt{is\_record\_holder} & String & Record : World Record /
+Olympic Record / No & Discrète (Nominale) \\
+27 & \texttt{coach\_name} & String & Nom de l'entraîneur & Discrète
+(Nominale) \\
+28 & \texttt{height\_cm} & Float & Taille de l'athlète en centimètres &
+Continue \\
+29 & \texttt{weight\_kg} & Float & Poids de l'athlète en kilogrammes &
+Continue \\
+30 & \texttt{notes} & String & Contexte supplémentaire (ex: ``Personal
+Best'') & Discrète (Texte libre) \\
+\end{longtable}
+
+\subsection{Plan d'analyse}\label{plan-danalyse}
+
+\subsubsection{Questions de recherche}\label{questions-de-recherche}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Performance et Morphologie} : Est-ce que la taille/poids d'un
+  athlète influence sa performance ?
+\item
+  \textbf{Temporalité} : Quelles sont les saisons qui sont marquées par
+  un grand nombre de compétitions ?
+\item
+  \textbf{Succès national} : Quels pays remportent le plus de
+  compétitions ?
+\item
+  \textbf{Genre} : Y'a-t-il un genre mis en avant plus qu'un autre ?
+\item
+  \textbf{Représentativité} : Quelles sont les nationalités les plus /
+  moins représentées ?
+\end{itemize}
+
+\subsubsection{Interrogations et
+objectifs}\label{interrogations-et-objectifs}
+
+Notre analyse gravite autour d'une problématique centrale :
+\textbf{L'influence de la morphologie (taille et poids) sur la
+performance athlétique.} Nous cherchons à déterminer si des
+caractéristiques physiques spécifiques constituent un avantage
+déterminant pour l'obtention d'une médaille ou d'un record.
+
+\textbf{Objectifs secondaires :} * Existe-t-il une ``taille idéale'' par
+discipline sportive ? * Le rapport poids/taille (IMC) est-il plus
+corrélé à la performance que la taille seule ? * Cette influence
+morphologique a-t-elle évolué entre les premiers Jeux Olympiques et les
+éditions récentes (spécialisation des corps) ?
+
+\subsubsection{Informations attendues}\label{informations-attendues}
+
+Nous espérons identifier des clusters d'athlètes performants par sport.
+Par exemple, nous anticipons une corrélation positive forte entre la
+taille et la performance en basketball ou en natation, tandis qu'elle
+pourrait être négative ou inexistante en gymnastique ou en équitation.
+
+\subsubsection{Variables comparées et
+méthodes}\label{variables-comparuxe9es-et-muxe9thodes}
+
+Pour valider nos hypothèses, nous allons croiser les variables suivantes
+: 1. \textbf{Taille (height\_cm) vs Performance (result\_value)} :
+Utilisation de nuages de points pour visualiser la dispersion et calcul
+du coefficient de corrélation de Pearson (\(r\)). 2. \textbf{Poids
+(weight\_kg) vs Sport (sport)} : Comparaison des distributions via des
+boîtes à moustaches (boxplots) pour voir la variabilité du poids selon
+la discipline. 3. \textbf{Médaille (medal) vs Morphologie} : Analyse par
+groupes pour voir si les médaillés d'or présentent des caractéristiques
+physiques distinctes du reste des participants.
+
+\subsection{Défis et limites
+potentiels}\label{duxe9fis-et-limites-potentiels}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Hétérogénéité des unités} : La variable \texttt{result\_value}
+  mélange des secondes, des mètres et des points. Il faudra normaliser
+  ces données ou filtrer l'analyse sport par sport.
+\item
+  \textbf{Données manquantes} : Les données historiques comportent
+  souvent des valeurs de poids ou de taille manquantes, ce qui pourrait
+  biaiser l'analyse temporelle.
+\item
+  \textbf{Variables confondantes} : La performance dépend aussi de
+  l'âge, de l'expérience (\texttt{total\_olympics}) et des
+  infrastructures du pays d'origine.
+\end{itemize}
+
+\section{Rapport de l'étude de base de données
+:}\label{rapport-de-luxe9tude-de-base-de-donnuxe9es}
+
+\subsubsection{Quels sont les pays qui ont accumulé le plus de médailles
+d'or au cours de l'histoire des Jeux Olympiques
+?}\label{quels-sont-les-pays-qui-ont-accumuluxe9-le-plus-de-muxe9dailles-dor-au-cours-de-lhistoire-des-jeux-olympiques}
+
+Nous pouvons imaginer que les pays ayant gagné le plus de médailles sont
+les pays les plus influents dans le monde tels que les Etats-Unis ou
+l'Europe, qui ont plus de ressources et de moyens pour développer le
+niveau de leurs athlètes.
+
+Avant de débuter l'analyse, une étape de préparation a été nécessaire
+sur le jeu de données. Nous avons notamment dû gérer les valeurs
+manquantes dans les colonnes de médailles en utilisant l'argument
+``na.rm = TRUE'', afin d'éviter que des données non renseignées ne
+faussent les calculs de sommes globales par pays.
+
+Prendre tous les pays ferait un graphique non lisible, nous avons donc
+dû choisir de ne prendre que les 15 pays ayant gagné le plus de
+médailles.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-3-1.pdf}}
+
+Le graphique confirme en partie notre hypothèse. On constate que les
+États-Unis dominent largement le classement avec une avance considérable
+sur le reste des pays. Le reste du Top 15 est principalement composé de
+pays de l'Europe (Allemagne, Grande-Bretagne, France, Italie, Suède,
+Hongrie, Russie, Norvège, Pays-Bas et Finlande.), les puissances
+asiatiques (La Chine et le Japon), ainsi que l'Australie. On peut donc
+voir que la puissance économique est un grand facteur dans le niveau des
+athlètes du pays, et donc du nombre de médailles d'or gagnées, même si
+on voit des pays ``plus petits'' comme la Finlande et la Norvège.
+
+\section{Représentativité des
+nationalités}\label{repruxe9sentativituxe9-des-nationalituxe9s}
+
+L'objectif de cette partie est d'analyser la représentativité des
+nationalités dans le dataset des athlètes olympiques.
+
+\subsection{Graphe 1 --- Pays les plus
+représentés}\label{graphe-1-pays-les-plus-repruxe9sentuxe9s}
+
+\subsubsection{Choix du graphique}\label{choix-du-graphique}
+
+Nous avons choisi un diagramme en barres pour représenter les
+nationalités les plus présentes dans le dataset. Ce type de graphique
+est particulièrement adapté à la comparaison de valeurs quantitatives
+entre différentes catégories. Le choix d'un Top 15 permet d'obtenir une
+vision suffisamment large des pays dominants tout en conservant une
+bonne lisibilité.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-5-1.pdf}}
+
+\subsection{Interprétation}\label{interpruxe9tation}
+
+Ce graphique met en évidence les nationalités les plus représentées dans
+le dataset. Chaque barre correspond à un pays, et sa longueur indique le
+nombre d'athlètes.
+
+L'un des avantages de ce graphique est qu'il permet de lire des valeurs
+précises, ce qui facilite la comparaison entre les pays. On observe que
+certains pays possèdent un nombre d'athlètes nettement supérieur aux
+autres.
+
+Cela montre une forte concentration des données autour de quelques
+nationalités dominantes. Cette situation peut s'expliquer par la taille
+des délégations, la régularité de participation aux Jeux olympiques ou
+encore les ressources sportives plus importantes de certains pays.
+
+\subsection{Graphe 2 --- Pays les moins
+représentés}\label{graphe-2-pays-les-moins-repruxe9sentuxe9s}
+
+\subsubsection{Choix du graphique}\label{choix-du-graphique-1}
+
+Nous avons également choisi un diagramme en barres pour les pays les
+moins représentés afin de garder une cohérence visuelle avec le premier
+graphique. Ce choix facilite la comparaison entre les extrêmes du
+dataset.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-6-1.pdf}}
+
+\subsection{Interprétation}\label{interpruxe9tation-1}
+
+Ce graphique met en évidence les nationalités les moins représentées
+dans le dataset. Contrairement au premier graphique, les effectifs
+observés ici sont très faibles et relativement proches les uns des
+autres.
+
+Cela signifie qu'un grand nombre de pays occupent une place très
+marginale dans les données. Cette faible représentation peut s'expliquer
+par une participation plus récente, une présence limitée à certaines
+disciplines ou des moyens sportifs plus faibles.
+
+Ce graphique complète donc le premier en montrant que la
+représentativité des nationalités n'est pas uniforme : quelques pays
+dominent, tandis que beaucoup d'autres sont très peu présents.
+
+\subsection{Graphe 3 --- Comparaison}\label{graphe-3-comparaison}
+
+\subsubsection{Choix du graphique}\label{choix-du-graphique-2}
+
+Ce graphique a été choisi pour comparer directement les extrêmes du
+dataset, c'est-à-dire les pays les plus représentés et les moins
+représentés. Le fait de les regrouper dans un même espace visuel permet
+de mettre en évidence immédiatement l'écart entre les deux groupes.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-7-1.pdf}}
+
+\subsection{Interprétation}\label{interpruxe9tation-2}
+
+Ce graphique montre clairement l'écart entre les pays les plus
+représentés et les pays les moins représentés. Les différences de
+hauteur entre les barres sont très importantes, ce qui rend la
+comparaison immédiate.
+
+On constate que les pays les plus représentés possèdent un nombre
+d'athlètes largement supérieur à celui des pays les moins représentés.
+Cette différence met en évidence une forte inégalité de représentativité
+dans le dataset.
+
+Ce graphique permet donc de synthétiser les résultats des deux premiers
+graphes : la distribution des nationalités est fortement déséquilibrée,
+avec une concentration importante autour de quelques pays.
+
+\subsubsection{Conclusion pour
+Représentativité}\label{conclusion-pour-repruxe9sentativituxe9}
+
+L'analyse de ces trois graphiques montre que la représentativité des
+nationalités dans le dataset est très inégale. Quelques pays concentrent
+une grande partie des athlètes, tandis qu'un grand nombre de
+nationalités sont faiblement représentées.
+
+Le premier graphique permet d'identifier les pays dominants avec des
+valeurs précises. Le deuxième montre que de nombreux pays occupent une
+place marginale. Enfin, le troisième met directement en évidence l'écart
+entre ces deux groupes. L'ensemble confirme donc une structure
+déséquilibrée de la répartition des nationalités.
+
+\section{Influence de la morphologie sur la
+performance}\label{influence-de-la-morphologie-sur-la-performance}
+
+Cette partie analyse si la corpulence d'un athlète (mesurée par l'Indice
+de Masse Corporelle - IMC) constitue un avantage déterminant pour ses
+performances.
+
+\subsection{Force de l'influence de l'IMC par
+discipline}\label{force-de-linfluence-de-limc-par-discipline}
+
+Ce graphique permet d'identifier les disciplines où la corpulence a
+l'influence la plus forte sur le résultat (chrono, points, distance).
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/correlation_sport-1.pdf}}
+
+\subsection{Zoom sur les sports clés}\label{zoom-sur-les-sports-cluxe9s}
+
+Pour comprendre l'impact réel, nous isolons deux sports aux tendances
+opposées.
+
+\subsubsection{Archery (Tir à l'arc) : Une corrélation
+positive}\label{archery-tir-uxe0-larc-une-corruxe9lation-positive}
+
+En tir à l'arc, le résultat est en \textbf{points} (plus c'est haut,
+mieux c'est).
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/zoom_archery-1.pdf}}
+
+\textbf{Interprétation :} On observe une pente montante. Cela signifie
+qu'un IMC plus élevé est globalement associé à un meilleur score en
+points. Une plus grande masse corporelle pourrait offrir une meilleure
+assise et stabilité face au vent ou lors de la tension de l'arc.
+
+\subsubsection{Swimming (Natation) : Une corrélation
+négative}\label{swimming-natation-une-corruxe9lation-nuxe9gative}
+
+En natation, le résultat est souvent en \textbf{secondes} (plus c'est
+bas, mieux c'est).
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/zoom_swimming-1.pdf}}
+
+\textbf{Interprétation :} La pente est descendante. Comme le résultat
+est exprimé en secondes, une baisse du temps signifie une amélioration.
+On peut en conclure qu'un IMC plus élevé est souvent un avantage pour la
+propulsion et la puissance dans l'eau chez les nageurs Olympiques.
+
+\subsubsection{Conclusion sur la
+morphologie}\label{conclusion-sur-la-morphologie}
+
+L'influence de l'IMC n'est pas uniforme : elle dépend de la nature de
+l'effort. Dans les sports de précision, elle favorise la stabilité,
+tandis que dans certains sports de vitesse, elle semble agir comme un
+indicateur de puissance musculaire bénéfique à la performance.
+
+\end{document}
