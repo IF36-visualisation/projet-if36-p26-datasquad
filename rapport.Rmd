@@ -1,9 +1,14 @@
 ---
 title: "Rapport"
-author: "Lucas"
+author: "data-squad"
 date: "2026-04-21"
 output: html_document
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(tidyverse)
+```
 
 # Projet IF36 - DataSquad : Analyse des Données Olympiques (1896-2024)
 
@@ -88,7 +93,6 @@ library(dplyr)
 library(ggplot2)
 ```
 
-Base de donnée :
 
 ```{r}
 dataset = read_csv("data/olympics_athletes_dataset.csv")
@@ -108,3 +112,129 @@ dataset %>% group_by(country_name) %>% summarize(country_golds = sum(country_tot
 ```
 
 Le graphique confirme en partie notre hypothèse. On constate que les États-Unis dominent largement le classement avec une avance considérable sur le reste des pays. Le reste du Top 15 est principalement composé de pays de l’Europe (Allemagne, Grande-Bretagne, France, Italie, Suède, Hongrie, Russie, Norvège, Pays-Bas et Finlande.), les puissances asiatiques (La Chine et le Japon), ainsi que l’Australie. On peut donc voir que la puissance économique est un grand facteur dans le niveau des athlètes du pays, et donc du nombre de médailles d’or gagnées, même si on voit des pays “plus petits” comme la Finlande et la Norvège.
+
+# Représentativité des nationalités
+
+L’objectif de cette partie est d’analyser la représentativité des nationalités dans le dataset des athlètes olympiques.
+
+```{r}
+olympics <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
+
+olympics_clean <- olympics |>
+  filter(!is.na(nationality), nationality != "")
+
+country_counts <- olympics_clean |>
+  count(country_name, sort = TRUE) |>
+  rename(country = country_name)
+
+# Top / Bottom
+top_15 <- country_counts[1:15, ]
+bottom_10 <- tail(country_counts, 10)
+
+# Comparaison
+top_5 <- country_counts[1:5, ]
+top_5$type <- "Plus représentés"
+
+bottom_5 <- tail(country_counts, 5)
+bottom_5$type <- "Moins représentés"
+
+comparison <- rbind(top_5, bottom_5)
+```
+
+## Graphe 1 — Pays les plus représentés
+
+### Choix du graphique
+
+Nous avons choisi un diagramme en barres pour représenter les nationalités les plus présentes dans le dataset. Ce type de graphique est particulièrement adapté à la comparaison de valeurs quantitatives entre différentes catégories. Le choix d’un Top 15 permet d’obtenir une vision suffisamment large des pays dominants tout en conservant une bonne lisibilité.
+
+
+```{r}
+ggplot(top_15, aes(x = reorder(country, n), y = n)) +
+  geom_col(fill = "blue") +
+  geom_text(aes(label = n), hjust = -0.1, size = 3) +
+  coord_flip() +
+  ylim(0, max(top_15$n) * 1.15) +
+  labs(
+    title = "Top 15 des nationalités les plus représentées",
+    x = "Pays",
+    y = "Nombre d'athlètes"
+  )
+```
+
+## Interprétation
+
+Ce graphique met en évidence les nationalités les plus représentées dans le dataset. Chaque barre correspond à un pays, et sa longueur indique le nombre d’athlètes.
+
+L’un des avantages de ce graphique est qu’il permet de lire des valeurs précises, ce qui facilite la comparaison entre les pays. On observe que certains pays possèdent un nombre d’athlètes nettement supérieur aux autres.
+
+Cela montre une forte concentration des données autour de quelques nationalités dominantes. Cette situation peut s’expliquer par la taille des délégations, la régularité de participation aux Jeux olympiques ou encore les ressources sportives plus importantes de certains pays.
+
+
+## Graphe 2 — Pays les moins représentés
+
+### Choix du graphique
+
+Nous avons également choisi un diagramme en barres pour les pays les moins représentés afin de garder une cohérence visuelle avec le premier graphique. Ce choix facilite la comparaison entre les extrêmes du dataset.
+
+
+```{r}
+ggplot(bottom_10, aes(x = reorder(country, n), y = n)) +
+  geom_col(fill = "red") +
+  geom_text(aes(label = n), hjust = -0.1, size = 3) +
+  coord_flip() +
+  ylim(0, max(bottom_10$n) * 1.15) +
+  labs(
+    title = "Pays les moins représentés",
+    x = "Pays",
+    y = "Nombre d'athlètes"
+  )
+```
+
+## Interprétation
+
+Ce graphique met en évidence les nationalités les moins représentées dans le dataset. Contrairement au premier graphique, les effectifs observés ici sont très faibles et relativement proches les uns des autres.
+
+Cela signifie qu’un grand nombre de pays occupent une place très marginale dans les données. Cette faible représentation peut s’expliquer par une participation plus récente, une présence limitée à certaines disciplines ou des moyens sportifs plus faibles.
+
+Ce graphique complète donc le premier en montrant que la représentativité des nationalités n’est pas uniforme : quelques pays dominent, tandis que beaucoup d’autres sont très peu présents.
+
+
+## Graphe 3 — Comparaison
+
+### Choix du graphique
+
+Ce graphique a été choisi pour comparer directement les extrêmes du dataset, c’est-à-dire les pays les plus représentés et les moins représentés. Le fait de les regrouper dans un même espace visuel permet de mettre en évidence immédiatement l’écart entre les deux groupes.
+
+
+
+```{r}
+ggplot(comparison, aes(x = reorder(country, n), y = n, fill = type)) +
+  geom_col() +
+  geom_text(aes(label = n), hjust = -0.1, size = 3) +
+  coord_flip() +
+  ylim(0, max(comparison$n) * 1.15) +
+  labs(
+    title = "Comparaison des pays",
+    x = "Pays",
+    y = "Nombre d'athlètes",
+    fill = "Type"
+  )
+```
+
+## Interprétation
+
+Ce graphique montre clairement l’écart entre les pays les plus représentés et les pays les moins représentés. Les différences de hauteur entre les barres sont très importantes, ce qui rend la comparaison immédiate.
+
+On constate que les pays les plus représentés possèdent un nombre d’athlètes largement supérieur à celui des pays les moins représentés. Cette différence met en évidence une forte inégalité de représentativité dans le dataset.
+
+Ce graphique permet donc de synthétiser les résultats des deux premiers graphes : la distribution des nationalités est fortement déséquilibrée, avec une concentration importante autour de quelques pays.
+
+
+
+### Conclusion pour Représentativité
+
+L’analyse de ces trois graphiques montre que la représentativité des nationalités dans le dataset est très inégale. Quelques pays concentrent une grande partie des athlètes, tandis qu’un grand nombre de nationalités sont faiblement représentées.
+
+Le premier graphique permet d’identifier les pays dominants avec des valeurs précises. Le deuxième montre que de nombreux pays occupent une place marginale. Enfin, le troisième met directement en évidence l’écart entre ces deux groupes. L’ensemble confirme donc une structure déséquilibrée de la répartition des nationalités.
+
+
