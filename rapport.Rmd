@@ -105,7 +105,7 @@ Avant de débuter l’analyse, une étape de préparation a été nécessaire su
 
 Prendre tous les pays ferait un graphique non lisible, nous avons donc dû choisir de ne prendre que les 15 pays ayant gagné le plus de médailles.
 
-```{r}
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
 dataset %>% group_by(country_name) %>% summarize(country_golds = sum(country_total_gold, na.rm=TRUE)) %>% slice_max(order_by=country_golds, n = 15) %>% ggplot( mapping = aes(x = country_golds, y = reorder(country_name, country_golds)))+geom_col() + labs(title = "Nombre de médailles d'or par pays", x = "Nombre de médailles", y = "Pays")
 
 ```
