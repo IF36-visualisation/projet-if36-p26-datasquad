@@ -5,8 +5,7 @@ date: "2026-04-21"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
 library(tidyverse)
 ```
 
@@ -87,18 +86,18 @@ Pour valider nos hypothèses, nous allons croiser les variables suivantes : 1. *
 
 # Rapport de l'étude de base de données : 
 
-```{r}
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
 library(readr)
 library(dplyr)
 library(ggplot2)
 ```
 
 
-```{r}
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
 dataset = read_csv("data/olympics_athletes_dataset.csv")
 ```
 
-### Quels sont les pays qui ont accumulé le plus de médailles d’or au cours de l'histoire des Jeux Olympiques ?
+## QUESTION 1: Quels sont les pays qui ont accumulé le plus de médailles d’or au cours de l'histoire des Jeux Olympiques ?
 
 Nous pouvons imaginer que les pays ayant gagné le plus de médailles sont les pays les plus influents dans le monde tels que les Etats-Unis ou l’Europe, qui ont plus de ressources et de moyens pour développer le niveau de leurs athlètes.
 
@@ -113,11 +112,11 @@ dataset %>% group_by(country_name) %>% summarize(country_golds = sum(country_tot
 
 Le graphique confirme en partie notre hypothèse. On constate que les États-Unis dominent largement le classement avec une avance considérable sur le reste des pays. Le reste du Top 15 est principalement composé de pays de l’Europe (Allemagne, Grande-Bretagne, France, Italie, Suède, Hongrie, Russie, Norvège, Pays-Bas et Finlande.), les puissances asiatiques (La Chine et le Japon), ainsi que l’Australie. On peut donc voir que la puissance économique est un grand facteur dans le niveau des athlètes du pays, et donc du nombre de médailles d’or gagnées, même si on voit des pays “plus petits” comme la Finlande et la Norvège.
 
-# Représentativité des nationalités
+# QUESTION 2 : Quelles sont les nationalités les plus / moins représentées ?
 
 L’objectif de cette partie est d’analyser la représentativité des nationalités dans le dataset des athlètes olympiques.
 
-```{r}
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
 olympics <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
 
 olympics_clean <- olympics |>
@@ -148,7 +147,7 @@ comparison <- rbind(top_5, bottom_5)
 Nous avons choisi un diagramme en barres pour représenter les nationalités les plus présentes dans le dataset. Ce type de graphique est particulièrement adapté à la comparaison de valeurs quantitatives entre différentes catégories. Le choix d’un Top 15 permet d’obtenir une vision suffisamment large des pays dominants tout en conservant une bonne lisibilité.
 
 
-```{r}
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
 ggplot(top_15, aes(x = reorder(country, n), y = n)) +
   geom_col(fill = "blue") +
   geom_text(aes(label = n), hjust = -0.1, size = 3) +
@@ -177,7 +176,7 @@ Cela montre une forte concentration des données autour de quelques nationalité
 Nous avons également choisi un diagramme en barres pour les pays les moins représentés afin de garder une cohérence visuelle avec le premier graphique. Ce choix facilite la comparaison entre les extrêmes du dataset.
 
 
-```{r}
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
 ggplot(bottom_10, aes(x = reorder(country, n), y = n)) +
   geom_col(fill = "red") +
   geom_text(aes(label = n), hjust = -0.1, size = 3) +
@@ -207,7 +206,7 @@ Ce graphique a été choisi pour comparer directement les extrêmes du dataset, 
 
 
 
-```{r}
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
 ggplot(comparison, aes(x = reorder(country, n), y = n, fill = type)) +
   geom_col() +
   geom_text(aes(label = n), hjust = -0.1, size = 3) +
@@ -238,11 +237,12 @@ L’analyse de ces trois graphiques montre que la représentativité des nationa
 Le premier graphique permet d’identifier les pays dominants avec des valeurs précises. Le deuxième montre que de nombreux pays occupent une place marginale. Enfin, le troisième met directement en évidence l’écart entre ces deux groupes. L’ensemble confirme donc une structure déséquilibrée de la répartition des nationalités.
 
 
-# Influence de la morphologie sur la performance
+# QUESTION 3:  Est-ce que la taille/poids d'un athlète influence sa performance ?
 
 Cette partie analyse si la corpulence d'un athlète (mesurée par l'Indice de Masse Corporelle - IMC) constitue un avantage déterminant pour ses performances.
 
-```{r cleaning_morpho, include=FALSE}
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
+df_morpho <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
 # Nettoyage spécifique pour l'analyse IMC
 df_morpho <- olympics %>%
   mutate(
@@ -257,7 +257,7 @@ df_morpho <- olympics %>%
 ## Force de l'influence de l'IMC par discipline
 Ce graphique permet d'identifier les disciplines où la corpulence a l'influence la plus forte sur le résultat (chrono, points, distance).
 
-```{r correlation_sport}
+```{r correlation_sport,echo = FALSE, warning = FALSE, message = FALSE}
 corelation_globale <- df_morpho %>%
     group_by(sport) %>%
     summarise(
@@ -287,7 +287,7 @@ Pour comprendre l'impact réel, nous isolons deux sports aux tendances opposées
 ### Archery (Tir à l'arc) : Une corrélation positive
 En tir à l'arc, le résultat est en **points** (plus c'est haut, mieux c'est).
 
-```{r zoom_archery}
+```{r zoom_archery,echo = FALSE, warning = FALSE, message = FALSE}
 df_morpho %>%
   filter(sport == "Archery") %>%
   ggplot(aes(x = imc, y = result_value)) +
@@ -303,7 +303,7 @@ df_morpho %>%
 ### Swimming (Natation) : Une corrélation négative
 En natation, le résultat est souvent en **secondes** (plus c'est bas, mieux c'est).
 
-```{r zoom_swimming}
+```{r zoom_swimming,echo = FALSE, warning = FALSE, message = FALSE}
 df_morpho %>%
   filter(sport == "Swimming") %>%
   ggplot(aes(x = imc, y = result_value)) +
@@ -320,7 +320,6 @@ df_morpho %>%
 En conclusion, notre analyse confirme que l'influence de l'IMC est bien réelle, mais qu'elle est spécifique à chaque discipline. Il est important de noter que les athlètes Olympiques sont, par définition, déjà à leur **poids de forme** optimal pour leur sport. Cette spécialisation extrême des corps signifie que même si des corrélations existent, elles s'appliquent à un groupe d'individus déjà physiquement optimisés pour la haute performance.
 
 Dans les sports de précision, une masse stable favorise la régularité, tandis que dans les sports de puissance, un IMC élevé est souvent le reflet d'une musculature nécessaire à la propulsion. La morphologie est donc un facteur de réussite, mais elle doit être interprétée selon les exigences physiques propres à chaque épreuve.
-
 
 
 ## Question 4 :Y’a t-il un genre mis en avant qu’un autre?
@@ -502,5 +501,4 @@ On observe donc une tendance globale vers la parité.
 Cette évolution reflète probablement les efforts récents visant à promouvoir l’égalité dans le sport.
 
 Enfin, une piste d’amélioration serait d’analyser l’évolution de cette répartition au fil du temps afin de mieux comprendre les dynamiques historiques.
-
 
