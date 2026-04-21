@@ -323,3 +323,184 @@ Dans les sports de précision, une masse stable favorise la régularité, tandis
 
 
 
+## Question 4 :Y’a t-il un genre mis en avant qu’un autre?
+
+Ici, nous cherchons à répondre à la question suivante : existe-t-il un genre (homme ou femme) mis en avant dans les Jeux Olympiques ?
+
+Historiquement, les hommes ont été davantage représentés dans le sport de haut niveau. Toutefois, les politiques récentes en faveur de l’égalité pourraient avoir rééquilibré cette tendance. On peut donc s’attendre soit à une domination masculine, soit à une répartition plus équilibrée.
+Il est important de souligner que les résultats basés sur le genre dépendent de pliusieurs facteurs car une femme peut pratiquer des sports "dédiés aux hommes" sachant que l'inverse n'est pas totalement évident.
+
+Afin d’explorer cette question, nous commençons par analyser le nombre de participants par genre pour chaque événement.
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
+library(ggplot2)
+library(dplyr)
+
+# Chargement des données
+data <- read.csv("data/olympics_athletes_dataset.csv")
+
+# Comptage : participants par genre et par événement
+data %>%
+  group_by(event, gender) %>%
+  summarise(nb_participants = n(), .groups = "drop") %>%
+  ggplot(aes(x = event, y = nb_participants, fill = gender)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "Nombre de participants par genre et par événement",
+    x = "Événement",
+    y = "Nombre de participants"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+```
+Ce graphique présente une vue détaillée du nombre de participants par genre pour chaque épreuve.
+
+Cependant, il apparaît rapidement que ce graphique est difficilement exploitable. Le nombre très élevé d’événements rend la lecture complexe et empêche d’identifier des tendances claires.
+
+Ainsi, ce premier résultat ne permet pas de répondre efficacement à la question posée.
+
+Il met néanmoins en évidence la nécessité de simplifier l’analyse afin de mieux faire ressortir les tendances globales.
+
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
+data <- read.csv("data/olympics_athletes_dataset.csv")
+data %>%
+  group_by(event, gender) %>%
+  summarise(nb_participants = n(), .groups = "drop") %>%
+  arrange(event) %>%
+  slice_head(n = 10) %>%
+  ggplot(aes(x = event, y = nb_participants, fill = gender)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "Nombre de participants par genre et par événement (Top 20)",
+    x = "Événement",
+    y = "Nombre de participants"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+```
+Avec cette sélection, les résultats deviennent plus lisibles. On observe que certains événements présentent des écarts entre hommes et femmes.
+
+Cependant, ces différences s’expliquent principalement par la nature des épreuves (catégories de poids, disciplines distinctes, etc.) et non par une mise en avant globale d’un genre.
+
+Cette analyse reste donc insuffisante pour répondre à la question initiale.
+
+Elle suggère qu’il est préférable d’adopter une approche plus globale.
+
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
+data %>%
+  group_by(event, gender) %>%
+  summarise(nb_participants = n(), .groups = "drop") %>%
+  group_by(event) %>%
+  mutate(total_event = sum(nb_participants)) %>%
+  ungroup() %>%
+  arrange(desc(total_event)) %>%
+  slice_head(n = 20) %>%
+  ggplot(aes(x = reorder(event, -total_event), y = nb_participants, fill = gender)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "Top 20 des événements avec le plus de participants",
+    x = "Événement",
+    y = "Nombre de participants"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+```
+Nous nous intéressons maintenant aux événements regroupant le plus de participants.
+
+Ce graphique met en évidence les 20 événements les plus représentés.
+
+On remarque la présence d’épreuves masculines, féminines, mais aussi mixtes, ce qui reflète une volonté d’inclusion croissante dans les compétitions sportives.
+
+De plus, aucun déséquilibre majeur ne semble apparaître dans ces événements fortement représentés.
+
+Cela suggère que les événements les plus importants ne favorisent pas particulièrement un genre.
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
+data %>%
+  group_by(gender) %>%
+  summarise(nb_participants = n(), .groups = "drop") %>%
+  ggplot(aes(x = gender, y = nb_participants, fill = gender)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Comparaison du nombre total de participants par genre",
+    x = "Genre",
+    y = "Nombre de participants"
+  ) +
+  theme_minimal()
+```
+
+Afin d’obtenir une vision d’ensemble, nous comparons le nombre total de participations par genre.
+
+Les résultats montrent :
+
+Femmes : 4263 participations
+Hommes : 4237 participations
+
+```{r,echo=FALSE,message=FALSE}
+data %>%
+  group_by(event, gender) %>%
+  summarise(nb = n(), .groups = "drop") %>%
+  group_by(gender) %>%
+  summarise(total = sum(nb))
+```
+Ces valeurs sont très proches, indiquant une quasi-parité.
+
+Cependant, cette mesure peut être biaisée : un même athlète peut participer à plusieurs événements, ce qui gonfle artificiellement les effectifs.
+
+Il est donc nécessaire d’affiner l’analyse.
+
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
+data %>%
+  group_by(gender) %>%
+  distinct(athlete_name, gender) %>%
+  summarise(nb_participants = n(), .groups = "drop") %>%
+  ggplot(aes(x = gender, y = nb_participants, fill = gender)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Comparaison du nombre total de participants par genre",
+    x = "Genre",
+    y = "Nombre de participants"
+  ) +
+  theme_minimal()
+```
+Pour éviter ce biais, nous comptons le nombre d’athlètes uniques par genre.
+
+Les résultats obtenus sont les suivants :
+
+Femmes : 3696 athlètes
+Hommes : 3795 athlètes
+
+Cette fois, un léger avantage masculin apparaît.
+
+Cependant, l’écart reste modéré et ne traduit pas une domination marquée.
+
+Cette analyse est la plus pertinente car elle reflète le nombre réel d’individus et non le nombre de participations.
+
+```{r, echo=FALSE,message=FALSE}
+data %>%
+  distinct(athlete_name, gender) %>%
+  group_by(gender) %>%
+  summarise(
+    nb_athletes_uniques = n()
+  )
+```
+### Conclusion sur le genre 
+
+L’ensemble de l’analyse permet de répondre à la question initiale.
+
+Aucun genre n’est clairement mis en avant dans ce dataset.
+
+En effet :
+
+Les écarts observés par événement sont liés à la structure des disciplines
+Le nombre total de participations est quasiment équilibré
+Le nombre d’athlètes uniques montre un léger avantage masculin, mais limité
+
+On observe donc une tendance globale vers la parité.
+
+Cette évolution reflète probablement les efforts récents visant à promouvoir l’égalité dans le sport.
+
+Enfin, une piste d’amélioration serait d’analyser l’évolution de cette répartition au fil du temps afin de mieux comprendre les dynamiques historiques.
+
+
