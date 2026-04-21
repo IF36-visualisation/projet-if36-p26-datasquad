@@ -2,7 +2,7 @@
 title: "Rapport"
 author: "data-squad"
 date: "2026-04-21"
-output: html_document
+output: pdf_document
 ---
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
@@ -322,14 +322,14 @@ En conclusion, notre analyse confirme que l'influence de l'IMC est bien réelle,
 Dans les sports de précision, une masse stable favorise la régularité, tandis que dans les sports de puissance, un IMC élevé est souvent le reflet d'une musculature nécessaire à la propulsion. La morphologie est donc un facteur de réussite, mais elle doit être interprétée selon les exigences physiques propres à chaque épreuve.
 
 
-## Question 4 :Y’a t-il un genre mis en avant qu’un autre?
+## Question 4 : Y a-t-il un genre plus représenté que l'autre ?
 
-Ici, nous cherchons à répondre à la question suivante : existe-t-il un genre (homme ou femme) mis en avant dans les Jeux Olympiques ?
+Ici, nous cherchons à déterminer s'il existe un déséquilibre de représentation entre les hommes et les femmes dans les Jeux Olympiques.
 
-Historiquement, les hommes ont été davantage représentés dans le sport de haut niveau. Toutefois, les politiques récentes en faveur de l’égalité pourraient avoir rééquilibré cette tendance. On peut donc s’attendre soit à une domination masculine, soit à une répartition plus équilibrée.
-Il est important de souligner que les résultats basés sur le genre dépendent de pliusieurs facteurs car une femme peut pratiquer des sports "dédiés aux hommes" sachant que l'inverse n'est pas totalement évident.
+Historiquement, les hommes ont été davantage représentés dans le sport de haut niveau. Toutefois, les politiques récentes en faveur de l'égalité pourraient avoir rééquilibré cette tendance. Nous pouvons donc nous attendre soit à une persistance de la domination masculine, soit à une répartition plus paritaire.
+Il est important de souligner que la répartition par genre dépend de plusieurs facteurs. Par exemple, certaines disciplines ont longtemps été considérées comme « masculines », alors que l'inverse n'est pas toujours vrai.
 
-Afin d’explorer cette question, nous commençons par analyser le nombre de participants par genre pour chaque événement.
+Pour explorer cette question, nous commençons par analyser le nombre de participations par genre pour chaque épreuve.
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 library(ggplot2)
 library(dplyr)
@@ -352,69 +352,42 @@ data %>%
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 ```
-Ce graphique présente une vue détaillée du nombre de participants par genre pour chaque épreuve.
+Ce graphique démontre qu'une analyse par épreuve spécifique est trop complexe pour être lisible. Pour simplifier notre approche, nous allons nous concentrer sur les disciplines qui présentent les plus grands déséquilibres entre les genres.
 
-Cependant, il apparaît rapidement que ce graphique est difficilement exploitable. Le nombre très élevé d’événements rend la lecture complexe et empêche d’identifier des tendances claires.
+### Les 8 sports avec les plus fortes disparités de genre
 
-Ainsi, ce premier résultat ne permet pas de répondre efficacement à la question posée.
+Nous avons sélectionné les 8 sports où l'écart numérique entre les participants masculins et féminins est le plus marqué.
 
-Il met néanmoins en évidence la nécessité de simplifier l’analyse afin de mieux faire ressortir les tendances globales.
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+library(tidyr)
 
-```{r,echo = FALSE, warning = FALSE, message = FALSE}
-data <- read.csv("data/olympics_athletes_dataset.csv")
+# Identification des 8 sports avec la plus grande différence absolue
+top_8_disparity <- data %>%
+  group_by(sport, gender) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  pivot_wider(names_from = gender, values_from = n, values_fill = 0) %>%
+  mutate(disparity = abs(Male - Female)) %>%
+  arrange(desc(disparity)) %>%
+  slice_head(n = 8)
+
+# Graphique de ces 8 sports
 data %>%
-  group_by(event, gender) %>%
+  filter(sport %in% top_8_disparity$sport) %>%
+  group_by(sport, gender) %>%
   summarise(nb_participants = n(), .groups = "drop") %>%
-  arrange(event) %>%
-  slice_head(n = 10) %>%
-  ggplot(aes(x = event, y = nb_participants, fill = gender)) +
+  ggplot(aes(x = reorder(sport, -nb_participants), y = nb_participants, fill = gender)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(
-    title = "Nombre de participants par genre et par événement (Top 20)",
-    x = "Événement",
+    title = "Top 8 des sports avec la plus grande disparité de genre",
+    x = "Sport",
     y = "Nombre de participants"
   ) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-Avec cette sélection, les résultats deviennent plus lisibles. On observe que certains événements présentent des écarts entre hommes et femmes.
 
-Cependant, ces différences s’expliquent principalement par la nature des épreuves (catégories de poids, disciplines distinctes, etc.) et non par une mise en avant globale d’un genre.
+Ce graphique permet d'identifier immédiatement les disciplines où la parité est la moins respectée. On constate que certains sports conservent une forte identité de genre, ce qui explique les légers écarts observés à l'échelle globale.
 
-Cette analyse reste donc insuffisante pour répondre à la question initiale.
-
-Elle suggère qu’il est préférable d’adopter une approche plus globale.
-
-```{r,echo = FALSE, warning = FALSE, message = FALSE}
-data %>%
-  group_by(event, gender) %>%
-  summarise(nb_participants = n(), .groups = "drop") %>%
-  group_by(event) %>%
-  mutate(total_event = sum(nb_participants)) %>%
-  ungroup() %>%
-  arrange(desc(total_event)) %>%
-  slice_head(n = 20) %>%
-  ggplot(aes(x = reorder(event, -total_event), y = nb_participants, fill = gender)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(
-    title = "Top 20 des événements avec le plus de participants",
-    x = "Événement",
-    y = "Nombre de participants"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-```
-Nous nous intéressons maintenant aux événements regroupant le plus de participants.
-
-Ce graphique met en évidence les 20 événements les plus représentés.
-
-On remarque la présence d’épreuves masculines, féminines, mais aussi mixtes, ce qui reflète une volonté d’inclusion croissante dans les compétitions sportives.
-
-De plus, aucun déséquilibre majeur ne semble apparaître dans ces événements fortement représentés.
-
-Cela suggère que les événements les plus importants ne favorisent pas particulièrement un genre.
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 data %>%
   group_by(gender) %>%
@@ -429,25 +402,23 @@ data %>%
   theme_minimal()
 ```
 
-Afin d’obtenir une vision d’ensemble, nous comparons le nombre total de participations par genre.
+Afin d'obtenir une vision d'ensemble, nous comparons le nombre total de participations par genre.
 
-Les résultats montrent :
+Les résultats montrent une répartition très équilibrée :
 
-Femmes : 4263 participations
-Hommes : 4237 participations
+* **Femmes** : 4 263 participations
+* **Hommes** : 4 237 participations
 
-```{r,echo=FALSE,message=FALSE}
+```{r, echo=FALSE, message=FALSE, results='hide'}
 data %>%
   group_by(event, gender) %>%
   summarise(nb = n(), .groups = "drop") %>%
   group_by(gender) %>%
   summarise(total = sum(nb))
 ```
-Ces valeurs sont très proches, indiquant une quasi-parité.
+Ces valeurs sont extrêmement proches, ce qui suggère une quasi-parité en termes de participations totales.
 
-Cependant, cette mesure peut être biaisée : un même athlète peut participer à plusieurs événements, ce qui gonfle artificiellement les effectifs.
-
-Il est donc nécessaire d’affiner l’analyse.
+Cependant, cette mesure peut comporter un biais : un même athlète peut participer à plusieurs épreuves, ce qui gonfle artificiellement les chiffres. Il est donc nécessaire d'affiner l'analyse.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 data %>%
@@ -463,20 +434,14 @@ data %>%
   ) +
   theme_minimal()
 ```
-Pour éviter ce biais, nous comptons le nombre d’athlètes uniques par genre.
+Pour lever ce biais, nous comptons désormais le nombre d'athlètes uniques par genre. Les résultats sont les suivants :
 
-Les résultats obtenus sont les suivants :
+* **Femmes** : 3 696 athlètes
+* **Hommes** : 3 795 athlètes
 
-Femmes : 3696 athlètes
-Hommes : 3795 athlètes
+Cette fois, un léger avantage masculin apparaît. Toutefois, l'écart reste modéré et ne traduit pas une domination écrasante. Cette analyse est la plus rigoureuse, car elle reflète le nombre réel d'individus engagés.
 
-Cette fois, un léger avantage masculin apparaît.
-
-Cependant, l’écart reste modéré et ne traduit pas une domination marquée.
-
-Cette analyse est la plus pertinente car elle reflète le nombre réel d’individus et non le nombre de participations.
-
-```{r, echo=FALSE,message=FALSE}
+```{r, echo=FALSE, message=FALSE, results='hide'}
 data %>%
   distinct(athlete_name, gender) %>%
   group_by(gender) %>%
@@ -484,21 +449,14 @@ data %>%
     nb_athletes_uniques = n()
   )
 ```
-### Conclusion sur le genre 
+### Conclusion sur la parité de genre
 
-L’ensemble de l’analyse permet de répondre à la question initiale.
+L'ensemble de l'analyse permet de répondre à notre problématique initiale : aucun genre n'est massivement privilégié dans ce jeu de données.
 
-Aucun genre n’est clairement mis en avant dans ce dataset.
+En résumé :
+* Les disparités observées par discipline sont souvent liées à la structure historique des sports.
+* Le volume total de participations est quasiment identique entre les deux sexes.
+* Le nombre d'athlètes uniques révèle une légère prédominance masculine, mais la tendance globale penche vers la parité.
 
-En effet :
-
-Les écarts observés par événement sont liés à la structure des disciplines
-Le nombre total de participations est quasiment équilibré
-Le nombre d’athlètes uniques montre un léger avantage masculin, mais limité
-
-On observe donc une tendance globale vers la parité.
-
-Cette évolution reflète probablement les efforts récents visant à promouvoir l’égalité dans le sport.
-
-Enfin, une piste d’amélioration serait d’analyser l’évolution de cette répartition au fil du temps afin de mieux comprendre les dynamiques historiques.
+Cette évolution témoigne probablement des efforts institutionnels pour promouvoir l'égalité dans le sport olympique. Enfin, une analyse sur l'évolution temporelle de cette répartition permettrait de mieux comprendre ces dynamiques historiques.
 
