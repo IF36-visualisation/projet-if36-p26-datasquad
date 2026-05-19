@@ -540,3 +540,39 @@ ggplot(data_graphique, aes(x = reorder(nationality, -Nb_Medailles), y = Nb_Medai
 #### Interprétation : 
 
 On peut donc voir dans ce graphique qu’il y a pour chaque pays analysé, la barre des années où le pays est hôte est plus haute, à peu près de 30 % en moyenne, que la moyenne des pays pendant les Jeux Olympiques. On peut donc en comprendre que notre hypothèse est validée, il y a bien un avantage à domicile, qui fait qu’il y a plus de médailles les années ou le pays est hôte des Jeux Olympiques.
+
+# Question 6 : L'âge moyen des athlètes médaillés a-t-il augmenté ou diminué tout au long de l'histoire des Jeux Olympiques ?
+
+Nous cherchons donc a regarder l'âge médian des médaillés dans les Jeux Olympiques, pour pouvoir comparer entre les années, pour voir si il y a des changements notables.
+
+Notre hypothèse est que l'âge moyen pourrait augmenter en fonction de l'année, grâce aux avancements de la médecine et de la technologie, qui permettraient aux athlètes d'avoir une carière plus longue, et de rester au maximum de leurs capacités pendant plus longtemps.
+
+Pour cela nous allons donc faire un line chart, pour pouvoir avoir l'évolution, et une courbe de tendance globale, pour pouvoir voir une plus grande variété de résultats.
+
+```{r}
+
+data_age_line <- dataset %>%
+  filter(medal %in% c("Gold", "Silver", "Bronze")) %>%
+  group_by(year) %>%
+  summarize(age_moyen = mean(age, na.rm = TRUE), .groups = "drop")
+
+ggplot(data_age_line, aes(x = year, y = age_moyen)) +
+  geom_line(color = "blue", size = 1) +
+  geom_point(color = "darkblue", size = 2) +
+  geom_smooth(method = "loess", color = "red", linetype = "dashed", formula = 'y ~ x') +
+  labs(
+    title = "Moyenne par édition avec courbe de tendance globale (1896-2024)",
+    x = "Année des Jeux Olympiques",
+    y = "Âge moyen des médaillés"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14)
+  )
+```
+
+#### Interprétation :
+
+On peut voir sur ce graphique, que notre hypothèse n'est pas validée. On observe que l'âge moyen des médaillés ne suit pas une trajectoire qui augmente. Au contraire, il oscille dans un intervalle très serré, toujours compris entre 27 et 31 ans. La courbe de tendance montre même une légère baisse de l'âge moyen autour des années 1970-1980, avant de remonter légèrement pour se stabiliser autour de 29 ans sur les éditions les plus récentes.
+
+On peut donc en comprendre que les technologies et la médecine n'ont pas un effet assez fort pour influencer l'âge moyen des médaillés.
