@@ -20,7 +20,7 @@ Ces variables couvrent à la fois les résultats sportifs des individus (répart
 ## Types de données
 
 | \# | Nom de la colonne | Format donnée | Description | Type |
-|---------------|---------------|---------------|---------------|---------------|
+|----|----|----|----|----|
 | 1 | `athlete_id` | String | ID unique (format ATH-00001 à ATH-08500) | Discrète (Identifiant) |
 | 2 | `athlete_name` | String | Nom complet (Prénom + Nom) | Discrète (Nominale) |
 | 3 | `gender` | String | Sexe de l'athlète (Male/Female) | Discrète (Nominale) |

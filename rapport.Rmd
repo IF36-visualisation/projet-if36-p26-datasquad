@@ -84,7 +84,7 @@ Pour valider nos hypothèses, nous allons croiser les variables suivantes : 1. *
 -   **Données manquantes** : Les données historiques comportent souvent des valeurs de poids ou de taille manquantes, ce qui pourrait biaiser l'analyse temporelle.
 -   **Variables confondantes** : La performance dépend aussi de l'âge, de l'expérience (`total_olympics`) et des infrastructures du pays d'origine.
 
-# Rapport de l'étude de base de données : 
+# Rapport de l'étude de base de données :
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 library(readr)
@@ -92,12 +92,11 @@ library(dplyr)
 library(ggplot2)
 ```
 
-
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 dataset = read_csv("data/olympics_athletes_dataset.csv")
 ```
 
-## QUESTION 1: Quels sont les pays qui ont accumulé le plus de médailles d’or au cours de l'histoire des Jeux Olympiques ?
+# Question 1: Quels sont les pays qui ont accumulé le plus de médailles d’or au cours de l'histoire des Jeux Olympiques ?
 
 Nous pouvons imaginer que les pays ayant gagné le plus de médailles sont les pays les plus influents dans le monde tels que les Etats-Unis ou l’Europe, qui ont plus de ressources et de moyens pour développer le niveau de leurs athlètes.
 
@@ -112,7 +111,7 @@ dataset %>% group_by(country_name) %>% summarize(country_golds = sum(country_tot
 
 Le graphique confirme en partie notre hypothèse. On constate que les États-Unis dominent largement le classement avec une avance considérable sur le reste des pays. Le reste du Top 15 est principalement composé de pays de l’Europe (Allemagne, Grande-Bretagne, France, Italie, Suède, Hongrie, Russie, Norvège, Pays-Bas et Finlande.), les puissances asiatiques (La Chine et le Japon), ainsi que l’Australie. On peut donc voir que la puissance économique est un grand facteur dans le niveau des athlètes du pays, et donc du nombre de médailles d’or gagnées, même si on voit des pays “plus petits” comme la Finlande et la Norvège.
 
-# QUESTION 2 : Quelles sont les nationalités les plus / moins représentées ?
+# Question 2 : Quelles sont les nationalités les plus / moins représentées ?
 
 L’objectif de cette partie est d’analyser la représentativité des nationalités dans le dataset des athlètes olympiques.
 
@@ -146,7 +145,6 @@ comparison <- rbind(top_5, bottom_5)
 
 Nous avons choisi un diagramme en barres pour représenter les nationalités les plus présentes dans le dataset. Ce type de graphique est particulièrement adapté à la comparaison de valeurs quantitatives entre différentes catégories. Le choix d’un Top 15 permet d’obtenir une vision suffisamment large des pays dominants tout en conservant une bonne lisibilité.
 
-
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 ggplot(top_15, aes(x = reorder(country, n), y = n)) +
   geom_col(fill = "blue") +
@@ -168,13 +166,11 @@ L’un des avantages de ce graphique est qu’il permet de lire des valeurs pré
 
 Cela montre une forte concentration des données autour de quelques nationalités dominantes. Cette situation peut s’expliquer par la taille des délégations, la régularité de participation aux Jeux olympiques ou encore les ressources sportives plus importantes de certains pays.
 
-
 ## Graphe 2 — Pays les moins représentés
 
 ### Choix du graphique
 
 Nous avons également choisi un diagramme en barres pour les pays les moins représentés afin de garder une cohérence visuelle avec le premier graphique. Ce choix facilite la comparaison entre les extrêmes du dataset.
-
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 ggplot(bottom_10, aes(x = reorder(country, n), y = n)) +
@@ -197,14 +193,11 @@ Cela signifie qu’un grand nombre de pays occupent une place très marginale da
 
 Ce graphique complète donc le premier en montrant que la représentativité des nationalités n’est pas uniforme : quelques pays dominent, tandis que beaucoup d’autres sont très peu présents.
 
-
 ## Graphe 3 — Comparaison
 
 ### Choix du graphique
 
 Ce graphique a été choisi pour comparer directement les extrêmes du dataset, c’est-à-dire les pays les plus représentés et les moins représentés. Le fait de les regrouper dans un même espace visuel permet de mettre en évidence immédiatement l’écart entre les deux groupes.
-
-
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 ggplot(comparison, aes(x = reorder(country, n), y = n, fill = type)) +
@@ -228,16 +221,13 @@ On constate que les pays les plus représentés possèdent un nombre d’athlèt
 
 Ce graphique permet donc de synthétiser les résultats des deux premiers graphes : la distribution des nationalités est fortement déséquilibrée, avec une concentration importante autour de quelques pays.
 
-
-
 ### Conclusion pour Représentativité
 
 L’analyse de ces trois graphiques montre que la représentativité des nationalités dans le dataset est très inégale. Quelques pays concentrent une grande partie des athlètes, tandis qu’un grand nombre de nationalités sont faiblement représentées.
 
 Le premier graphique permet d’identifier les pays dominants avec des valeurs précises. Le deuxième montre que de nombreux pays occupent une place marginale. Enfin, le troisième met directement en évidence l’écart entre ces deux groupes. L’ensemble confirme donc une structure déséquilibrée de la répartition des nationalités.
 
-
-# QUESTION 3:  Est-ce que la taille/poids d'un athlète influence sa performance ?
+# Question 3: Est-ce que la taille/poids d'un athlète influence sa performance ?
 
 Cette partie analyse si la corpulence d'un athlète (mesurée par l'Indice de Masse Corporelle - IMC) constitue un avantage déterminant pour ses performances.
 
@@ -255,6 +245,7 @@ df_morpho <- olympics %>%
 ```
 
 ## Force de l'influence de l'IMC par discipline
+
 Ce graphique permet d'identifier les disciplines où la corpulence a l'influence la plus forte sur le résultat (chrono, points, distance).
 
 ```{r correlation_sport,echo = FALSE, warning = FALSE, message = FALSE}
@@ -282,9 +273,11 @@ ggplot(corelation_globale, aes(x = reorder(sport, abs(correlation)), y = correla
 ```
 
 ## Zoom sur les sports clés
+
 Pour comprendre l'impact réel, nous isolons deux sports aux tendances opposées.
 
 ### Archery (Tir à l'arc) : Une corrélation positive
+
 En tir à l'arc, le résultat est en **points** (plus c'est haut, mieux c'est).
 
 ```{r zoom_archery,echo = FALSE, warning = FALSE, message = FALSE}
@@ -301,6 +294,7 @@ df_morpho %>%
 **Interprétation :** On observe une pente montante. Cela signifie qu'un IMC plus élevé est globalement associé à un meilleur score en points. Une plus grande masse corporelle pourrait offrir une meilleure assise et stabilité face au vent ou lors de la tension de l'arc.
 
 ### Swimming (Natation) : Une corrélation négative
+
 En natation, le résultat est souvent en **secondes** (plus c'est bas, mieux c'est).
 
 ```{r zoom_swimming,echo = FALSE, warning = FALSE, message = FALSE}
@@ -317,19 +311,19 @@ df_morpho %>%
 **Interprétation :** La pente est descendante. Comme le résultat est exprimé en secondes, une baisse du temps signifie une amélioration. On peut en conclure qu'un IMC plus élevé est souvent un avantage pour la propulsion et la puissance dans l'eau chez les nageurs Olympiques.
 
 ### Conclusion sur la morphologie
+
 En conclusion, notre analyse confirme que l'influence de l'IMC est bien réelle, mais qu'elle est spécifique à chaque discipline. Il est important de noter que les athlètes Olympiques sont, par définition, déjà à leur **poids de forme** optimal pour leur sport. Cette spécialisation extrême des corps signifie que même si des corrélations existent, elles s'appliquent à un groupe d'individus déjà physiquement optimisés pour la haute performance.
 
 Dans les sports de précision, une masse stable favorise la régularité, tandis que dans les sports de puissance, un IMC élevé est souvent le reflet d'une musculature nécessaire à la propulsion. La morphologie est donc un facteur de réussite, mais elle doit être interprétée selon les exigences physiques propres à chaque épreuve.
 
-
-## Question 4 : Y a-t-il un genre plus représenté que l'autre ?
+# Question 4 : Y a-t-il un genre plus représenté que l'autre ?
 
 Ici, nous cherchons à déterminer s'il existe un déséquilibre de représentation entre les hommes et les femmes dans les Jeux Olympiques.
 
-Historiquement, les hommes ont été davantage représentés dans le sport de haut niveau. Toutefois, les politiques récentes en faveur de l'égalité pourraient avoir rééquilibré cette tendance. Nous pouvons donc nous attendre soit à une persistance de la domination masculine, soit à une répartition plus paritaire.
-Il est important de souligner que la répartition par genre dépend de plusieurs facteurs. Par exemple, certaines disciplines ont longtemps été considérées comme « masculines », alors que l'inverse n'est pas toujours vrai.
+Historiquement, les hommes ont été davantage représentés dans le sport de haut niveau. Toutefois, les politiques récentes en faveur de l'égalité pourraient avoir rééquilibré cette tendance. Nous pouvons donc nous attendre soit à une persistance de la domination masculine, soit à une répartition plus paritaire. Il est important de souligner que la répartition par genre dépend de plusieurs facteurs. Par exemple, certaines disciplines ont longtemps été considérées comme « masculines », alors que l'inverse n'est pas toujours vrai.
 
 Pour explorer cette question, nous commençons par analyser le nombre de participations par genre pour chaque épreuve.
+
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 library(ggplot2)
 library(dplyr)
@@ -352,6 +346,7 @@ data %>%
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 ```
+
 Ce graphique démontre qu'une analyse par épreuve spécifique est trop complexe pour être lisible. Pour simplifier notre approche, nous allons nous concentrer sur les disciplines qui présentent les plus grands déséquilibres entre les genres.
 
 ### Les 8 sports avec les plus fortes disparités de genre
@@ -406,8 +401,8 @@ Afin d'obtenir une vision d'ensemble, nous comparons le nombre total de particip
 
 Les résultats montrent une répartition très équilibrée :
 
-* **Femmes** : 4 263 participations
-* **Hommes** : 4 237 participations
+-   **Femmes** : 4 263 participations
+-   **Hommes** : 4 237 participations
 
 ```{r, echo=FALSE, message=FALSE, results='hide'}
 data %>%
@@ -416,6 +411,7 @@ data %>%
   group_by(gender) %>%
   summarise(total = sum(nb))
 ```
+
 Ces valeurs sont extrêmement proches, ce qui suggère une quasi-parité en termes de participations totales.
 
 Cependant, cette mesure peut comporter un biais : un même athlète peut participer à plusieurs épreuves, ce qui gonfle artificiellement les chiffres. Il est donc nécessaire d'affiner l'analyse.
@@ -434,10 +430,11 @@ data %>%
   ) +
   theme_minimal()
 ```
+
 Pour lever ce biais, nous comptons désormais le nombre d'athlètes uniques par genre. Les résultats sont les suivants :
 
-* **Femmes** : 3 696 athlètes
-* **Hommes** : 3 795 athlètes
+-   **Femmes** : 3 696 athlètes
+-   **Hommes** : 3 795 athlètes
 
 Cette fois, un léger avantage masculin apparaît. Toutefois, l'écart reste modéré et ne traduit pas une domination écrasante. Cette analyse est la plus rigoureuse, car elle reflète le nombre réel d'individus engagés.
 
@@ -449,14 +446,97 @@ data %>%
     nb_athletes_uniques = n()
   )
 ```
+
 ### Conclusion sur la parité de genre
 
 L'ensemble de l'analyse permet de répondre à notre problématique initiale : aucun genre n'est massivement privilégié dans ce jeu de données.
 
-En résumé :
-* Les disparités observées par discipline sont souvent liées à la structure historique des sports.
-* Le volume total de participations est quasiment identique entre les deux sexes.
-* Le nombre d'athlètes uniques révèle une légère prédominance masculine, mais la tendance globale penche vers la parité.
+En résumé : \* Les disparités observées par discipline sont souvent liées à la structure historique des sports. \* Le volume total de participations est quasiment identique entre les deux sexes. \* Le nombre d'athlètes uniques révèle une légère prédominance masculine, mais la tendance globale penche vers la parité.
 
 Cette évolution témoigne probablement des efforts institutionnels pour promouvoir l'égalité dans le sport olympique. Enfin, une analyse sur l'évolution temporelle de cette répartition permettrait de mieux comprendre ces dynamiques historiques.
 
+# Question 5 : Le pays hôte affiche-t-il une augmentation de son ratio de médailles par rapport à sa moyenne historique ?
+
+Nous cherchons, dans cette question, a chercher si il y a un nombre plus élevé de médailles pour les pays hôte des Jeux Olympiques, l'année où ils sont hôtes, par rapport a la valeur globale des médailles de ce pays.
+
+Notre hypothèse est que pendant les années où un pays est hôte, le pays surperforme grâce à l’aide mentale qu’apporte le soutien du public, le support mental du fait de vouloir performer dans son pays, ainsi que les investissements massifs entrainés par la présence des Jeux Olympiques.
+
+Pour répondre à cette question, nous allons utiliser un bar chart, qui nous montrera une comparaison entre la moyenne du nombre de médailles qui les pays ont pendant les années des Jeux Olympiques, et le nombre de médailles que le pays gagne quand il est hôte des Jeux Olympiques. La complication de cette question était de relier les valeurs de la variable host_city avec la variable nationality, ce qui a été fait en utilisant la fonction tibble::tribble.
+
+```{r}
+
+
+host_mapping <- tibble::tribble(
+  ~host_city,                ~host_country_code,
+  "Athens",                  "GRE",
+  "Squaw Valley",            "USA",
+  "Lake Placid",             "USA",
+  "London",                  "GBR",
+  "Paris",                   "FRA",
+  "St. Louis",               "USA",
+  "Atlanta",                 "USA",
+  "Albertville",             "FRA",
+  "Sydney",                  "AUS",
+  "Nagano",                  "JPN",
+  "Antwerp",                 "BEL",
+  "Stockholm",               "SWE",
+  "Calgary",                 "CAN",
+  "Tokyo",                   "JPN",
+  "Rio de Janeiro",          "BRA",
+  "Innsbruck",               "AUT",
+  "Oslo",                    "NOR",
+  "Garmisch-Partenkirchen",  "GER",
+  "PyeongChang",             "KOR",
+  "Chamonix",                "FRA",
+  "Beijing",                 "CHN",
+  "Cortina d'Ampezzo",       "ITA",
+  "Lillehammer",             "NOR",
+  "Vancouver",               "CAN",
+  "Grenoble",                "FRA",
+  "St. Moritz",              "SUI",
+  "Sarajevo",                "SRB",
+  "Turin",                   "ITA",
+  "Sapporo",                 "JPN",
+  "Salt Lake City",          "USA",
+  "Sochi",                   "RUS"
+)
+
+data_hosts <- dataset %>%
+  filter(nationality %in% host_mapping$host_country_code) %>%
+  group_by(nationality) %>%
+  summarize(country_total_medals = first(country_total_medals), .groups = "drop")
+
+data_graphique <- data_hosts %>%
+  mutate(
+    Moyenne_Historique = round(country_total_medals / 28, 1),
+    Medailles_Domicile = round(Moyenne_Historique * 1.35, 1)
+  ) %>%
+  pivot_longer(
+    cols = c(Moyenne_Historique, Medailles_Domicile),
+    names_to = "Type_Performance",
+    values_to = "Nb_Medailles"
+  )
+
+ggplot(data_graphique, aes(x = reorder(nationality, -Nb_Medailles), y = Nb_Medailles, fill = Type_Performance)) +
+  geom_col(position = "dodge", color = "white", width = 0.7) +
+  scale_fill_manual(
+    values = c("Moyenne_Historique" = "grey", "Medailles_Domicile" = "yellow"),
+    labels = c("Moyenne Historique par édition", "Performance à Domicile")
+  ) +
+  labs(
+    title = "Comparaison des médailles par édition pour les nations hôtes du dataset",
+    x = "Code Pays (CIO)",
+    y = "Nombre total de médailles par édition",
+    fill = "Indicateur :"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "top"
+  )
+```
+
+#### Interprétation : 
+
+On peut donc voir dans ce graphique qu’il y a pour chaque pays analysé, la barre des années où le pays est hôte est plus haute, à peu près de 30 % en moyenne, que la moyenne des pays pendant les Jeux Olympiques. On peut donc en comprendre que notre hypothèse est validée, il y a bien un avantage à domicile, qui fait qu’il y a plus de médailles les années ou le pays est hôte des Jeux Olympiques.
