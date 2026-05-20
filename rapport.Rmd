@@ -576,3 +576,89 @@ ggplot(data_age_line, aes(x = year, y = age_moyen)) +
 On peut voir sur ce graphique, que notre hypothèse n'est pas validée. On observe que l'âge moyen des médaillés ne suit pas une trajectoire qui augmente. Au contraire, il oscille dans un intervalle très serré, toujours compris entre 27 et 31 ans. La courbe de tendance montre même une légère baisse de l'âge moyen autour des années 1970-1980, avant de remonter légèrement pour se stabiliser autour de 29 ans sur les éditions les plus récentes.
 
 On peut donc en comprendre que les technologies et la médecine n'ont pas un effet assez fort pour influencer l'âge moyen des médaillés.
+
+# Question 7 : Existe-t-il une différence en terme de poids, enre les athlètes participant aux Jeux D'été, et ceux des Jeux d'hiver ?
+
+Le but de cette question est de comparer les poids des athlètes des jeux d'été et d'hiver pour déterminer si il y a une différence significative.
+
+Notre hypothèse est qu'il y aura une petite différence de poids, car les sports de Jeux d'hiver se basent sur l'inertie, ce qui pourrait nécessiter une masse supérieure, même si on suppose qu'il y aura des extrèmes plus importants pour l'été, avec par exemple des sport de lancer, qui ne nécessitent pas d'être plus léger.
+
+Pour répondre à cette question, nous allons utiliser un graphique en violon, qui permet de bien voir la distribution, en utilisant aussi des lignes pour voir les différents quantiles, et de pouvoir voir les extrêmes.
+
+```{r}
+data_morphology <- dataset %>%
+  filter(!is.na(weight_kg))
+
+ggplot(data_morphology, aes(x = games_type, y = weight_kg, fill = games_type)) +
+  geom_violin(alpha = 0.6, color = "black", draw_quantiles = c(0.25, 0.5, 0.75)) +
+  scale_fill_manual(
+    values = c("Summer" = "#FF7F0E", "Winter" = "#1F77B4"),
+    labels = c("Jeux d'Été", "Jeux d'Hiver")
+  ) +
+  labs(
+    title = "Comparaison de la distribution du poids des athlètes selon la saison",
+    x = "Saison des Jeux Olympiques",
+    y = "Poids de l'athlète (en kg)",
+    fill = "Saison :"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    legend.position = "top"
+  )
+```
+
+#### Interprétation : 
+
+On peut voir que la distribution de poids est très similiare sur les deux saisons, ce qui ne valide pas notre hypothèse. La forme des violons est presque identique, et les médianes sont au même niveau, ce qui montre que la moyenne des profils sur les deux saisons est similaire. Mais une partie de notre hypothèse est bonne quand même, car on voit des profils beaucoup plus lourds sur les Jeux d'été, qui peuvent venir des sports de lancer, ou de combats, ou d'autres sports, qui ne sont pas présents aux Jeux d'hiver.
+
+# Question 8 : Quelles sont les disciplines sportives qui comptent le plus grand nombre d'athlètes enregistrés ?
+
+Le but de cette question est de voir quels sont les sports avec le plus d'athèles, pour voir si certains sports qui ont une plus grande base de joueur en dehors des Jeux Olympiques, ont aussi le plus d'athlètes dans les Jeux Olympiques.
+
+Notre hypothèse est que les sport les plus "gros" et les plus suivis, tels que la natation ou l'athlétisme, auront le plus d'athlètes.
+
+Pour répondre à cette question, nous allons utiliser un diagramme en barres horizontales, en triant par odre décroissant.
+
+```{r}
+data_all_sports <- dataset %>%
+  group_by(sport) %>%
+  summarize(nb_athletes = n_distinct(athlete_id))
+
+ggplot(data_all_sports, aes(x = nb_athletes, y = reorder(sport, nb_athletes))) +
+  geom_col(fill = "darkcyan", color = "white") +
+  labs(
+    title = "Répartition des disciplines sportives par nombre d'athlètes",
+    x = "Nombre d'athlètes uniques",
+    y = "Discipline sportive"
+  ) +
+  theme_minimal()
+```
+
+#### Interprétation : 
+
+Dans ce graphique, le nom des sports est difficilement lisilble, nous allons donc en faire un second avec seuelement le top 5 des sports, mais on peut quand même voir avec ce graphique que la différence entre le nombre d'athlètes entre les plus représentés et les moins représentés n'est pas énorme, tous les sports ayant entre 200 et 300 athlètes.
+
+```{r}
+data_top_sports <- dataset %>%
+  group_by(sport) %>%
+  summarize(nb_athletes = n_distinct(athlete_id)) %>%
+  slice_max(order_by = nb_athletes, n = 5)
+
+ggplot(data_top_sports, aes(x = nb_athletes, y = reorder(sport, nb_athletes))) +
+  geom_col(fill = "darkcyan", color = "white", width = 0.6) +
+  coord_cartesian(xlim = c(200, 290)) +
+  scale_x_continuous(breaks = seq(200, 290, by = 10)) +
+  labs(
+    title = "Zoom sur la zone au-dessus de 200 athlètes pour observer précisément les écarts",
+    x = "Nombre d'athlètes uniques",
+    y = "Discipline sportive"
+  ) +
+  theme_minimal()
+```
+
+#### Interprétation : 
+
+On peut voir que les 5 sports avec le plus d'athlètes ne sont pas les sports les plsu "gros" auxquels ont pensait pendant notre hypothèse, mais ce sont d'autres sports. Ces 5 sport ont seulement une différence de 10 athlètes, ce qui est très peu.
+
+On peu donc en tirer que soit notre jeu de données n'est pas une liste de juste tous les athlètes, mais est un échantillon choisit de manière équilibrée pour avoir une représentativité équivalente pour tous les sports, soit il y a plus d'athlètes dans ces 5 sports, que dans les "grands" sports comme la natation ou l'athétisme.
