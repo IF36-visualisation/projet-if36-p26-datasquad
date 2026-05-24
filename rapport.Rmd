@@ -258,16 +258,13 @@ corelation_globale <- df_morpho %>%
     filter(nb_athletes >= 20) %>% 
     arrange(desc(abs(correlation)))
 
-ggplot(corelation_globale, aes(x = reorder(sport, abs(correlation)), y = correlation, fill = correlation > 0)) +
-    geom_col() +
+ggplot(corelation_globale, aes(x = reorder(sport, abs(correlation)), y = abs(correlation))) +
+    geom_col(fill = "darkcyan") +
     coord_flip() + 
-    scale_fill_manual(values = c("TRUE" = "#2ecc71", "FALSE" = "#e74c3c"), 
-                      labels = c("Influence Négative", "Influence Positive")) +
     labs(
         title = "Intensité de la corrélation IMC / Performance",
         x = "Discipline Sportive",
-        y = "Coefficient de corrélation (r)",
-        fill = "Direction de l'influence"
+        y = "Valeur absolue du coefficient de corrélation (|r|)"
     ) +
     theme_minimal()
 ```
@@ -662,3 +659,101 @@ ggplot(data_top_sports, aes(x = nb_athletes, y = reorder(sport, nb_athletes))) +
 On peut voir que les 5 sports avec le plus d'athlètes ne sont pas les sports les plsu "gros" auxquels ont pensait pendant notre hypothèse, mais ce sont d'autres sports. Ces 5 sport ont seulement une différence de 10 athlètes, ce qui est très peu.
 
 On peu donc en tirer que soit notre jeu de données n'est pas une liste de juste tous les athlètes, mais est un échantillon choisit de manière équilibrée pour avoir une représentativité équivalente pour tous les sports, soit il y a plus d'athlètes dans ces 5 sports, que dans les "grands" sports comme la natation ou l'athétisme.
+
+# Question 9 : Corrélation entre expérience olympique et succès
+
+**Question :** Existe-t-il un "pic d'efficacité" en fonction du nombre de participations (`total_olympics_attended`) ? Est-on plus susceptible de gagner l'or à sa 1ère, 2ème ou 3ème participation ?
+
+**Hypothèse :** La performance maximale (médaille d'or) survient plus souvent lors de la deuxième participation (équilibre entre jeunesse et expérience).
+
+Pour répondre à cette question sans être biaisé par le fait qu'il y a beaucoup plus d'athlètes réalisant une seule participation par rapport à ceux en cumulant plusieurs, nous allons créer une **Heatmap (Carte de chaleur)**. Elle affichera la proportion (en pourcentage) de chaque type de résultat selon le nombre de participations.
+
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
+# Filtrage et préparation des données
+data_experience <- dataset %>%
+  filter(!is.na(total_olympics_attended) & !is.na(medal)) %>%
+  mutate(medal = factor(medal, levels = c("None", "Bronze", "Silver", "Gold")))
+
+# Calcul des pourcentages par groupe de participation
+heatmap_data <- data_experience %>%
+  group_by(total_olympics_attended, medal) %>%
+  summarize(count = n(), .groups = "drop") %>%
+  group_by(total_olympics_attended) %>%
+  mutate(proportion = count / sum(count) * 100) %>%
+  ungroup()
+
+# Création de la Heatmap des proportions
+ggplot(heatmap_data, aes(x = as.factor(total_olympics_attended), y = medal, fill = proportion)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "white", high = "darkcyan", name = "Proportion (%)") +
+  geom_text(aes(label = sprintf("%.1f%%", proportion)), color = "black", size = 3.5) +
+  labs(
+    title = "Heatmap des chances de médailles selon le nombre de participations",
+    x = "Nombre total de participations",
+    y = "Type de résultat (Médaille)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 13)
+  )
+```
+
+#### Interprétation :
+
+La carte de chaleur permet de visualiser de façon claire la probabilité d'obtenir une médaille (Or, Argent, Bronze) ou aucune ("None") selon l'expérience olympique de l'athlète. On remarque généralement que la proportion de "None" baisse à mesure que le nombre de participations augmente, ce qui indique que les athlètes plus expérimentés ont de meilleures chances globales de repartir avec une médaille. 
+
+Concernant l'Or spécifiquement, cette visualisation permet de confirmer ou d'infirmer l'hypothèse d'un "pic d'efficacité" : les athlètes participant pour la deuxième ou troisième fois sont statistiquement l'élite de leur discipline, ce qui se reflète souvent par un pourcentage de réussite plus important comparé aux premières participations. L'expérience est donc un facteur clé de succès aux Jeux Olympiques.
+
+# Question 10 : L'efficacité des délégations (Ratio Participation/Succès)
+
+**Question :** Quelles sont les nationalités qui possèdent le meilleur "taux de transformation" (nombre de médailles remportées divisé par le nombre d'athlètes uniques envoyés) ?
+
+**Hypothèse :** Les grandes nations (avec un grand nombre d'athlètes) remportent le plus grand volume de médailles, mais certaines plus petites délégations ciblées affichent un taux d'efficacité (médailles par athlète) exceptionnel.
+
+Pour répondre à cette question, nous allons croiser le nombre d'athlètes uniques envoyés par pays avec le nombre total de médailles obtenues. Le graphique proposé est un **Scatter Plot (nuage de points)** où :
+- L'abscisse (X) représente le nombre d'athlètes uniques envoyés par pays.
+- L'ordonnée (Y) représente le nombre total de médailles remportées.
+- La taille et la couleur des points reflètent le **taux de transformation** (le pourcentage d'athlètes de la délégation repartant avec une médaille).
+
+Nous filtrons les pays ayant envoyé moins de 10 athlètes pour éviter les cas extrêmes de petites délégations qui fausseraient les statistiques d'efficacité globale.
+
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
+# Calcul du nombre d'athlètes et de médailles par pays
+data_efficacite <- dataset %>%
+  group_by(country_name) %>%
+  summarize(
+    nb_athletes = n_distinct(athlete_id),
+    nb_medailles = sum(medal %in% c("Gold", "Silver", "Bronze")),
+    taux_transformation = (nb_medailles / nb_athletes) * 100,
+    .groups = "drop"
+  ) %>%
+  filter(nb_athletes >= 10)
+
+# Définition des étiquettes pour les pays notables (forte efficacité ou forte délégation)
+data_efficacite <- data_efficacite %>%
+  mutate(label = ifelse(taux_transformation > 20 | nb_athletes > 150, country_name, ""))
+
+# Création du Scatter Plot
+ggplot(data_efficacite, aes(x = nb_athletes, y = nb_medailles, label = label)) +
+  geom_point(aes(size = taux_transformation, color = taux_transformation), alpha = 0.7) +
+  geom_text(vjust = -0.7, hjust = 0.5, size = 3, check_overlap = TRUE) +
+  scale_color_gradient(low = "blue", high = "red", name = "Taux (%)") +
+  labs(
+    title = "Efficacité des délégations : Volume vs Efficacité",
+    x = "Nombre d'athlètes uniques envoyés",
+    y = "Nombre total de médailles remportées",
+    size = "Taux de transformation (%)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14)
+  )
+```
+
+#### Interprétation :
+
+Le nuage de points permet de distinguer deux stratégies ou dynamiques différentes chez les nations olympiques :
+1. **Les géants olympiques :** Situés en haut à droite (grand nombre d'athlètes et grand nombre de médailles). Ces pays envoient d'immenses délégations et convertissent une part significative de leurs athlètes en médaillés.
+2. **Les délégations ultra-efficaces :** Situées plus haut par rapport à leur position horizontale (les points rouges/chauds). Ces pays ont un taux de transformation élevé, ce qui signifie qu'une grande partie des athlètes qu'ils envoient réussissent à décrocher une médaille.
+
+Ce graphique illustre parfaitement le compromis entre la quantité d'athlètes engagés et l'optimisation des performances par athlète individuel.
