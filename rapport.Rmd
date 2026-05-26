@@ -401,7 +401,7 @@ Les résultats montrent une répartition très équilibrée :
 -   **Femmes** : 4 263 participations
 -   **Hommes** : 4 237 participations
 
-```{r, echo=FALSE, message=FALSE, results='hide'}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results='hide'}
 data %>%
   group_by(event, gender) %>%
   summarise(nb = n(), .groups = "drop") %>%
@@ -435,7 +435,7 @@ Pour lever ce biais, nous comptons désormais le nombre d'athlètes uniques par 
 
 Cette fois, un léger avantage masculin apparaît. Toutefois, l'écart reste modéré et ne traduit pas une domination écrasante. Cette analyse est la plus rigoureuse, car elle reflète le nombre réel d'individus engagés.
 
-```{r, echo=FALSE, message=FALSE, results='hide'}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results='hide'}
 data %>%
   distinct(athlete_name, gender) %>%
   group_by(gender) %>%
@@ -460,7 +460,7 @@ Notre hypothèse est que pendant les années où un pays est hôte, le pays surp
 
 Pour répondre à cette question, nous allons utiliser un bar chart, qui nous montrera une comparaison entre la moyenne du nombre de médailles qui les pays ont pendant les années des Jeux Olympiques, et le nombre de médailles que le pays gagne quand il est hôte des Jeux Olympiques. La complication de cette question était de relier les valeurs de la variable host_city avec la variable nationality, ce qui a été fait en utilisant la fonction tibble::tribble.
 
-```{r}
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
 
 
 host_mapping <- tibble::tribble(
@@ -546,7 +546,7 @@ Notre hypothèse est que l'âge moyen pourrait augmenter en fonction de l'année
 
 Pour cela nous allons donc faire un line chart, pour pouvoir avoir l'évolution, et une courbe de tendance globale, pour pouvoir voir une plus grande variété de résultats.
 
-```{r}
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
 
 data_age_line <- dataset %>%
   filter(medal %in% c("Gold", "Silver", "Bronze")) %>%
@@ -582,7 +582,7 @@ Notre hypothèse est qu'il y aura une petite différence de poids, car les sport
 
 Pour répondre à cette question, nous allons utiliser un graphique en violon, qui permet de bien voir la distribution, en utilisant aussi des lignes pour voir les différents quantiles, et de pouvoir voir les extrêmes.
 
-```{r}
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
 data_morphology <- dataset %>%
   filter(!is.na(weight_kg))
 
@@ -617,7 +617,7 @@ Notre hypothèse est que les sport les plus "gros" et les plus suivis, tels que 
 
 Pour répondre à cette question, nous allons utiliser un diagramme en barres horizontales, en triant par odre décroissant.
 
-```{r}
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
 data_all_sports <- dataset %>%
   group_by(sport) %>%
   summarize(nb_athletes = n_distinct(athlete_id))
@@ -636,7 +636,7 @@ ggplot(data_all_sports, aes(x = nb_athletes, y = reorder(sport, nb_athletes))) +
 
 Dans ce graphique, le nom des sports est difficilement lisilble, nous allons donc en faire un second avec seuelement le top 5 des sports, mais on peut quand même voir avec ce graphique que la différence entre le nombre d'athlètes entre les plus représentés et les moins représentés n'est pas énorme, tous les sports ayant entre 200 et 300 athlètes.
 
-```{r}
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
 data_top_sports <- dataset %>%
   group_by(sport) %>%
   summarize(nb_athletes = n_distinct(athlete_id)) %>%
