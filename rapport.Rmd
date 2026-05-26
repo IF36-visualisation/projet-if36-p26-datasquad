@@ -757,3 +757,188 @@ Le nuage de points permet de distinguer deux stratégies ou dynamiques différen
 2. **Les délégations ultra-efficaces :** Situées plus haut par rapport à leur position horizontale (les points rouges/chauds). Ces pays ont un taux de transformation élevé, ce qui signifie qu'une grande partie des athlètes qu'ils envoient réussissent à décrocher une médaille.
 
 Ce graphique illustre parfaitement le compromis entre la quantité d'athlètes engagés et l'optimisation des performances par athlète individuel.
+
+# Question 11 : L'évolution morphologique temporelle (La spécialisation des corps)
+
+Nous avons vu précédemment que l'IMC impacte la performance aujourd'hui. Mais est-ce que cette optimisation a toujours existé ? Les athlètes sont-ils devenus physiquement plus "extrêmes" au fil des décennies dans certaines disciplines ?
+
+**Hypothèse :** Avec la professionnalisation du sport, le physique des athlètes s'est ultra-spécialisé. La taille moyenne des basketteurs a augmenté, tandis que celle des gymnastes a diminué par rapport aux premières éditions des Jeux Olympiques.
+
+Pour valider cette hypothèse, nous croisons les variables d'année, de taille et de discipline pour deux sports aux besoins morphologiques opposés : le Basketball et la Gymnastique Artistique.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+data_morpho_temp <- dataset %>%
+  filter(sport %in% c("Basketball", "Gymnastics (Artistic)")) %>%
+  group_by(year, sport) %>%
+  summarize(
+    taille_moyenne = mean(height_cm, na.rm = TRUE),
+    poids_moyen = mean(weight_kg, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+ggplot(data_morpho_temp, aes(x = year, y = taille_moyenne, color = sport)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  geom_smooth(method = "loess", formula = y ~ x, linetype = "dashed", se = FALSE, linewidth = 0.8) +
+  scale_color_manual(
+    values = c("Basketball" = "#2c3e50", "Gymnastics (Artistic)" = "#e74c3c"),
+    labels = c("Basketball", "Gymnastique (Artistique)")
+  ) +
+  labs(
+    title = "Évolution de la taille moyenne des athlètes (1896-2024)",
+    subtitle = "Spécialisation morphologique opposée entre le Basketball et la Gymnastique",
+    x = "Année des Jeux Olympiques",
+    y = "Taille moyenne (cm)",
+    color = "Discipline :"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 13),
+    plot.subtitle = element_text(face = "italic", size = 10),
+    legend.position = "top"
+  )
+```
+
+#### Interprétation :
+
+Le graphique confirme notre hypothèse d'ultra-spécialisation des corps, visible à travers la divergence progressive des deux courbes de tendance (en pointillés). 
+
+Malgré un creux de données entre 1930 et 1980 pour ces disciplines, l'évolution sur plus d'un siècle est marquée :
+1. **Basketball :** La courbe de tendance montre une augmentation globale, passant d'environ 1m91 à plus de 1m94. Sur les éditions récentes (après 2000), on observe même un pic au-dessus de 2 mètres en moyenne, prouvant que les profils de très grande taille sont toujours plus recherchés.
+2. **Gymnastique (Artistique) :** À l'inverse, la tendance est à la baisse. Partant d'environ 1m65 au début du siècle dernier, la taille moyenne diminue pour s'établir autour de 1m61 de nos jours, avec des creux récents sous la barre des 1m60. Un centre de gravité plus bas facilite en effet l'exécution de figures acrobatiques complexes.
+
+Cette évolution opposée met en évidence que les caractéristiques physiques ne sont pas dues au hasard : elles s'optimisent et se spécialisent pour répondre de plus en plus précisément aux exigences spécifiques de chaque discipline de haut niveau.
+
+# Question 12 : Le phénomène de l'Effet d'Âge Relatif (Relative Age Effect)
+
+Ce phénomène est un grand classique de la data science sportive. Il s'agit de vérifier si le mois de naissance influence les chances de devenir un athlète olympique.
+
+**Hypothèse :** Les athlètes nés en début d'année (janvier, février, mars) sont surreprésentés. Dans les catégories de jeunes, ils sont physiquement plus matures de quelques mois que ceux nés en fin d'année, ce qui les place plus facilement dans les filières d'élite (le fameux "Relative Age Effect").
+
+Pour vérifier cela, nous allons extraire le mois de naissance de chaque athlète et observer la distribution comparée à une répartition théorique parfaite (environ 8.33% par mois).
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+library(lubridate)
+
+data_rae <- dataset %>%
+  filter(!is.na(date_of_birth)) %>%
+  distinct(athlete_id, .keep_all = TRUE) %>%
+  mutate(
+    mois_num = month(date_of_birth),
+    mois_naissance = factor(mois_num, levels = 1:12, labels = c("Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"))
+  ) %>%
+  group_by(mois_naissance) %>%
+  summarize(nombre_athletes = n(), .groups = "drop") %>%
+  mutate(pourcentage = nombre_athletes / sum(nombre_athletes) * 100)
+
+ligne_theorique <- 100 / 12
+
+ggplot(data_rae, aes(x = mois_naissance, y = pourcentage)) +
+  geom_col(fill = "darkcyan", color = "white", alpha = 0.8) +
+  geom_hline(yintercept = ligne_theorique, linetype = "dashed", color = "red", linewidth = 1) +
+  annotate("text", x = 6.5, y = ligne_theorique + 0.5, label = "Répartition théorique parfaite (8.33%)", color = "red", size = 4) +
+  labs(
+    title = "L'Effet d'Âge Relatif chez les athlètes olympiques",
+    subtitle = "Distribution des mois de naissance comparée à une répartition uniforme",
+    x = "Mois de naissance",
+    y = "Proportion d'athlètes (%)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(face = "italic", size = 11),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+```
+
+#### Interprétation :
+
+Si la ligne de tendance théorique (en rouge) était parfaitement respectée, chaque mois regrouperait environ 8.33% des naissances. 
+En observant la répartition réelle via les barres du graphique, on peut voir si les mois de début d'année (Janvier, Février, Mars) dépassent cette ligne rouge de manière significative. Le cas échéant, cela confirmera que la sélection précoce dans les filières sportives durant l'enfance offre un avantage mesurable et durable aux enfants nés en début d'année, avantage qui se répercute jusqu'aux Jeux Olympiques.
+
+### Dans quels sports cet effet est-il le plus marqué ?
+
+Pour aller plus loin, nous pouvons identifier les disciplines où ce phénomène est le plus prononcé. L'hypothèse est que les sports nécessitant une grande maturité physique précoce (puissance, vitesse, taille) afficheront un effet d'âge relatif plus fort que les sports de pure technique.
+
+Nous allons calculer le pourcentage d'athlètes nés au premier trimestre (Janvier, Février, Mars) par sport. Théoriquement, si la naissance n'avait aucune influence, ce chiffre devrait être autour de **25%** (3 mois sur 12).
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+data_rae_sport <- dataset %>%
+  filter(!is.na(date_of_birth)) %>%
+  distinct(athlete_id, .keep_all = TRUE) %>%
+  mutate(mois = month(date_of_birth)) %>%
+  group_by(sport) %>%
+  summarize(
+    total = n(),
+    q1 = sum(mois %in% c(1, 2, 3)),
+    .groups = "drop"
+  ) %>%
+  filter(total >= 100) %>% # Filtrer pour avoir un échantillon représentatif
+  mutate(pct_q1 = q1 / total * 100) %>%
+  arrange(desc(pct_q1)) %>%
+  slice_head(n = 10)
+
+ggplot(data_rae_sport, aes(x = pct_q1, y = reorder(sport, pct_q1))) +
+  geom_col(fill = "orange", color = "white", alpha = 0.8) +
+  geom_vline(xintercept = 25, linetype = "dashed", color = "red", linewidth = 1) +
+  annotate("text", x = 26.5, y = 1.5, label = "Ligne théorique (25%)", color = "red", size = 4) +
+  labs(
+    title = "Top 10 des sports les plus touchés par l'Effet d'Âge Relatif",
+    subtitle = "Pourcentage d'athlètes nés au 1er trimestre (Jan, Fév, Mar)",
+    x = "Pourcentage d'athlètes nés en Q1 (%)",
+    y = "Discipline sportive"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(face = "italic", size = 11)
+  )
+```
+
+#### Interprétation :
+
+En filtrant les sports et en isolant la part d'athlètes nés dans le premier trimestre (Q1), le graphique met en évidence les disciplines où la date de naissance joue le rôle le plus crucial.
+La ligne rouge verticale représente l'espérance théorique (25%). Les sports qui s'en éloignent fortement vers la droite, comme le Patinage de Vitesse, la Lutte ou le Saut à ski, démontrent un "Relative Age Effect" très marqué. Dans ces sports physiques où les catégories d'âge dans l'enfance sont strictes, être né en tout début d'année offre un avantage physique temporaire décisif qui se transforme en un avantage de sélection durable menant jusqu'au plus haut niveau olympique.
+
+# Question 13 : Sports d'équipe vs Sports individuels : l'âge de l'or
+
+Dans cette partie, nous cherchons à savoir si la dynamique d'équipe influe sur la longévité de la performance au plus haut niveau (la médaille d'or). L'âge de la performance maximale diffère-t-il selon que le sport se pratique seul ou en équipe ?
+
+**Hypothèse :** L'âge médian des médaillés d'or est plus élevé dans les sports d'équipe (Team). L'intelligence tactique, l'expérience et la cohésion de groupe permettent de compenser le léger déclin physique lié à l'âge, là où l'explosivité pure prime davantage dans les sports individuels (Individual).
+
+Pour le vérifier, nous isolons tous les athlètes ayant remporté l'Or et comparons la distribution de leur âge selon la nature de leur épreuve (Individuelle ou Équipe).
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+data_team_indiv <- dataset %>%
+  filter(medal == "Gold" & !is.na(age) & !is.na(team_or_individual))
+
+ggplot(data_team_indiv, aes(x = team_or_individual, y = age, fill = team_or_individual)) +
+  geom_boxplot(alpha = 0.7, outlier.color = "red", outlier.shape = 16) +
+  scale_fill_manual(
+    values = c("Individual" = "#3498db", "Team" = "#9b59b6"),
+    labels = c("Individuel", "Équipe")
+  ) +
+  labs(
+    title = "Âge des médaillés d'or : Sports individuels vs Équipe",
+    subtitle = "Comparaison de l'âge de la performance maximale",
+    x = "Type d'épreuve",
+    y = "Âge du médaillé d'or",
+    fill = "Catégorie :"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(face = "italic", size = 11),
+    legend.position = "none"
+  )
+```
+
+#### Interprétation :
+
+Le graphique contredit notre hypothèse de départ de manière assez surprenante ! 
+
+En lisant la médiane (la ligne noire épaisse au milieu de chaque boîte), on constate que l'âge médian des médaillés d'or individuels est de **30 ans**, contre environ **28 ans** pour les sports d'équipe. 
+
+Comment expliquer cela ? Les sports individuels incluent un grand nombre de disciplines où l'adresse, la précision et la technique priment sur l'explosivité physique pure (le tir, l'équitation, la voile, le golf, etc.), ce qui permet des carrières parfois très longues. À l'inverse, la majorité des sports d'équipe olympiques (comme le football, le basketball, le handball) exigent un engagement athlétique et cardiovasculaire intense, favorisant des athlètes légèrement plus jeunes dans la force de l'âge physique. 
+
+Les boîtes (l'écart interquartile) montrent également que la grande majorité des vainqueurs se situent entre 22 et 35 ans dans les deux catégories, démontrant que la performance olympique maximale culmine globalement dans cette fenêtre, mais avec une "prime à l'expérience" paradoxalement plus forte en individuel.
