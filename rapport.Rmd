@@ -518,7 +518,7 @@ ggplot(data_graphique, aes(x = reorder(nationality, -Nb_Medailles), y = Nb_Medai
   geom_col(position = "dodge", color = "white", width = 0.7) +
   scale_fill_manual(
     values = c("Moyenne_Historique" = "grey", "Medailles_Domicile" = "yellow"),
-    labels = c("Moyenne Historique par édition", "Performance à Domicile")
+    labels = c("Performance à Domicile", "Moyenne Historique par édition")
   ) +
   labs(
     title = "Comparaison des médailles par édition pour les nations hôtes du dataset",
@@ -589,7 +589,7 @@ data_morphology <- dataset %>%
 ggplot(data_morphology, aes(x = games_type, y = weight_kg, fill = games_type)) +
   geom_violin(alpha = 0.6, color = "black", draw_quantiles = c(0.25, 0.5, 0.75)) +
   scale_fill_manual(
-    values = c("Summer" = "#FF7F0E", "Winter" = "#1F77B4"),
+    values = c("Summer" = "orange", "Winter" = "blue"),
     labels = c("Jeux d'Été", "Jeux d'Hiver")
   ) +
   labs(
@@ -605,7 +605,7 @@ ggplot(data_morphology, aes(x = games_type, y = weight_kg, fill = games_type)) +
   )
 ```
 
-#### Interprétation : 
+#### Interprétation :
 
 On peut voir que la distribution de poids est très similiare sur les deux saisons, ce qui ne valide pas notre hypothèse. La forme des violons est presque identique, et les médianes sont au même niveau, ce qui montre que la moyenne des profils sur les deux saisons est similaire. Mais une partie de notre hypothèse est bonne quand même, car on voit des profils beaucoup plus lourds sur les Jeux d'été, qui peuvent venir des sports de lancer, ou de combats, ou d'autres sports, qui ne sont pas présents aux Jeux d'hiver.
 
@@ -623,7 +623,7 @@ data_all_sports <- dataset %>%
   summarize(nb_athletes = n_distinct(athlete_id))
 
 ggplot(data_all_sports, aes(x = nb_athletes, y = reorder(sport, nb_athletes))) +
-  geom_col(fill = "darkcyan", color = "white") +
+  geom_col(fill = "cyan", color = "white") +
   labs(
     title = "Répartition des disciplines sportives par nombre d'athlètes",
     x = "Nombre d'athlètes uniques",
@@ -632,7 +632,7 @@ ggplot(data_all_sports, aes(x = nb_athletes, y = reorder(sport, nb_athletes))) +
   theme_minimal()
 ```
 
-#### Interprétation : 
+#### Interprétation :
 
 Dans ce graphique, le nom des sports est difficilement lisilble, nous allons donc en faire un second avec seuelement le top 5 des sports, mais on peut quand même voir avec ce graphique que la différence entre le nombre d'athlètes entre les plus représentés et les moins représentés n'est pas énorme, tous les sports ayant entre 200 et 300 athlètes.
 
@@ -643,7 +643,7 @@ data_top_sports <- dataset %>%
   slice_max(order_by = nb_athletes, n = 5)
 
 ggplot(data_top_sports, aes(x = nb_athletes, y = reorder(sport, nb_athletes))) +
-  geom_col(fill = "darkcyan", color = "white", width = 0.6) +
+  geom_col(fill = "cyan", color = "white", width = 0.6) +
   coord_cartesian(xlim = c(200, 290)) +
   scale_x_continuous(breaks = seq(200, 290, by = 10)) +
   labs(
@@ -654,7 +654,7 @@ ggplot(data_top_sports, aes(x = nb_athletes, y = reorder(sport, nb_athletes))) +
   theme_minimal()
 ```
 
-#### Interprétation : 
+#### Interprétation :
 
 On peut voir que les 5 sports avec le plus d'athlètes ne sont pas les sports les plsu "gros" auxquels ont pensait pendant notre hypothèse, mais ce sont d'autres sports. Ces 5 sport ont seulement une différence de 10 athlètes, ce qui est très peu.
 
@@ -700,7 +700,7 @@ ggplot(heatmap_data, aes(x = as.factor(total_olympics_attended), y = medal, fill
 
 #### Interprétation :
 
-La carte de chaleur permet de visualiser de façon claire la probabilité d'obtenir une médaille (Or, Argent, Bronze) ou aucune ("None") selon l'expérience olympique de l'athlète. On remarque généralement que la proportion de "None" baisse à mesure que le nombre de participations augmente, ce qui indique que les athlètes plus expérimentés ont de meilleures chances globales de repartir avec une médaille. 
+La carte de chaleur permet de visualiser de façon claire la probabilité d'obtenir une médaille (Or, Argent, Bronze) ou aucune ("None") selon l'expérience olympique de l'athlète. On remarque généralement que la proportion de "None" baisse à mesure que le nombre de participations augmente, ce qui indique que les athlètes plus expérimentés ont de meilleures chances globales de repartir avec une médaille.
 
 Concernant l'Or spécifiquement, cette visualisation permet de confirmer ou d'infirmer l'hypothèse d'un "pic d'efficacité" : les athlètes participant pour la deuxième ou troisième fois sont statistiquement l'élite de leur discipline, ce qui se reflète souvent par un pourcentage de réussite plus important comparé aux premières participations. L'expérience est donc un facteur clé de succès aux Jeux Olympiques.
 
@@ -710,10 +710,7 @@ Concernant l'Or spécifiquement, cette visualisation permet de confirmer ou d'in
 
 **Hypothèse :** Les grandes nations (avec un grand nombre d'athlètes) remportent le plus grand volume de médailles, mais certaines plus petites délégations ciblées affichent un taux d'efficacité (médailles par athlète) exceptionnel.
 
-Pour répondre à cette question, nous allons croiser le nombre d'athlètes uniques envoyés par pays avec le nombre total de médailles obtenues. Le graphique proposé est un **Scatter Plot (nuage de points)** où :
-- L'abscisse (X) représente le nombre d'athlètes uniques envoyés par pays.
-- L'ordonnée (Y) représente le nombre total de médailles remportées.
-- La taille et la couleur des points reflètent le **taux de transformation** (le pourcentage d'athlètes de la délégation repartant avec une médaille).
+Pour répondre à cette question, nous allons croiser le nombre d'athlètes uniques envoyés par pays avec le nombre total de médailles obtenues. Le graphique proposé est un **Scatter Plot (nuage de points)** où : - L'abscisse (X) représente le nombre d'athlètes uniques envoyés par pays. - L'ordonnée (Y) représente le nombre total de médailles remportées. - La taille et la couleur des points reflètent le **taux de transformation** (le pourcentage d'athlètes de la délégation repartant avec une médaille).
 
 Nous filtrons les pays ayant envoyé moins de 10 athlètes pour éviter les cas extrêmes de petites délégations qui fausseraient les statistiques d'efficacité globale.
 
@@ -752,9 +749,7 @@ ggplot(data_efficacite, aes(x = nb_athletes, y = nb_medailles, label = label)) +
 
 #### Interprétation :
 
-Le nuage de points permet de distinguer deux stratégies ou dynamiques différentes chez les nations olympiques :
-1. **Les géants olympiques :** Situés en haut à droite (grand nombre d'athlètes et grand nombre de médailles). Ces pays envoient d'immenses délégations et convertissent une part significative de leurs athlètes en médaillés.
-2. **Les délégations ultra-efficaces :** Situées plus haut par rapport à leur position horizontale (les points rouges/chauds). Ces pays ont un taux de transformation élevé, ce qui signifie qu'une grande partie des athlètes qu'ils envoient réussissent à décrocher une médaille.
+Le nuage de points permet de distinguer deux stratégies ou dynamiques différentes chez les nations olympiques : 1. **Les géants olympiques :** Situés en haut à droite (grand nombre d'athlètes et grand nombre de médailles). Ces pays envoient d'immenses délégations et convertissent une part significative de leurs athlètes en médaillés. 2. **Les délégations ultra-efficaces :** Situées plus haut par rapport à leur position horizontale (les points rouges/chauds). Ces pays ont un taux de transformation élevé, ce qui signifie qu'une grande partie des athlètes qu'ils envoient réussissent à décrocher une médaille.
 
 Ce graphique illustre parfaitement le compromis entre la quantité d'athlètes engagés et l'optimisation des performances par athlète individuel.
 
@@ -801,11 +796,9 @@ ggplot(data_morpho_temp, aes(x = year, y = taille_moyenne, color = sport)) +
 
 #### Interprétation :
 
-Le graphique confirme notre hypothèse d'ultra-spécialisation des corps, visible à travers la divergence progressive des deux courbes de tendance (en pointillés). 
+Le graphique confirme notre hypothèse d'ultra-spécialisation des corps, visible à travers la divergence progressive des deux courbes de tendance (en pointillés).
 
-Malgré un creux de données entre 1930 et 1980 pour ces disciplines, l'évolution sur plus d'un siècle est marquée :
-1. **Basketball :** La courbe de tendance montre une augmentation globale, passant d'environ 1m91 à plus de 1m94. Sur les éditions récentes (après 2000), on observe même un pic au-dessus de 2 mètres en moyenne, prouvant que les profils de très grande taille sont toujours plus recherchés.
-2. **Gymnastique (Artistique) :** À l'inverse, la tendance est à la baisse. Partant d'environ 1m65 au début du siècle dernier, la taille moyenne diminue pour s'établir autour de 1m61 de nos jours, avec des creux récents sous la barre des 1m60. Un centre de gravité plus bas facilite en effet l'exécution de figures acrobatiques complexes.
+Malgré un creux de données entre 1930 et 1980 pour ces disciplines, l'évolution sur plus d'un siècle est marquée : 1. **Basketball :** La courbe de tendance montre une augmentation globale, passant d'environ 1m91 à plus de 1m94. Sur les éditions récentes (après 2000), on observe même un pic au-dessus de 2 mètres en moyenne, prouvant que les profils de très grande taille sont toujours plus recherchés. 2. **Gymnastique (Artistique) :** À l'inverse, la tendance est à la baisse. Partant d'environ 1m65 au début du siècle dernier, la taille moyenne diminue pour s'établir autour de 1m61 de nos jours, avec des creux récents sous la barre des 1m60. Un centre de gravité plus bas facilite en effet l'exécution de figures acrobatiques complexes.
 
 Cette évolution opposée met en évidence que les caractéristiques physiques ne sont pas dues au hasard : elles s'optimisent et se spécialisent pour répondre de plus en plus précisément aux exigences spécifiques de chaque discipline de haut niveau.
 
@@ -853,8 +846,7 @@ ggplot(data_rae, aes(x = mois_naissance, y = pourcentage)) +
 
 #### Interprétation :
 
-Si la ligne de tendance théorique (en rouge) était parfaitement respectée, chaque mois regrouperait environ 8.33% des naissances. 
-En observant la répartition réelle via les barres du graphique, on peut voir si les mois de début d'année (Janvier, Février, Mars) dépassent cette ligne rouge de manière significative. Le cas échéant, cela confirmera que la sélection précoce dans les filières sportives durant l'enfance offre un avantage mesurable et durable aux enfants nés en début d'année, avantage qui se répercute jusqu'aux Jeux Olympiques.
+Si la ligne de tendance théorique (en rouge) était parfaitement respectée, chaque mois regrouperait environ 8.33% des naissances. En observant la répartition réelle via les barres du graphique, on peut voir si les mois de début d'année (Janvier, Février, Mars) dépassent cette ligne rouge de manière significative. Le cas échéant, cela confirmera que la sélection précoce dans les filières sportives durant l'enfance offre un avantage mesurable et durable aux enfants nés en début d'année, avantage qui se répercute jusqu'aux Jeux Olympiques.
 
 ### Dans quels sports cet effet est-il le plus marqué ?
 
@@ -897,8 +889,7 @@ ggplot(data_rae_sport, aes(x = pct_q1, y = reorder(sport, pct_q1))) +
 
 #### Interprétation :
 
-En filtrant les sports et en isolant la part d'athlètes nés dans le premier trimestre (Q1), le graphique met en évidence les disciplines où la date de naissance joue le rôle le plus crucial.
-La ligne rouge verticale représente l'espérance théorique (25%). Les sports qui s'en éloignent fortement vers la droite, comme le Patinage de Vitesse, la Lutte ou le Saut à ski, démontrent un "Relative Age Effect" très marqué. Dans ces sports physiques où les catégories d'âge dans l'enfance sont strictes, être né en tout début d'année offre un avantage physique temporaire décisif qui se transforme en un avantage de sélection durable menant jusqu'au plus haut niveau olympique.
+En filtrant les sports et en isolant la part d'athlètes nés dans le premier trimestre (Q1), le graphique met en évidence les disciplines où la date de naissance joue le rôle le plus crucial. La ligne rouge verticale représente l'espérance théorique (25%). Les sports qui s'en éloignent fortement vers la droite, comme le Patinage de Vitesse, la Lutte ou le Saut à ski, démontrent un "Relative Age Effect" très marqué. Dans ces sports physiques où les catégories d'âge dans l'enfance sont strictes, être né en tout début d'année offre un avantage physique temporaire décisif qui se transforme en un avantage de sélection durable menant jusqu'au plus haut niveau olympique.
 
 # Question 13 : Sports d'équipe vs Sports individuels : l'âge de l'or
 
@@ -935,10 +926,10 @@ ggplot(data_team_indiv, aes(x = team_or_individual, y = age, fill = team_or_indi
 
 #### Interprétation :
 
-Le graphique contredit notre hypothèse de départ de manière assez surprenante ! 
+Le graphique contredit notre hypothèse de départ de manière assez surprenante !
 
-En lisant la médiane (la ligne noire épaisse au milieu de chaque boîte), on constate que l'âge médian des médaillés d'or individuels est de **30 ans**, contre environ **28 ans** pour les sports d'équipe. 
+En lisant la médiane (la ligne noire épaisse au milieu de chaque boîte), on constate que l'âge médian des médaillés d'or individuels est de **30 ans**, contre environ **28 ans** pour les sports d'équipe.
 
-Comment expliquer cela ? Les sports individuels incluent un grand nombre de disciplines où l'adresse, la précision et la technique priment sur l'explosivité physique pure (le tir, l'équitation, la voile, le golf, etc.), ce qui permet des carrières parfois très longues. À l'inverse, la majorité des sports d'équipe olympiques (comme le football, le basketball, le handball) exigent un engagement athlétique et cardiovasculaire intense, favorisant des athlètes légèrement plus jeunes dans la force de l'âge physique. 
+Comment expliquer cela ? Les sports individuels incluent un grand nombre de disciplines où l'adresse, la précision et la technique priment sur l'explosivité physique pure (le tir, l'équitation, la voile, le golf, etc.), ce qui permet des carrières parfois très longues. À l'inverse, la majorité des sports d'équipe olympiques (comme le football, le basketball, le handball) exigent un engagement athlétique et cardiovasculaire intense, favorisant des athlètes légèrement plus jeunes dans la force de l'âge physique.
 
 Les boîtes (l'écart interquartile) montrent également que la grande majorité des vainqueurs se situent entre 22 et 35 ans dans les deux catégories, démontrant que la performance olympique maximale culmine globalement dans cette fenêtre, mais avec une "prime à l'expérience" paradoxalement plus forte en individuel.
