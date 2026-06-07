@@ -933,3 +933,233 @@ En lisant la médiane (la ligne noire épaisse au milieu de chaque boîte), on c
 Comment expliquer cela ? Les sports individuels incluent un grand nombre de disciplines où l'adresse, la précision et la technique priment sur l'explosivité physique pure (le tir, l'équitation, la voile, le golf, etc.), ce qui permet des carrières parfois très longues. À l'inverse, la majorité des sports d'équipe olympiques (comme le football, le basketball, le handball) exigent un engagement athlétique et cardiovasculaire intense, favorisant des athlètes légèrement plus jeunes dans la force de l'âge physique.
 
 Les boîtes (l'écart interquartile) montrent également que la grande majorité des vainqueurs se situent entre 22 et 35 ans dans les deux catégories, démontrant que la performance olympique maximale culmine globalement dans cette fenêtre, mais avec une "prime à l'expérience" paradoxalement plus forte en individuel.
+
+
+## Question 14 — Les athlètes ayant la plus grande longévité sont-ils aussi ceux qui ont participé à la plus grande diversité d’épreuves ?
+
+### Hypothèse
+
+On suppose que les athlètes les plus polyvalents, c’est-à-dire ceux qui participent à plusieurs sports ou épreuves, peuvent avoir une carrière plus longue.
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+
+athlete_longevity <- olympics |>
+  filter(!is.na(athlete_name), !is.na(year)) |>
+  group_by(athlete_name) |>
+  summarise(
+    first_year = min(year, na.rm = TRUE),
+    last_year = max(year, na.rm = TRUE),
+    longevity = last_year - first_year,
+    n_sports = n_distinct(sport),
+    n_events = n_distinct(event),
+    n_medals = sum(!is.na(medal) & medal != "No medal"),
+    .groups = "drop"
+  )
+
+ggplot(athlete_longevity, aes(x = longevity, y = n_events)) +
+  geom_point(color = "darkblue", alpha = 0.6) +
+  labs(
+    title = "Relation entre longévité et diversité des épreuves",
+    x = "Longévité de carrière",
+    y = "Nombre d'épreuves différentes"
+  )
+```
+
+### Choix du graphique
+
+Nous avons choisi un nuage de points car il permet d’étudier la relation entre deux variables quantitatives : la longévité de carrière et le nombre d’épreuves différentes pratiquées. Chaque point représente un athlète.
+
+### Interprétation
+
+Ce graphique permet de voir si les athlètes ayant une carrière plus longue participent aussi à un plus grand nombre d’épreuves. Si les points montent lorsque la longévité augmente, cela indiquerait une relation positive entre polyvalence et durée de carrière.
+
+À l’inverse, si les points sont dispersés sans tendance claire, cela signifie que la longévité ne dépend pas forcément du nombre d’épreuves pratiquées. Dans ce cas, certains athlètes peuvent avoir une longue carrière tout en restant spécialisés dans une seule discipline.
+
+### Conclusion
+
+Ce graphique permet de tester l’hypothèse selon laquelle la polyvalence favorise une carrière plus longue. Il met en relation la durée de carrière des athlètes avec leur diversité d’épreuves, afin de voir si les athlètes les plus polyvalents sont aussi ceux qui restent le plus longtemps dans les Jeux olympiques.
+
+## Question 15 — L'écart-type de la taille des athlètes au sein d'une même discipline a-t-il diminué entre 1924 et 2024 ?
+
+### Hypothèse
+
+Nous supposons qu'au fil du temps, les athlètes d'une même discipline ont développé des caractéristiques physiques de plus en plus similaires. Cette évolution traduirait une spécialisation progressive vers un profil physique considéré comme optimal pour chaque sport.
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+
+
+swimming_data <- olympics |>
+  filter(
+    sport == "Swimming",
+    !is.na(height_cm),
+    !is.na(year)
+  )
+
+height_variation <- swimming_data |>
+  group_by(year) |>
+  summarise(
+    sd_height = sd(height_cm),
+    .groups = "drop"
+  )
+
+ggplot(height_variation,
+       aes(x = year, y = sd_height)) +
+  geom_line(color = "blue") +
+  geom_point(color = "blue") +
+  labs(
+    title = "Évolution de l'écart-type de la taille en natation",
+    x = "Année",
+    y = "Écart-type de la taille (cm)"
+  )
+```
+
+### Choix du graphique
+
+Nous avons choisi un graphique en lignes car nous souhaitons observer l'évolution d'une variable au cours du temps. Ce type de représentation permet de visualiser facilement les tendances et les variations de l'écart-type de la taille des athlètes d'une même discipline.
+
+### Interprétation
+
+Chaque point représente l'écart-type de la taille des nageurs pour une année donnée. L'écart-type mesure la dispersion des tailles autour de la moyenne.
+
+Si la courbe diminue progressivement au fil du temps, cela signifie que les tailles des athlètes deviennent plus homogènes. Cette évolution soutiendrait l'hypothèse d'une standardisation physique, où les sportifs tendent à se rapprocher d'un profil considéré comme optimal pour la discipline.
+
+À l'inverse, si l'écart-type reste stable ou augmente, cela suggère que la diversité physique demeure importante et que plusieurs profils morphologiques peuvent coexister au sein du même sport.
+
+### Conclusion
+
+Cette analyse permet d'étudier l'évolution de la diversité physique des athlètes au sein d'une même discipline. Une diminution de l'écart-type de la taille au cours du temps constituerait un indice de spécialisation progressive des profils physiques.
+
+## Question 16 — La taille des athlètes influence-t-elle davantage les performances mesurées en distance (mètres) que celles mesurées en temps (secondes) ?
+
+### Hypothèse
+
+Nous supposons que la taille constitue un avantage plus important dans les disciplines où la performance est mesurée en distance. Des membres plus longs peuvent favoriser certaines actions comme les lancers ou les sauts.
+
+À l'inverse, dans les disciplines chronométrées, la performance dépend davantage de facteurs tels que la vitesse, l'endurance ou la technique. L'influence directe de la taille pourrait donc être moins marquée.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+
+height_results <- olympics |>
+  filter(
+    !is.na(height_cm),
+    !is.na(result_value),
+    !is.na(result_unit)
+  ) |>
+  filter(
+    result_unit %in% c("metres", "seconds")
+  )
+
+ggplot(
+  height_results,
+  aes(x = height_cm, y = result_value)
+) +
+  geom_point(alpha = 0.5, color = "blue") +
+  facet_wrap(~ result_unit, scales = "free_y") +
+  labs(
+    title = "Relation entre la taille et les performances",
+    x = "Taille (cm)",
+    y = "Résultat"
+  ) +
+  theme_minimal()
+```
+
+### Choix du graphique
+
+Nous avons choisi un nuage de points car il permet d'étudier la relation entre deux variables quantitatives : la taille des athlètes et leur performance.
+Le graphique est divisé en deux parties selon l'unité de mesure du résultat (« metres » ou « seconds »). Cette séparation permet de comparer visuellement l'effet de la taille dans différents types d'épreuves.
+
+## Interprétation
+
+Chaque point représente un athlète. L'axe horizontal correspond à sa taille et l'axe vertical à sa performance.
+Dans les épreuves mesurées en mètres, une tendance croissante entre la taille et le résultat pourrait indiquer qu'une plus grande taille favorise la performance. Cela peut s'expliquer par un avantage biomécanique dans certaines disciplines.
+Dans les épreuves mesurées en secondes, la relation peut être différente. Une dispersion importante des points ou l'absence de tendance visible suggérerait que la taille n'est pas le principal facteur expliquant la performance.
+La comparaison des deux graphiques permet ainsi de déterminer si l'influence de la taille est plus forte dans les disciplines de distance que dans les disciplines chronométrées.
+
+## Question 17 — Existe-t-il une corrélation visuelle entre la taille et le poids des athlètes, toutes disciplines confondues ?
+
+## Hypothèse
+
+Nous supposons qu'il existe une corrélation positive entre la taille et le poids des athlètes. En général, les athlètes les plus grands ont également tendance à être plus lourds.
+
+Nous nous attendons donc à observer une tendance croissante reliant ces deux variables. Cette analyse permet également de détecter d'éventuelles valeurs aberrantes ou incohérentes dans le dataset.arquée.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+
+height_weight <- olympics |>
+  filter(
+    !is.na(height_cm),
+    !is.na(weight_kg)
+  )
+
+ggplot(height_weight,
+       aes(x = height_cm,
+           y = weight_kg)) +
+  geom_point(alpha = 0.4, color = "blue") +
+  geom_smooth(method = "lm",
+              se = FALSE,
+              color = "red") +
+  labs(
+    title = "Relation entre la taille et le poids des athlètes",
+    x = "Taille (cm)",
+    y = "Poids (kg)"
+  ) +
+  theme_minimal()
+```
+
+
+### Choix du graphique
+
+Nous avons choisi un nuage de points car il permet de représenter la relation entre deux variables quantitatives : la taille et le poids.
+L'ajout d'une ligne de tendance linéaire facilite l'identification d'une corrélation générale entre ces deux caractéristiques physiques.
+
+## Interprétation
+
+Chaque point représente un athlète. L'axe horizontal correspond à sa taille et l'axe vertical à son poids.
+Si les points suivent globalement une trajectoire ascendante et que la ligne de tendance est croissante, cela indique une corrélation positive entre la taille et le poids. Les athlètes les plus grands ont alors tendance à être également les plus lourds.
+Le nuage de points permet également d'identifier des valeurs atypiques. Par exemple, un athlète très grand mais extrêmement léger, ou inversement très petit mais particulièrement lourd, apparaîtrait éloigné du reste des observations.
+
+# Question 18 — Combien d'athlètes participent aux Jeux Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver ?
+
+## Hypothèse
+
+Nous supposons que les Jeux Olympiques d'Été rassemblent un plus grand nombre d'athlètes que les Jeux Olympiques d'Hiver.
+
+Cette différence s'explique par le nombre plus élevé de disciplines sportives présentes aux Jeux d'Été ainsi que par la participation d'un plus grand nombre de pays.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+games_count <- olympics |>
+  count(games_type)
+
+ggplot(games_count,
+       aes(x = games_type,
+           y = n,
+           fill = games_type)) +
+  geom_col() +
+  geom_text(
+    aes(label = n),
+    vjust = -0.3,
+    size = 4
+  ) +
+  labs(
+    title = "Nombre d'athlètes selon le type de Jeux Olympiques",
+    x = "Type de Jeux",
+    y = "Nombre d'athlètes"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none"
+  )
+```
+
+### Choix du graphique
+
+Nous avons choisi un diagramme en barres car il permet de comparer facilement les effectifs de deux catégories distinctes : les Jeux d'Été et les Jeux d'Hiver.
+
+Ce type de représentation rend immédiatement visible la différence d'envergure entre les deux compétitions.
+
+## Interprétation
+
+Chaque barre représente le nombre total d'athlètes participant à un type de Jeux Olympiques.
+
+La comparaison des hauteurs de barres permet d'observer immédiatement quelle compétition rassemble le plus grand nombre d'athlètes.
+
+Si la barre correspondant aux Jeux d'Été est nettement plus élevée, cela confirme que cette compétition possède une envergure plus importante en termes de participation.
+
