@@ -1216,7 +1216,12 @@ ggplot(morpho_sel, aes(x = height_cm, y = weight_kg)) +
   theme_minimal() +
   # La légende des niveaux de densité n'est pas interprétable en valeur absolue :
   # on la masque et on explique le code couleur dans le texte.
-  theme(legend.position = "none")
+  theme(legend.position = "none")+
+  theme(
+    legend.position = "none",
+    plot.title  = element_text(face = "bold"),
+    axis.title  = element_text(face = "bold")
+  )
 ```
 
 ```{r q19_ellipses, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 9, fig.height = 6}
@@ -1232,7 +1237,12 @@ ggplot(morpho_sel, aes(x = height_cm, y = weight_kg, colour = sport)) +
     title  = "Séparation morphologique des disciplines (ellipses de confiance 95 %)",
     x = "Taille (cm)", y = "Poids (kg)", colour = "Discipline"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.title  = element_text(face = "bold"),
+    axis.title  = element_text(face = "bold")
+  )
 ```
 
 ### Interprétation
@@ -1315,7 +1325,12 @@ ggplot(imc_data, aes(x = imc, y = sport, fill = imc_median)) +
     x = "Indice de Masse Corporelle (IMC)", y = "Discipline sportive",
     fill = "IMC médian"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.title  = element_text(face = "bold"),
+    axis.title  = element_text(face = "bold")
+  )
 ```
 
 ### Interprétation
@@ -1340,3 +1355,115 @@ L'IMC se révèle un excellent indicateur synthétique pour « cartographier » 
 résume en une dimension ce que la Question 19 montrait en deux. Après avoir épuisé l'angle
 *morphologique*, nous changeons d'échelle pour nous intéresser non plus à l'athlète, mais à la
 **nation** : l'histoire et le rang d'un pays expliquent-ils son palmarès ?
+
+
+# Question 21 : L'ancienneté olympique et le rang historique d'une nation prédisent-ils son palmarès ?
+
+Nous quittons l'athlète pour la **nation**. Le jeu de données contient des agrégats par pays :
+l'année de première participation (`country_first_participation`), le total historique de médailles
+(`country_total_medals`) et le meilleur classement jamais atteint (`country_best_rank`). Nous nous
+demandons si ces variables sont liées : **un pays présent depuis longtemps, ou très bien classé,
+gagne-t-il davantage de médailles ?**
+
+**Hypothèse :** les nations historiques (présentes dès 1896) et celles ayant déjà atteint le
+sommet du classement (rang 1) ont accumulé un palmarès bien supérieur. Nous anticipons une
+corrélation négative entre l'année de première participation et le total de médailles (plus on
+arrive tôt, plus on accumule), et une corrélation négative entre le meilleur rang et le total
+(meilleur rang = chiffre plus petit = plus de médailles).
+
+### Choix du graphique
+
+Les agrégats `country_*` ne prennent **qu'une seule valeur par pays** : nous réduisons donc le jeu
+de données à une ligne par pays. Nous traçons ensuite deux **nuages de points** avec une **droite
+de régression linéaire** (`geom_smooth(method = "lm")`) pour matérialiser la tendance. Comme le
+total de médailles varie énormément (de 5 à plus de 2600), nous passons l'axe vertical en **échelle
+logarithmique** pour rendre le graphique lisible. Quelques pays remarquables sont annotés.
+
+```{r q21_prepare, echo = FALSE, warning = FALSE, message = FALSE}
+# --- Chargement et réduction à une ligne par pays ---
+pays_data <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
+
+# Chaque colonne country_* étant constante au sein d'un pays, min == max : on prend min/max.
+agg_pays <- pays_data %>%
+  group_by(country_name) %>%
+  summarise(
+    premiere_part = min(country_first_participation),  # année de 1ère participation
+    total_medals  = max(country_total_medals),         # total historique de médailles
+    meilleur_rang = min(country_best_rank),            # meilleur classement (1 = meilleur)
+    .groups = "drop"
+  )
+
+# Coefficients de corrélation de Pearson (calculés sur les valeurs brutes).
+r_anciennete <- round(cor(agg_pays$premiere_part, agg_pays$total_medals), 3)
+r_rang       <- round(cor(agg_pays$meilleur_rang, agg_pays$total_medals), 3)
+```
+
+```{r q21_panneau_anciennete, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 8, fig.height = 5}
+# --- Panneau A : année de 1ère participation vs total de médailles ---
+ggplot(agg_pays, aes(x = premiere_part, y = total_medals)) +
+  # Taille des points proportionnelle au palmarès, pour repérer les grandes nations.
+  geom_point(aes(size = total_medals), alpha = 0.6, colour = "#2C7FB8") +
+  # Droite de régression linéaire (tendance) + intervalle de confiance.
+  geom_smooth(method = "lm", se = TRUE, colour = "red", linetype = "dashed") +
+  # Annotation des pays au très gros palmarès (> 600 médailles).
+  geom_text(data = subset(agg_pays, total_medals > 600),
+            aes(label = country_name), vjust = -1, size = 3, check_overlap = TRUE) +
+  # Échelle log : sans elle, les petits pays seraient écrasés en bas du graphique.
+  scale_y_log10() +
+  labs(
+    title    = "Ancienneté olympique et palmarès des nations",
+    subtitle = paste0("Corrélation de Pearson r = ", r_anciennete,
+                      " (échelle verticale logarithmique)"),
+    x = "Année de première participation", y = "Total historique de médailles",
+    size = "Total médailles"
+  ) +
+  theme_minimal()
+```
+
+```{r q21_panneau_rang, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 8, fig.height = 5}
+# --- Panneau B : meilleur rang historique vs total de médailles ---
+ggplot(agg_pays, aes(x = meilleur_rang, y = total_medals)) +
+  geom_point(alpha = 0.6, colour = "#D95F0E", size = 2) +
+  geom_smooth(method = "lm", se = TRUE, colour = "red", linetype = "dashed") +
+  geom_text(data = subset(agg_pays, total_medals > 600),
+            aes(label = country_name), vjust = -1, size = 3, check_overlap = TRUE) +
+  scale_y_log10() +
+  labs(
+    title    = "Meilleur classement historique et palmarès des nations",
+    subtitle = paste0("Corrélation de Pearson r = ", r_rang,
+                      " (échelle verticale logarithmique)"),
+    x = "Meilleur classement historique (1 = meilleur)",
+    y = "Total historique de médailles"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.title  = element_text(face = "bold"),
+    axis.title  = element_text(face = "bold")
+  )
+```
+
+### Interprétation
+
+Les deux panneaux valident notre hypothèse, avec des forces différentes :
+
+- **Ancienneté (r ≈ -0,37) :** la tendance est réelle mais modérée. Les nations fondatrices
+  (États-Unis, France, Grande-Bretagne, Allemagne, toutes présentes dès 1896) figurent bien parmi
+  les plus médaillées. Mais la corrélation est loin d'être parfaite : la **Chine** (1ère
+  participation en 1932) et l'**Union soviétique** (1952) sont arrivées tardivement tout en figurant
+  parmi les toutes premières nations du palmarès. L'ancienneté aide, mais la puissance démographique
+  et l'investissement comptent davantage.
+- **Meilleur rang (r ≈ -0,63) :** la corrélation est nettement plus forte. Avoir déjà atteint le
+  rang 1 va presque systématiquement de pair avec un énorme total de médailles. C'est logique : il
+  s'agit de deux mesures de la même domination sportive.
+
+L'échelle logarithmique est ici indispensable : sans elle, les États-Unis (≈ 2638 médailles)
+écraseraient à eux seuls tout le graphique.
+
+### Conclusion
+
+Le rang historique est un bien meilleur prédicteur du palmarès que la simple ancienneté. Mais
+toutes les médailles ne se valent pas : un pays peut accumuler beaucoup de podiums sans dominer.
+La dernière question affine donc l'analyse en s'intéressant à la **qualité** du palmarès - la part
+d'or.
+
