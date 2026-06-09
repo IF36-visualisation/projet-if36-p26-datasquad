@@ -1467,3 +1467,86 @@ toutes les médailles ne se valent pas : un pays peut accumuler beaucoup de podi
 La dernière question affine donc l'analyse en s'intéressant à la **qualité** du palmarès - la part
 d'or.
 
+
+# Question 22 : Quelles nations sont des « machines à or » et lesquelles sont des « collectionneuses de médailles » ?
+
+Le total de médailles (Question 21) mélange l'or, l'argent et le bronze. Or gagner beaucoup de
+médailles n'est pas la même chose que **dominer**. Nous calculons donc le **ratio d'or** de chaque
+nation : la part de médailles d'or dans son palmarès total
+(`country_total_gold / country_total_medals`).
+
+**Hypothèse :** certaines nations « dominatrices » transforment une grande part de leurs podiums en
+or, tandis que d'autres « collectionnent » des médailles sans souvent atteindre la première marche.
+Nous nous attendons aussi à voir émerger des **spécialistes** : de petits pays gold-riches sur une
+poignée de disciplines.
+
+### Choix du graphique
+
+Nous utilisons un **graphique en sucettes** (*lollipop chart* : un segment terminé par un point),
+plus léger visuellement qu'un diagramme en barres pour comparer 49 pays. Les pays sont ordonnés par
+ratio d'or décroissant. La **taille du point** représente le total de médailles (pour distinguer
+les géants des petites délégations) et sa **couleur** reprend le ratio d'or. Nous écartons les pays
+ayant moins de 30 médailles au total, car un ratio calculé sur un trop petit dénominateur serait
+statistiquement fragile.
+
+```{r q22_ratio_or, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 9, fig.height = 10}
+# --- Chargement et calcul du ratio d'or par pays ---
+or_data <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
+
+ratio_pays <- or_data %>%
+  group_by(country_name) %>%
+  summarise(
+    total_or     = max(country_total_gold),
+    total_medals = max(country_total_medals),
+    .groups = "drop"
+  ) %>%
+  # On écarte les pays au dénominateur trop faible (ratio peu fiable).
+  filter(total_medals >= 30) %>%
+  # Ratio d'or en pourcentage.
+  mutate(ratio_or = total_or / total_medals * 100)
+
+# --- Graphique en sucettes (lollipop) ordonné par ratio d'or ---
+ggplot(ratio_pays, aes(x = ratio_or, y = reorder(country_name, ratio_or))) +
+  # Le "bâton" de la sucette : un segment de 0 jusqu'à la valeur du pays.
+  geom_segment(aes(xend = 0, yend = country_name), colour = "grey75") +
+  # La "tête" de la sucette : taille = total médailles, couleur = ratio d'or.
+  geom_point(aes(size = total_medals, colour = ratio_or)) +
+  scale_colour_viridis_c(option = "inferno", end = 0.9) +
+  labs(
+    title    = "Ratio d'or des nations : part de l'or dans le palmarès total",
+    subtitle = "Pays ayant au moins 30 médailles au total",
+    x = "% de médailles d'or", y = "Pays",
+    size = "Total médailles", colour = "% d'or"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.title  = element_text(face = "bold"),
+    axis.title  = element_text(face = "bold")
+  )
+```
+
+### Interprétation
+
+Le graphique révèle **trois profils de nations** :
+
+- **Les géants dominateurs** (gros points en haut) : l'Union soviétique (42 %), la **Chine**
+  (41 %) et les **États-Unis** (40 %) cumulent à la fois un énorme volume de médailles et un ratio
+  d'or élevé. Ce sont les vraies puissances : elles ne se contentent pas de participer aux podiums,
+  elles les gagnent.
+- **Les spécialistes** (petits points, ratio élevé) : l'**Éthiopie** (44 %), le **Nigeria** (41 %)
+  ou la **Turquie** (40 %) affichent un ratio d'or aussi haut que les géants, mais sur un volume
+  bien plus faible. Ce sont des nations qui dominent un **petit nombre de disciplines** (l'Éthiopie
+  est historiquement reine du fond), ce qui est cohérent avec la réalité sportive.
+- **Les collectionneuses** (bas du classement) : le **Mexique** (19 %), la **Pologne**, la
+  **Bulgarie** ou le **Brésil** (≈ 24 %) accumulent les podiums mais transforment rarement en or.
+
+On note tout de même que l'éventail des ratios reste resserré (≈ 19 % à 44 %), ce qui invite à la
+prudence : sur ce jeu de données, la part d'or tourne globalement autour de 30–40 %. La taille des
+points (le volume) reste donc le meilleur séparateur entre vraies puissances et nations de niche.
+
+### Conclusion
+
+En croisant le **volume** (taille des points) et la **qualité** (ratio d'or), ce dernier graphique
+synthétise élégamment la hiérarchie olympique : il distingue les nations qui gagnent gros, celles
+qui gagnent juste, et celles qui gagnent souvent sans gagner le titre.
