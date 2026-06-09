@@ -2,7 +2,10 @@
 title: "Rapport"
 author: "data-squad"
 date: "2026-04-21"
-output: pdf_document
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 ---
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
@@ -1550,3 +1553,39 @@ points (le volume) reste donc le meilleur séparateur entre vraies puissances et
 En croisant le **volume** (taille des points) et la **qualité** (ratio d'or), ce dernier graphique
 synthétise élégamment la hiérarchie olympique : il distingue les nations qui gagnent gros, celles
 qui gagnent juste, et celles qui gagnent souvent sans gagner le titre.
+
+# Question 23 : Application Shiny — un explorateur morphologique interactif
+
+Pour permettre au lecteur d'explorer lui-même les empreintes morphologiques vues en Question 19,
+nous avons développé une **application Shiny** (dossier `/shiny/`). Plutôt que de figer un seul
+graphique, elle laisse l'utilisateur **choisir la discipline, la saison et le genre**, et observer
+en temps réel comment se déplace le nuage taille × poids et comment évolue la distribution de l'IMC.
+
+*Les figures ci-dessous n'ont pas été générées directement dans ce rapport : ce sont des captures
+d'écran de l'application Shiny. Pour
+interagir avec ces graphiques, il faut lancer l'application (`/shiny/app.R`).*
+
+```{r, echo=FALSE, fig.align='center', out.width='80%', fig.cap="Onglet 1 de l'application Shiny : nuage taille x poids filtré par discipline, saison et genre, points colorés selon la médaille obtenue."}
+knitr::include_graphics("Shiny_1_filtre.png")
+```
+
+```{r, echo=FALSE, fig.align='center', out.width='80%', fig.cap="Onglet 2 de l'application Shiny : distribution de l'IMC pour les disciplines sélectionnées (violon interactif)."}
+knitr::include_graphics("Shiny2_violon_interactif.png")
+```
+
+La première capture (nuage taille × poids) confirme de manière interactive ce que la Question 19
+montrait : en sélectionnant successivement « Basketball » puis « Gymnastics (Artistic) », le nuage
+se déplace radicalement dans le plan, illustrant en direct la spécialisation des gabarits. Le filtre
+par saison et par genre permet en outre de vérifier que ces empreintes restent stables (les femmes
+suivent la même logique morphologique que les hommes, simplement décalée vers des gabarits un peu
+plus légers).
+
+La seconde capture (violon d'IMC) permet de comparer interactivement deux ou trois disciplines au
+choix, et retrouve le classement de la Question 20 : l'haltérophilie domine toujours en IMC, la
+gymnastique reste tout en bas.
+
+### Conclusion
+
+L'application Shiny transforme une analyse figée en outil d'exploration : elle apporte une valeur
+ajoutée réelle par rapport à un graphique statique, puisqu'elle laisse le lecteur poser ses propres
+sous-questions.

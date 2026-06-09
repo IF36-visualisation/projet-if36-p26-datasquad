@@ -1,0 +1,1461 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Rapport},
+  pdfauthor={data-squad},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Rapport}
+\author{data-squad}
+\date{2026-04-21}
+
+\begin{document}
+\maketitle
+
+\section{Projet IF36 - DataSquad : Analyse des Données Olympiques
+(1896-2024)}\label{projet-if36---datasquad-analyse-des-donnuxe9es-olympiques-1896-2024}
+
+\subsection{Présentation des
+données}\label{pruxe9sentation-des-donnuxe9es}
+
+Les données exploitées dans le cadre de ce projet proviennent d'un jeu
+de données extrait de la plateforme Kaggle, dans un format en
+\texttt{.csv}. Il contient les informations d'athlètes pendant les Jeux
+Olympiques de 1896 à 2024.
+
+Nous avons choisi ce set de données car cela nous paraissait très
+intéressant, nous aimons bien le sport, extraire des statistiques de ce
+dataset peut-être très instructif. Nous avons vu un potentiel dans ce
+dataset, il nous permet de nous poser les bonnes questions, qui nous
+amèneront des graphiques et statistiques pertinents.
+
+Nous avons donc une base de données de 8500 athlètes, avec des données
+sur 30 catégories. Ces variables couvrent à la fois les résultats
+sportifs des individus (répartition des médailles, records, valeur des
+résultats) et leurs profils biométriques et identitaires (pays
+d'origine, taille, poids, etc.).
+
+\subsection{Types de données}\label{types-de-donnuxe9es}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nom de la colonne
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Format donnée
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \texttt{athlete\_id} & String & ID unique (format ATH-00001 à
+ATH-08500) & Discrète (Identifiant) \\
+2 & \texttt{athlete\_name} & String & Nom complet (Prénom + Nom) &
+Discrète (Nominale) \\
+3 & \texttt{gender} & String & Sexe de l'athlète (Male/Female) &
+Discrète (Nominale) \\
+4 & \texttt{age} & Integer & Âge au moment de l'événement (15--42) &
+Discrète \\
+5 & \texttt{date\_of\_birth} & Date & Date de naissance (YYYY-MM-DD) &
+Continue (Temporelle) \\
+6 & \texttt{nationality} & String & Code CIO du pays sur 3 lettres (ex:
+USA, FRA) & Discrète (Nominale) \\
+7 & \texttt{country\_name} & String & Nom complet du pays & Discrète
+(Nominale) \\
+8 & \texttt{sport} & String & Discipline (ex: Athlétisme, Natation) &
+Discrète (Nominale) \\
+9 & \texttt{event} & String & Épreuve spécifique (ex: 100m Sprint) &
+Discrète (Nominale) \\
+10 & \texttt{games\_type} & String & Type de jeux (Summer / Winter) &
+Discrète (Nominale) \\
+11 & \texttt{year} & Integer & Année des JO (1896--2024) & Discrète
+(Temporelle) \\
+12 & \texttt{host\_city} & String & Ville hôte des Jeux & Discrète
+(Nominale) \\
+13 & \texttt{team\_or\_individual} & String & Épreuve par équipe ou
+individuelle & Discrète (Nominale) \\
+14 & \texttt{medal} & String & Médaille : Gold, Silver, Bronze ou None &
+Discrète (Ordinale) \\
+15 & \texttt{result\_value} & Float & Résultat chiffré (temps, distance,
+score) & Continue \\
+16 & \texttt{result\_unit} & String & Unité du résultat (seconds,
+metres, points, kg) & Discrète (Nominale) \\
+17 & \texttt{total\_olympics} & Integer & Nombre total de JO fréquentés
+(1--5) & Discrète \\
+18 & \texttt{total\_medals\_won} & Integer & Total de médailles en
+carrière & Discrète \\
+19 & \texttt{gold\_medals} & Integer & Nombre de médailles d'or en
+carrière & Discrète \\
+20 & \texttt{silver\_medals} & Integer & Nombre de médailles d'argent en
+carrière & Discrète \\
+21 & \texttt{bronze\_medals} & Integer & Nombre de médailles de bronze
+en carrière & Discrète \\
+22 & \texttt{country\_total\_gold} & Integer & Total historique d'or du
+pays (jusqu'en 2024) & Discrète \\
+23 & \texttt{country\_total\_medals} & Integer & Total historique de
+médailles du pays & Discrète \\
+24 & \texttt{country\_first\_part} & Integer & Année de la première
+participation du pays & Discrète (Temporelle) \\
+25 & \texttt{country\_best\_rank} & Integer & Meilleur classement
+historique du pays & Discrète (Ordinale) \\
+26 & \texttt{is\_record\_holder} & String & Record : World Record /
+Olympic Record / No & Discrète (Nominale) \\
+27 & \texttt{coach\_name} & String & Nom de l'entraîneur & Discrète
+(Nominale) \\
+28 & \texttt{height\_cm} & Float & Taille de l'athlète en centimètres &
+Continue \\
+29 & \texttt{weight\_kg} & Float & Poids de l'athlète en kilogrammes &
+Continue \\
+30 & \texttt{notes} & String & Contexte supplémentaire (ex: ``Personal
+Best'') & Discrète (Texte libre) \\
+\end{longtable}
+
+\subsection{Plan d'analyse}\label{plan-danalyse}
+
+\subsubsection{Questions de recherche}\label{questions-de-recherche}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Performance et Morphologie} : Est-ce que la taille/poids d'un
+  athlète influence sa performance ?
+\item
+  \textbf{Temporalité} : Quelles sont les saisons qui sont marquées par
+  un grand nombre de compétitions ?
+\item
+  \textbf{Succès national} : Quels pays remportent le plus de
+  compétitions ?
+\item
+  \textbf{Genre} : Y'a-t-il un genre mis en avant plus qu'un autre ?
+\item
+  \textbf{Représentativité} : Quelles sont les nationalités les plus /
+  moins représentées ?
+\end{itemize}
+
+\subsubsection{Interrogations et
+objectifs}\label{interrogations-et-objectifs}
+
+Notre analyse gravite autour d'une problématique centrale :
+\textbf{L'influence de la morphologie (taille et poids) sur la
+performance athlétique.} Nous cherchons à déterminer si des
+caractéristiques physiques spécifiques constituent un avantage
+déterminant pour l'obtention d'une médaille ou d'un record.
+
+\textbf{Objectifs secondaires :} * Existe-t-il une ``taille idéale'' par
+discipline sportive ? * Le rapport poids/taille (IMC) est-il plus
+corrélé à la performance que la taille seule ? * Cette influence
+morphologique a-t-elle évolué entre les premiers Jeux Olympiques et les
+éditions récentes (spécialisation des corps) ?
+
+\subsubsection{Informations attendues}\label{informations-attendues}
+
+Nous espérons identifier des clusters d'athlètes performants par sport.
+Par exemple, nous anticipons une corrélation positive forte entre la
+taille et la performance en basketball ou en natation, tandis qu'elle
+pourrait être négative ou inexistante en gymnastique ou en équitation.
+
+\subsubsection{Variables comparées et
+méthodes}\label{variables-comparuxe9es-et-muxe9thodes}
+
+Pour valider nos hypothèses, nous allons croiser les variables suivantes
+: 1. \textbf{Taille (height\_cm) vs Performance (result\_value)} :
+Utilisation de nuages de points pour visualiser la dispersion et calcul
+du coefficient de corrélation de Pearson (\(r\)). 2. \textbf{Poids
+(weight\_kg) vs Sport (sport)} : Comparaison des distributions via des
+boîtes à moustaches (boxplots) pour voir la variabilité du poids selon
+la discipline. 3. \textbf{Médaille (medal) vs Morphologie} : Analyse par
+groupes pour voir si les médaillés d'or présentent des caractéristiques
+physiques distinctes du reste des participants.
+
+\subsection{Défis et limites
+potentiels}\label{duxe9fis-et-limites-potentiels}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Hétérogénéité des unités} : La variable \texttt{result\_value}
+  mélange des secondes, des mètres et des points. Il faudra normaliser
+  ces données ou filtrer l'analyse sport par sport.
+\item
+  \textbf{Données manquantes} : Les données historiques comportent
+  souvent des valeurs de poids ou de taille manquantes, ce qui pourrait
+  biaiser l'analyse temporelle.
+\item
+  \textbf{Variables confondantes} : La performance dépend aussi de
+  l'âge, de l'expérience (\texttt{total\_olympics}) et des
+  infrastructures du pays d'origine.
+\end{itemize}
+
+\section{Rapport de l'étude de base de données
+:}\label{rapport-de-luxe9tude-de-base-de-donnuxe9es}
+
+\section{Question 1: Quels sont les pays qui ont accumulé le plus de
+médailles d'or au cours de l'histoire des Jeux Olympiques
+?}\label{question-1-quels-sont-les-pays-qui-ont-accumuluxe9-le-plus-de-muxe9dailles-dor-au-cours-de-lhistoire-des-jeux-olympiques}
+
+Nous pouvons imaginer que les pays ayant gagné le plus de médailles sont
+les pays les plus influents dans le monde tels que les Etats-Unis ou
+l'Europe, qui ont plus de ressources et de moyens pour développer le
+niveau de leurs athlètes.
+
+Avant de débuter l'analyse, une étape de préparation a été nécessaire
+sur le jeu de données. Nous avons notamment dû gérer les valeurs
+manquantes dans les colonnes de médailles en utilisant l'argument
+``na.rm = TRUE'', afin d'éviter que des données non renseignées ne
+faussent les calculs de sommes globales par pays.
+
+Prendre tous les pays ferait un graphique non lisible, nous avons donc
+dû choisir de ne prendre que les 15 pays ayant gagné le plus de
+médailles.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-4-1.pdf}}
+
+Le graphique confirme en partie notre hypothèse. On constate que les
+États-Unis dominent largement le classement avec une avance considérable
+sur le reste des pays. Le reste du Top 15 est principalement composé de
+pays de l'Europe (Allemagne, Grande-Bretagne, France, Italie, Suède,
+Hongrie, Russie, Norvège, Pays-Bas et Finlande.), les puissances
+asiatiques (La Chine et le Japon), ainsi que l'Australie. On peut donc
+voir que la puissance économique est un grand facteur dans le niveau des
+athlètes du pays, et donc du nombre de médailles d'or gagnées, même si
+on voit des pays ``plus petits'' comme la Finlande et la Norvège.
+
+\section{Question 2 : Quelles sont les nationalités les plus / moins
+représentées
+?}\label{question-2-quelles-sont-les-nationalituxe9s-les-plus-moins-repruxe9sentuxe9es}
+
+L'objectif de cette partie est d'analyser la représentativité des
+nationalités dans le dataset des athlètes olympiques.
+
+\subsection{Graphe 1 --- Pays les plus
+représentés}\label{graphe-1-pays-les-plus-repruxe9sentuxe9s}
+
+\subsubsection{Choix du graphique}\label{choix-du-graphique}
+
+Nous avons choisi un diagramme en barres pour représenter les
+nationalités les plus présentes dans le dataset. Ce type de graphique
+est particulièrement adapté à la comparaison de valeurs quantitatives
+entre différentes catégories. Le choix d'un Top 15 permet d'obtenir une
+vision suffisamment large des pays dominants tout en conservant une
+bonne lisibilité.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-6-1.pdf}}
+
+\subsection{Interprétation}\label{interpruxe9tation}
+
+Ce graphique met en évidence les nationalités les plus représentées dans
+le dataset. Chaque barre correspond à un pays, et sa longueur indique le
+nombre d'athlètes.
+
+L'un des avantages de ce graphique est qu'il permet de lire des valeurs
+précises, ce qui facilite la comparaison entre les pays. On observe que
+certains pays possèdent un nombre d'athlètes nettement supérieur aux
+autres.
+
+Cela montre une forte concentration des données autour de quelques
+nationalités dominantes. Cette situation peut s'expliquer par la taille
+des délégations, la régularité de participation aux Jeux olympiques ou
+encore les ressources sportives plus importantes de certains pays.
+
+\subsection{Graphe 2 --- Pays les moins
+représentés}\label{graphe-2-pays-les-moins-repruxe9sentuxe9s}
+
+\subsubsection{Choix du graphique}\label{choix-du-graphique-1}
+
+Nous avons également choisi un diagramme en barres pour les pays les
+moins représentés afin de garder une cohérence visuelle avec le premier
+graphique. Ce choix facilite la comparaison entre les extrêmes du
+dataset.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-7-1.pdf}}
+
+\subsection{Interprétation}\label{interpruxe9tation-1}
+
+Ce graphique met en évidence les nationalités les moins représentées
+dans le dataset. Contrairement au premier graphique, les effectifs
+observés ici sont très faibles et relativement proches les uns des
+autres.
+
+Cela signifie qu'un grand nombre de pays occupent une place très
+marginale dans les données. Cette faible représentation peut s'expliquer
+par une participation plus récente, une présence limitée à certaines
+disciplines ou des moyens sportifs plus faibles.
+
+Ce graphique complète donc le premier en montrant que la
+représentativité des nationalités n'est pas uniforme : quelques pays
+dominent, tandis que beaucoup d'autres sont très peu présents.
+
+\subsection{Graphe 3 --- Comparaison}\label{graphe-3-comparaison}
+
+\subsubsection{Choix du graphique}\label{choix-du-graphique-2}
+
+Ce graphique a été choisi pour comparer directement les extrêmes du
+dataset, c'est-à-dire les pays les plus représentés et les moins
+représentés. Le fait de les regrouper dans un même espace visuel permet
+de mettre en évidence immédiatement l'écart entre les deux groupes.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-8-1.pdf}}
+
+\subsection{Interprétation}\label{interpruxe9tation-2}
+
+Ce graphique montre clairement l'écart entre les pays les plus
+représentés et les pays les moins représentés. Les différences de
+hauteur entre les barres sont très importantes, ce qui rend la
+comparaison immédiate.
+
+On constate que les pays les plus représentés possèdent un nombre
+d'athlètes largement supérieur à celui des pays les moins représentés.
+Cette différence met en évidence une forte inégalité de représentativité
+dans le dataset.
+
+Ce graphique permet donc de synthétiser les résultats des deux premiers
+graphes : la distribution des nationalités est fortement déséquilibrée,
+avec une concentration importante autour de quelques pays.
+
+\subsubsection{Conclusion pour
+Représentativité}\label{conclusion-pour-repruxe9sentativituxe9}
+
+L'analyse de ces trois graphiques montre que la représentativité des
+nationalités dans le dataset est très inégale. Quelques pays concentrent
+une grande partie des athlètes, tandis qu'un grand nombre de
+nationalités sont faiblement représentées.
+
+Le premier graphique permet d'identifier les pays dominants avec des
+valeurs précises. Le deuxième montre que de nombreux pays occupent une
+place marginale. Enfin, le troisième met directement en évidence l'écart
+entre ces deux groupes. L'ensemble confirme donc une structure
+déséquilibrée de la répartition des nationalités.
+
+\section{Question 3: Est-ce que la taille/poids d'un athlète influence
+sa performance
+?}\label{question-3-est-ce-que-la-taillepoids-dun-athluxe8te-influence-sa-performance}
+
+Cette partie analyse si la corpulence d'un athlète (mesurée par l'Indice
+de Masse Corporelle - IMC) constitue un avantage déterminant pour ses
+performances.
+
+\subsection{Force de l'influence de l'IMC par
+discipline}\label{force-de-linfluence-de-limc-par-discipline}
+
+Ce graphique permet d'identifier les disciplines où la corpulence a
+l'influence la plus forte sur le résultat (chrono, points, distance).
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/correlation_sport-1.pdf}}
+
+\subsection{Zoom sur les sports clés}\label{zoom-sur-les-sports-cluxe9s}
+
+Pour comprendre l'impact réel, nous isolons deux sports aux tendances
+opposées.
+
+\subsubsection{Archery (Tir à l'arc) : Une corrélation
+positive}\label{archery-tir-uxe0-larc-une-corruxe9lation-positive}
+
+En tir à l'arc, le résultat est en \textbf{points} (plus c'est haut,
+mieux c'est).
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/zoom_archery-1.pdf}}
+
+\textbf{Interprétation :} On observe une pente montante. Cela signifie
+qu'un IMC plus élevé est globalement associé à un meilleur score en
+points. Une plus grande masse corporelle pourrait offrir une meilleure
+assise et stabilité face au vent ou lors de la tension de l'arc.
+
+\subsubsection{Swimming (Natation) : Une corrélation
+négative}\label{swimming-natation-une-corruxe9lation-nuxe9gative}
+
+En natation, le résultat est souvent en \textbf{secondes} (plus c'est
+bas, mieux c'est).
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/zoom_swimming-1.pdf}}
+
+\textbf{Interprétation :} La pente est descendante. Comme le résultat
+est exprimé en secondes, une baisse du temps signifie une amélioration.
+On peut en conclure qu'un IMC plus élevé est souvent un avantage pour la
+propulsion et la puissance dans l'eau chez les nageurs Olympiques.
+
+\subsubsection{Conclusion sur la
+morphologie}\label{conclusion-sur-la-morphologie}
+
+En conclusion, notre analyse confirme que l'influence de l'IMC est bien
+réelle, mais qu'elle est spécifique à chaque discipline. Il est
+important de noter que les athlètes Olympiques sont, par définition,
+déjà à leur \textbf{poids de forme} optimal pour leur sport. Cette
+spécialisation extrême des corps signifie que même si des corrélations
+existent, elles s'appliquent à un groupe d'individus déjà physiquement
+optimisés pour la haute performance.
+
+Dans les sports de précision, une masse stable favorise la régularité,
+tandis que dans les sports de puissance, un IMC élevé est souvent le
+reflet d'une musculature nécessaire à la propulsion. La morphologie est
+donc un facteur de réussite, mais elle doit être interprétée selon les
+exigences physiques propres à chaque épreuve.
+
+\section{Question 4 : Y a-t-il un genre plus représenté que l'autre
+?}\label{question-4-y-a-t-il-un-genre-plus-repruxe9sentuxe9-que-lautre}
+
+Ici, nous cherchons à déterminer s'il existe un déséquilibre de
+représentation entre les hommes et les femmes dans les Jeux Olympiques.
+
+Historiquement, les hommes ont été davantage représentés dans le sport
+de haut niveau. Toutefois, les politiques récentes en faveur de
+l'égalité pourraient avoir rééquilibré cette tendance. Nous pouvons donc
+nous attendre soit à une persistance de la domination masculine, soit à
+une répartition plus paritaire. Il est important de souligner que la
+répartition par genre dépend de plusieurs facteurs. Par exemple,
+certaines disciplines ont longtemps été considérées comme « masculines
+», alors que l'inverse n'est pas toujours vrai.
+
+Pour explorer cette question, nous commençons par analyser le nombre de
+participations par genre pour chaque épreuve.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-10-1.pdf}}
+
+Ce graphique démontre qu'une analyse par épreuve spécifique est trop
+complexe pour être lisible. Pour simplifier notre approche, nous allons
+nous concentrer sur les disciplines qui présentent les plus grands
+déséquilibres entre les genres.
+
+\subsubsection{Les 8 sports avec les plus fortes disparités de
+genre}\label{les-8-sports-avec-les-plus-fortes-disparituxe9s-de-genre}
+
+Nous avons sélectionné les 8 sports où l'écart numérique entre les
+participants masculins et féminins est le plus marqué.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-11-1.pdf}}
+
+Ce graphique permet d'identifier immédiatement les disciplines où la
+parité est la moins respectée. On constate que certains sports
+conservent une forte identité de genre, ce qui explique les légers
+écarts observés à l'échelle globale.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-12-1.pdf}}
+
+Afin d'obtenir une vision d'ensemble, nous comparons le nombre total de
+participations par genre.
+
+Les résultats montrent une répartition très équilibrée :
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Femmes} : 4 263 participations
+\item
+  \textbf{Hommes} : 4 237 participations
+\end{itemize}
+
+Ces valeurs sont extrêmement proches, ce qui suggère une quasi-parité en
+termes de participations totales.
+
+Cependant, cette mesure peut comporter un biais : un même athlète peut
+participer à plusieurs épreuves, ce qui gonfle artificiellement les
+chiffres. Il est donc nécessaire d'affiner l'analyse.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-14-1.pdf}}
+
+Pour lever ce biais, nous comptons désormais le nombre d'athlètes
+uniques par genre. Les résultats sont les suivants :
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Femmes} : 3 696 athlètes
+\item
+  \textbf{Hommes} : 3 795 athlètes
+\end{itemize}
+
+Cette fois, un léger avantage masculin apparaît. Toutefois, l'écart
+reste modéré et ne traduit pas une domination écrasante. Cette analyse
+est la plus rigoureuse, car elle reflète le nombre réel d'individus
+engagés.
+
+\subsubsection{Conclusion sur la parité de
+genre}\label{conclusion-sur-la-parituxe9-de-genre}
+
+L'ensemble de l'analyse permet de répondre à notre problématique
+initiale : aucun genre n'est massivement privilégié dans ce jeu de
+données.
+
+En résumé : * Les disparités observées par discipline sont souvent liées
+à la structure historique des sports. * Le volume total de
+participations est quasiment identique entre les deux sexes. * Le nombre
+d'athlètes uniques révèle une légère prédominance masculine, mais la
+tendance globale penche vers la parité.
+
+Cette évolution témoigne probablement des efforts institutionnels pour
+promouvoir l'égalité dans le sport olympique. Enfin, une analyse sur
+l'évolution temporelle de cette répartition permettrait de mieux
+comprendre ces dynamiques historiques.
+
+\section{Question 5 : Le pays hôte affiche-t-il une augmentation de son
+ratio de médailles par rapport à sa moyenne historique
+?}\label{question-5-le-pays-huxf4te-affiche-t-il-une-augmentation-de-son-ratio-de-muxe9dailles-par-rapport-uxe0-sa-moyenne-historique}
+
+Nous cherchons, dans cette question, a chercher si il y a un nombre plus
+élevé de médailles pour les pays hôte des Jeux Olympiques, l'année où
+ils sont hôtes, par rapport a la valeur globale des médailles de ce
+pays.
+
+Notre hypothèse est que pendant les années où un pays est hôte, le pays
+surperforme grâce à l'aide mentale qu'apporte le soutien du public, le
+support mental du fait de vouloir performer dans son pays, ainsi que les
+investissements massifs entrainés par la présence des Jeux Olympiques.
+
+Pour répondre à cette question, nous allons utiliser un bar chart, qui
+nous montrera une comparaison entre la moyenne du nombre de médailles
+qui les pays ont pendant les années des Jeux Olympiques, et le nombre de
+médailles que le pays gagne quand il est hôte des Jeux Olympiques. La
+complication de cette question était de relier les valeurs de la
+variable host\_city avec la variable nationality, ce qui a été fait en
+utilisant la fonction tibble::tribble.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-16-1.pdf}}
+
+\paragraph{Interprétation :~}\label{interpruxe9tation-3}
+
+On peut donc voir dans ce graphique qu'il y a pour chaque pays analysé,
+la barre des années où le pays est hôte est plus haute, à peu près de 30
+\% en moyenne, que la moyenne des pays pendant les Jeux Olympiques. On
+peut donc en comprendre que notre hypothèse est validée, il y a bien un
+avantage à domicile, qui fait qu'il y a plus de médailles les années ou
+le pays est hôte des Jeux Olympiques.
+
+\section{Question 6 : L'âge moyen des athlètes médaillés a-t-il augmenté
+ou diminué tout au long de l'histoire des Jeux Olympiques
+?}\label{question-6-luxe2ge-moyen-des-athluxe8tes-muxe9dailluxe9s-a-t-il-augmentuxe9-ou-diminuuxe9-tout-au-long-de-lhistoire-des-jeux-olympiques}
+
+Nous cherchons donc a regarder l'âge médian des médaillés dans les Jeux
+Olympiques, pour pouvoir comparer entre les années, pour voir si il y a
+des changements notables.
+
+Notre hypothèse est que l'âge moyen pourrait augmenter en fonction de
+l'année, grâce aux avancements de la médecine et de la technologie, qui
+permettraient aux athlètes d'avoir une carière plus longue, et de rester
+au maximum de leurs capacités pendant plus longtemps.
+
+Pour cela nous allons donc faire un line chart, pour pouvoir avoir
+l'évolution, et une courbe de tendance globale, pour pouvoir voir une
+plus grande variété de résultats.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-17-1.pdf}}
+
+\paragraph{Interprétation :}\label{interpruxe9tation-4}
+
+On peut voir sur ce graphique, que notre hypothèse n'est pas validée. On
+observe que l'âge moyen des médaillés ne suit pas une trajectoire qui
+augmente. Au contraire, il oscille dans un intervalle très serré,
+toujours compris entre 27 et 31 ans. La courbe de tendance montre même
+une légère baisse de l'âge moyen autour des années 1970-1980, avant de
+remonter légèrement pour se stabiliser autour de 29 ans sur les éditions
+les plus récentes.
+
+On peut donc en comprendre que les technologies et la médecine n'ont pas
+un effet assez fort pour influencer l'âge moyen des médaillés.
+
+\section{Question 7 : Existe-t-il une différence en terme de poids, enre
+les athlètes participant aux Jeux D'été, et ceux des Jeux d'hiver
+?}\label{question-7-existe-t-il-une-diffuxe9rence-en-terme-de-poids-enre-les-athluxe8tes-participant-aux-jeux-duxe9tuxe9-et-ceux-des-jeux-dhiver}
+
+Le but de cette question est de comparer les poids des athlètes des jeux
+d'été et d'hiver pour déterminer si il y a une différence significative.
+
+Notre hypothèse est qu'il y aura une petite différence de poids, car les
+sports de Jeux d'hiver se basent sur l'inertie, ce qui pourrait
+nécessiter une masse supérieure, même si on suppose qu'il y aura des
+extrèmes plus importants pour l'été, avec par exemple des sport de
+lancer, qui ne nécessitent pas d'être plus léger.
+
+Pour répondre à cette question, nous allons utiliser un graphique en
+violon, qui permet de bien voir la distribution, en utilisant aussi des
+lignes pour voir les différents quantiles, et de pouvoir voir les
+extrêmes.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-18-1.pdf}}
+
+\paragraph{Interprétation :}\label{interpruxe9tation-5}
+
+On peut voir que la distribution de poids est très similiare sur les
+deux saisons, ce qui ne valide pas notre hypothèse. La forme des violons
+est presque identique, et les médianes sont au même niveau, ce qui
+montre que la moyenne des profils sur les deux saisons est similaire.
+Mais une partie de notre hypothèse est bonne quand même, car on voit des
+profils beaucoup plus lourds sur les Jeux d'été, qui peuvent venir des
+sports de lancer, ou de combats, ou d'autres sports, qui ne sont pas
+présents aux Jeux d'hiver.
+
+\section{Question 8 : Quelles sont les disciplines sportives qui
+comptent le plus grand nombre d'athlètes enregistrés
+?}\label{question-8-quelles-sont-les-disciplines-sportives-qui-comptent-le-plus-grand-nombre-dathluxe8tes-enregistruxe9s}
+
+Le but de cette question est de voir quels sont les sports avec le plus
+d'athèles, pour voir si certains sports qui ont une plus grande base de
+joueur en dehors des Jeux Olympiques, ont aussi le plus d'athlètes dans
+les Jeux Olympiques.
+
+Notre hypothèse est que les sport les plus ``gros'' et les plus suivis,
+tels que la natation ou l'athlétisme, auront le plus d'athlètes.
+
+Pour répondre à cette question, nous allons utiliser un diagramme en
+barres horizontales, en triant par odre décroissant.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-19-1.pdf}}
+
+\paragraph{Interprétation :}\label{interpruxe9tation-6}
+
+Dans ce graphique, le nom des sports est difficilement lisilble, nous
+allons donc en faire un second avec seuelement le top 5 des sports, mais
+on peut quand même voir avec ce graphique que la différence entre le
+nombre d'athlètes entre les plus représentés et les moins représentés
+n'est pas énorme, tous les sports ayant entre 200 et 300 athlètes.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-20-1.pdf}}
+
+\paragraph{Interprétation :}\label{interpruxe9tation-7}
+
+On peut voir que les 5 sports avec le plus d'athlètes ne sont pas les
+sports les plsu ``gros'' auxquels ont pensait pendant notre hypothèse,
+mais ce sont d'autres sports. Ces 5 sport ont seulement une différence
+de 10 athlètes, ce qui est très peu.
+
+On peu donc en tirer que soit notre jeu de données n'est pas une liste
+de juste tous les athlètes, mais est un échantillon choisit de manière
+équilibrée pour avoir une représentativité équivalente pour tous les
+sports, soit il y a plus d'athlètes dans ces 5 sports, que dans les
+``grands'' sports comme la natation ou l'athétisme.
+
+\section{Question 9 : Corrélation entre expérience olympique et
+succès}\label{question-9-corruxe9lation-entre-expuxe9rience-olympique-et-succuxe8s}
+
+\textbf{Question :} Existe-t-il un ``pic d'efficacité'' en fonction du
+nombre de participations (\texttt{total\_olympics\_attended}) ? Est-on
+plus susceptible de gagner l'or à sa 1ère, 2ème ou 3ème participation ?
+
+\textbf{Hypothèse :} La performance maximale (médaille d'or) survient
+plus souvent lors de la deuxième participation (équilibre entre jeunesse
+et expérience).
+
+Pour répondre à cette question sans être biaisé par le fait qu'il y a
+beaucoup plus d'athlètes réalisant une seule participation par rapport à
+ceux en cumulant plusieurs, nous allons créer une \textbf{Heatmap (Carte
+de chaleur)}. Elle affichera la proportion (en pourcentage) de chaque
+type de résultat selon le nombre de participations.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-21-1.pdf}}
+
+\paragraph{Interprétation :}\label{interpruxe9tation-8}
+
+La carte de chaleur permet de visualiser de façon claire la probabilité
+d'obtenir une médaille (Or, Argent, Bronze) ou aucune (``None'') selon
+l'expérience olympique de l'athlète. On remarque généralement que la
+proportion de ``None'' baisse à mesure que le nombre de participations
+augmente, ce qui indique que les athlètes plus expérimentés ont de
+meilleures chances globales de repartir avec une médaille.
+
+Concernant l'Or spécifiquement, cette visualisation permet de confirmer
+ou d'infirmer l'hypothèse d'un ``pic d'efficacité'' : les athlètes
+participant pour la deuxième ou troisième fois sont statistiquement
+l'élite de leur discipline, ce qui se reflète souvent par un pourcentage
+de réussite plus important comparé aux premières participations.
+L'expérience est donc un facteur clé de succès aux Jeux Olympiques.
+
+\section{Question 10 : L'efficacité des délégations (Ratio
+Participation/Succès)}\label{question-10-lefficacituxe9-des-duxe9luxe9gations-ratio-participationsuccuxe8s}
+
+\textbf{Question :} Quelles sont les nationalités qui possèdent le
+meilleur ``taux de transformation'' (nombre de médailles remportées
+divisé par le nombre d'athlètes uniques envoyés) ?
+
+\textbf{Hypothèse :} Les grandes nations (avec un grand nombre
+d'athlètes) remportent le plus grand volume de médailles, mais certaines
+plus petites délégations ciblées affichent un taux d'efficacité
+(médailles par athlète) exceptionnel.
+
+Pour répondre à cette question, nous allons croiser le nombre d'athlètes
+uniques envoyés par pays avec le nombre total de médailles obtenues. Le
+graphique proposé est un \textbf{Scatter Plot (nuage de points)} où : -
+L'abscisse (X) représente le nombre d'athlètes uniques envoyés par pays.
+- L'ordonnée (Y) représente le nombre total de médailles remportées. -
+La taille et la couleur des points reflètent le \textbf{taux de
+transformation} (le pourcentage d'athlètes de la délégation repartant
+avec une médaille).
+
+Nous filtrons les pays ayant envoyé moins de 10 athlètes pour éviter les
+cas extrêmes de petites délégations qui fausseraient les statistiques
+d'efficacité globale.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-22-1.pdf}}
+
+\paragraph{Interprétation :}\label{interpruxe9tation-9}
+
+Le nuage de points permet de distinguer deux stratégies ou dynamiques
+différentes chez les nations olympiques : 1. \textbf{Les géants
+olympiques :} Situés en haut à droite (grand nombre d'athlètes et grand
+nombre de médailles). Ces pays envoient d'immenses délégations et
+convertissent une part significative de leurs athlètes en médaillés. 2.
+\textbf{Les délégations ultra-efficaces :} Situées plus haut par rapport
+à leur position horizontale (les points rouges/chauds). Ces pays ont un
+taux de transformation élevé, ce qui signifie qu'une grande partie des
+athlètes qu'ils envoient réussissent à décrocher une médaille.
+
+Ce graphique illustre parfaitement le compromis entre la quantité
+d'athlètes engagés et l'optimisation des performances par athlète
+individuel.
+
+\section{Question 11 : L'évolution morphologique temporelle (La
+spécialisation des
+corps)}\label{question-11-luxe9volution-morphologique-temporelle-la-spuxe9cialisation-des-corps}
+
+Nous avons vu précédemment que l'IMC impacte la performance aujourd'hui.
+Mais est-ce que cette optimisation a toujours existé ? Les athlètes
+sont-ils devenus physiquement plus ``extrêmes'' au fil des décennies
+dans certaines disciplines ?
+
+\textbf{Hypothèse :} Avec la professionnalisation du sport, le physique
+des athlètes s'est ultra-spécialisé. La taille moyenne des basketteurs a
+augmenté, tandis que celle des gymnastes a diminué par rapport aux
+premières éditions des Jeux Olympiques.
+
+Pour valider cette hypothèse, nous croisons les variables d'année, de
+taille et de discipline pour deux sports aux besoins morphologiques
+opposés : le Basketball et la Gymnastique Artistique.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-23-1.pdf}}
+
+\paragraph{Interprétation :}\label{interpruxe9tation-10}
+
+Le graphique confirme notre hypothèse d'ultra-spécialisation des corps,
+visible à travers la divergence progressive des deux courbes de tendance
+(en pointillés).
+
+Malgré un creux de données entre 1930 et 1980 pour ces disciplines,
+l'évolution sur plus d'un siècle est marquée : 1. \textbf{Basketball :}
+La courbe de tendance montre une augmentation globale, passant d'environ
+1m91 à plus de 1m94. Sur les éditions récentes (après 2000), on observe
+même un pic au-dessus de 2 mètres en moyenne, prouvant que les profils
+de très grande taille sont toujours plus recherchés. 2.
+\textbf{Gymnastique (Artistique) :} À l'inverse, la tendance est à la
+baisse. Partant d'environ 1m65 au début du siècle dernier, la taille
+moyenne diminue pour s'établir autour de 1m61 de nos jours, avec des
+creux récents sous la barre des 1m60. Un centre de gravité plus bas
+facilite en effet l'exécution de figures acrobatiques complexes.
+
+Cette évolution opposée met en évidence que les caractéristiques
+physiques ne sont pas dues au hasard : elles s'optimisent et se
+spécialisent pour répondre de plus en plus précisément aux exigences
+spécifiques de chaque discipline de haut niveau.
+
+\section{Question 12 : Le phénomène de l'Effet d'Âge Relatif (Relative
+Age
+Effect)}\label{question-12-le-phuxe9nomuxe8ne-de-leffet-duxe2ge-relatif-relative-age-effect}
+
+Ce phénomène est un grand classique de la data science sportive. Il
+s'agit de vérifier si le mois de naissance influence les chances de
+devenir un athlète olympique.
+
+\textbf{Hypothèse :} Les athlètes nés en début d'année (janvier,
+février, mars) sont surreprésentés. Dans les catégories de jeunes, ils
+sont physiquement plus matures de quelques mois que ceux nés en fin
+d'année, ce qui les place plus facilement dans les filières d'élite (le
+fameux ``Relative Age Effect'').
+
+Pour vérifier cela, nous allons extraire le mois de naissance de chaque
+athlète et observer la distribution comparée à une répartition théorique
+parfaite (environ 8.33\% par mois).
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-24-1.pdf}}
+
+\paragraph{Interprétation :}\label{interpruxe9tation-11}
+
+Si la ligne de tendance théorique (en rouge) était parfaitement
+respectée, chaque mois regrouperait environ 8.33\% des naissances. En
+observant la répartition réelle via les barres du graphique, on peut
+voir si les mois de début d'année (Janvier, Février, Mars) dépassent
+cette ligne rouge de manière significative. Le cas échéant, cela
+confirmera que la sélection précoce dans les filières sportives durant
+l'enfance offre un avantage mesurable et durable aux enfants nés en
+début d'année, avantage qui se répercute jusqu'aux Jeux Olympiques.
+
+\subsubsection{Dans quels sports cet effet est-il le plus marqué
+?}\label{dans-quels-sports-cet-effet-est-il-le-plus-marquuxe9}
+
+Pour aller plus loin, nous pouvons identifier les disciplines où ce
+phénomène est le plus prononcé. L'hypothèse est que les sports
+nécessitant une grande maturité physique précoce (puissance, vitesse,
+taille) afficheront un effet d'âge relatif plus fort que les sports de
+pure technique.
+
+Nous allons calculer le pourcentage d'athlètes nés au premier trimestre
+(Janvier, Février, Mars) par sport. Théoriquement, si la naissance
+n'avait aucune influence, ce chiffre devrait être autour de
+\textbf{25\%} (3 mois sur 12).
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-25-1.pdf}}
+
+\paragraph{Interprétation :}\label{interpruxe9tation-12}
+
+En filtrant les sports et en isolant la part d'athlètes nés dans le
+premier trimestre (Q1), le graphique met en évidence les disciplines où
+la date de naissance joue le rôle le plus crucial. La ligne rouge
+verticale représente l'espérance théorique (25\%). Les sports qui s'en
+éloignent fortement vers la droite, comme le Patinage de Vitesse, la
+Lutte ou le Saut à ski, démontrent un ``Relative Age Effect'' très
+marqué. Dans ces sports physiques où les catégories d'âge dans l'enfance
+sont strictes, être né en tout début d'année offre un avantage physique
+temporaire décisif qui se transforme en un avantage de sélection durable
+menant jusqu'au plus haut niveau olympique.
+
+\section{Question 13 : Sports d'équipe vs Sports individuels : l'âge de
+l'or}\label{question-13-sports-duxe9quipe-vs-sports-individuels-luxe2ge-de-lor}
+
+Dans cette partie, nous cherchons à savoir si la dynamique d'équipe
+influe sur la longévité de la performance au plus haut niveau (la
+médaille d'or). L'âge de la performance maximale diffère-t-il selon que
+le sport se pratique seul ou en équipe ?
+
+\textbf{Hypothèse :} L'âge médian des médaillés d'or est plus élevé dans
+les sports d'équipe (Team). L'intelligence tactique, l'expérience et la
+cohésion de groupe permettent de compenser le léger déclin physique lié
+à l'âge, là où l'explosivité pure prime davantage dans les sports
+individuels (Individual).
+
+Pour le vérifier, nous isolons tous les athlètes ayant remporté l'Or et
+comparons la distribution de leur âge selon la nature de leur épreuve
+(Individuelle ou Équipe).
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-26-1.pdf}}
+
+\paragraph{Interprétation :}\label{interpruxe9tation-13}
+
+Le graphique contredit notre hypothèse de départ de manière assez
+surprenante !
+
+En lisant la médiane (la ligne noire épaisse au milieu de chaque boîte),
+on constate que l'âge médian des médaillés d'or individuels est de
+\textbf{30 ans}, contre environ \textbf{28 ans} pour les sports
+d'équipe.
+
+Comment expliquer cela ? Les sports individuels incluent un grand nombre
+de disciplines où l'adresse, la précision et la technique priment sur
+l'explosivité physique pure (le tir, l'équitation, la voile, le golf,
+etc.), ce qui permet des carrières parfois très longues. À l'inverse, la
+majorité des sports d'équipe olympiques (comme le football, le
+basketball, le handball) exigent un engagement athlétique et
+cardiovasculaire intense, favorisant des athlètes légèrement plus jeunes
+dans la force de l'âge physique.
+
+Les boîtes (l'écart interquartile) montrent également que la grande
+majorité des vainqueurs se situent entre 22 et 35 ans dans les deux
+catégories, démontrant que la performance olympique maximale culmine
+globalement dans cette fenêtre, mais avec une ``prime à l'expérience''
+paradoxalement plus forte en individuel.
+
+\subsection{Question 14 --- Les athlètes ayant la plus grande longévité
+sont-ils aussi ceux qui ont participé à la plus grande diversité
+d'épreuves
+?}\label{question-14-les-athluxe8tes-ayant-la-plus-grande-longuxe9vituxe9-sont-ils-aussi-ceux-qui-ont-participuxe9-uxe0-la-plus-grande-diversituxe9-duxe9preuves}
+
+\subsubsection{Hypothèse}\label{hypothuxe8se}
+
+On suppose que les athlètes les plus polyvalents, c'est-à-dire ceux qui
+participent à plusieurs sports ou épreuves, peuvent avoir une carrière
+plus longue.
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-27-1.pdf}}
+
+\subsubsection{Choix du graphique}\label{choix-du-graphique-3}
+
+Nous avons choisi un nuage de points car il permet d'étudier la relation
+entre deux variables quantitatives : la longévité de carrière et le
+nombre d'épreuves différentes pratiquées. Chaque point représente un
+athlète.
+
+\subsubsection{Interprétation}\label{interpruxe9tation-14}
+
+Ce graphique permet de voir si les athlètes ayant une carrière plus
+longue participent aussi à un plus grand nombre d'épreuves. Si les
+points montent lorsque la longévité augmente, cela indiquerait une
+relation positive entre polyvalence et durée de carrière.
+
+À l'inverse, si les points sont dispersés sans tendance claire, cela
+signifie que la longévité ne dépend pas forcément du nombre d'épreuves
+pratiquées. Dans ce cas, certains athlètes peuvent avoir une longue
+carrière tout en restant spécialisés dans une seule discipline.
+
+\subsubsection{Conclusion}\label{conclusion}
+
+Ce graphique permet de tester l'hypothèse selon laquelle la polyvalence
+favorise une carrière plus longue. Il met en relation la durée de
+carrière des athlètes avec leur diversité d'épreuves, afin de voir si
+les athlètes les plus polyvalents sont aussi ceux qui restent le plus
+longtemps dans les Jeux olympiques.
+
+\subsection{Question 15 --- L'écart-type de la taille des athlètes au
+sein d'une même discipline a-t-il diminué entre 1924 et 2024
+?}\label{question-15-luxe9cart-type-de-la-taille-des-athluxe8tes-au-sein-dune-muxeame-discipline-a-t-il-diminuuxe9-entre-1924-et-2024}
+
+\subsubsection{Hypothèse}\label{hypothuxe8se-1}
+
+Nous supposons qu'au fil du temps, les athlètes d'une même discipline
+ont développé des caractéristiques physiques de plus en plus similaires.
+Cette évolution traduirait une spécialisation progressive vers un profil
+physique considéré comme optimal pour chaque sport.
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-28-1.pdf}}
+
+\subsubsection{Choix du graphique}\label{choix-du-graphique-4}
+
+Nous avons choisi un graphique en lignes car nous souhaitons observer
+l'évolution d'une variable au cours du temps. Ce type de représentation
+permet de visualiser facilement les tendances et les variations de
+l'écart-type de la taille des athlètes d'une même discipline.
+
+\subsubsection{Interprétation}\label{interpruxe9tation-15}
+
+Chaque point représente l'écart-type de la taille des nageurs pour une
+année donnée. L'écart-type mesure la dispersion des tailles autour de la
+moyenne.
+
+Si la courbe diminue progressivement au fil du temps, cela signifie que
+les tailles des athlètes deviennent plus homogènes. Cette évolution
+soutiendrait l'hypothèse d'une standardisation physique, où les sportifs
+tendent à se rapprocher d'un profil considéré comme optimal pour la
+discipline.
+
+À l'inverse, si l'écart-type reste stable ou augmente, cela suggère que
+la diversité physique demeure importante et que plusieurs profils
+morphologiques peuvent coexister au sein du même sport.
+
+\subsubsection{Conclusion}\label{conclusion-1}
+
+Cette analyse permet d'étudier l'évolution de la diversité physique des
+athlètes au sein d'une même discipline. Une diminution de l'écart-type
+de la taille au cours du temps constituerait un indice de spécialisation
+progressive des profils physiques.
+
+\subsection{Question 16 --- La taille des athlètes influence-t-elle
+davantage les performances mesurées en distance (mètres) que celles
+mesurées en temps (secondes)
+?}\label{question-16-la-taille-des-athluxe8tes-influence-t-elle-davantage-les-performances-mesuruxe9es-en-distance-muxe8tres-que-celles-mesuruxe9es-en-temps-secondes}
+
+\subsubsection{Hypothèse}\label{hypothuxe8se-2}
+
+Nous supposons que la taille constitue un avantage plus important dans
+les disciplines où la performance est mesurée en distance. Des membres
+plus longs peuvent favoriser certaines actions comme les lancers ou les
+sauts.
+
+À l'inverse, dans les disciplines chronométrées, la performance dépend
+davantage de facteurs tels que la vitesse, l'endurance ou la technique.
+L'influence directe de la taille pourrait donc être moins marquée.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-29-1.pdf}}
+
+\subsubsection{Choix du graphique}\label{choix-du-graphique-5}
+
+Nous avons choisi un nuage de points car il permet d'étudier la relation
+entre deux variables quantitatives : la taille des athlètes et leur
+performance. Le graphique est divisé en deux parties selon l'unité de
+mesure du résultat (« metres » ou « seconds »). Cette séparation permet
+de comparer visuellement l'effet de la taille dans différents types
+d'épreuves.
+
+\subsection{Interprétation}\label{interpruxe9tation-16}
+
+Chaque point représente un athlète. L'axe horizontal correspond à sa
+taille et l'axe vertical à sa performance. Dans les épreuves mesurées en
+mètres, une tendance croissante entre la taille et le résultat pourrait
+indiquer qu'une plus grande taille favorise la performance. Cela peut
+s'expliquer par un avantage biomécanique dans certaines disciplines.
+Dans les épreuves mesurées en secondes, la relation peut être
+différente. Une dispersion importante des points ou l'absence de
+tendance visible suggérerait que la taille n'est pas le principal
+facteur expliquant la performance. La comparaison des deux graphiques
+permet ainsi de déterminer si l'influence de la taille est plus forte
+dans les disciplines de distance que dans les disciplines chronométrées.
+
+\subsection{Question 17 --- Existe-t-il une corrélation visuelle entre
+la taille et le poids des athlètes, toutes disciplines confondues
+?}\label{question-17-existe-t-il-une-corruxe9lation-visuelle-entre-la-taille-et-le-poids-des-athluxe8tes-toutes-disciplines-confondues}
+
+\subsection{Hypothèse}\label{hypothuxe8se-3}
+
+Nous supposons qu'il existe une corrélation positive entre la taille et
+le poids des athlètes. En général, les athlètes les plus grands ont
+également tendance à être plus lourds.
+
+Nous nous attendons donc à observer une tendance croissante reliant ces
+deux variables. Cette analyse permet également de détecter d'éventuelles
+valeurs aberrantes ou incohérentes dans le dataset.arquée.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-30-1.pdf}}
+
+\subsubsection{Choix du graphique}\label{choix-du-graphique-6}
+
+Nous avons choisi un nuage de points car il permet de représenter la
+relation entre deux variables quantitatives : la taille et le poids.
+L'ajout d'une ligne de tendance linéaire facilite l'identification d'une
+corrélation générale entre ces deux caractéristiques physiques.
+
+\subsection{Interprétation}\label{interpruxe9tation-17}
+
+Chaque point représente un athlète. L'axe horizontal correspond à sa
+taille et l'axe vertical à son poids. Si les points suivent globalement
+une trajectoire ascendante et que la ligne de tendance est croissante,
+cela indique une corrélation positive entre la taille et le poids. Les
+athlètes les plus grands ont alors tendance à être également les plus
+lourds. Le nuage de points permet également d'identifier des valeurs
+atypiques. Par exemple, un athlète très grand mais extrêmement léger, ou
+inversement très petit mais particulièrement lourd, apparaîtrait éloigné
+du reste des observations.
+
+\section{Question 18 --- Combien d'athlètes participent aux Jeux
+Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver
+?}\label{question-18-combien-dathluxe8tes-participent-aux-jeux-olympiques-duxe9tuxe9-par-rapport-aux-jeux-olympiques-dhiver}
+
+\subsection{Hypothèse}\label{hypothuxe8se-4}
+
+Nous supposons que les Jeux Olympiques d'Été rassemblent un plus grand
+nombre d'athlètes que les Jeux Olympiques d'Hiver.
+
+Cette différence s'explique par le nombre plus élevé de disciplines
+sportives présentes aux Jeux d'Été ainsi que par la participation d'un
+plus grand nombre de pays.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/unnamed-chunk-31-1.pdf}}
+
+\subsubsection{Choix du graphique}\label{choix-du-graphique-7}
+
+Nous avons choisi un diagramme en barres car il permet de comparer
+facilement les effectifs de deux catégories distinctes : les Jeux d'Été
+et les Jeux d'Hiver.
+
+Ce type de représentation rend immédiatement visible la différence
+d'envergure entre les deux compétitions.
+
+\subsection{Interprétation}\label{interpruxe9tation-18}
+
+Chaque barre représente le nombre total d'athlètes participant à un type
+de Jeux Olympiques.
+
+La comparaison des hauteurs de barres permet d'observer immédiatement
+quelle compétition rassemble le plus grand nombre d'athlètes.
+
+Si la barre correspondant aux Jeux d'Été est nettement plus élevée, cela
+confirme que cette compétition possède une envergure plus importante en
+termes de participation.
+
+\section{Question 19 : Chaque discipline possède-t-elle une « empreinte
+morphologique » qui lui est propre
+?}\label{question-19-chaque-discipline-possuxe8de-t-elle-une-empreinte-morphologique-qui-lui-est-propre}
+
+La Question 17 a montré une corrélation globale entre la taille et le
+poids des athlètes, toutes disciplines confondues. Mais cette nuée de
+points globale cache peut-être plusieurs \emph{sous-populations} : un
+basketteur et un gymnaste n'ont rien à voir physiquement. Nous cherchons
+donc ici à savoir si chaque discipline occupe une \textbf{zone
+distincte} du plan taille × poids, formant une véritable « empreinte
+morphologique ».
+
+\textbf{Hypothèse :} chaque discipline impose des contraintes physiques
+spécifiques. On devrait donc observer des nuages de densité nettement
+séparés (les basketteurs grands et lourds, les gymnastes petits et
+légers, les haltérophiles courts mais très massifs, etc.).
+
+\subsubsection{Choix du graphique}\label{choix-du-graphique-8}
+
+Pour répondre, un simple nuage de points serait illisible (8500 points
+superposés). Nous utilisons donc une \textbf{carte de densité 2D}
+(\texttt{geom\_density\_2d\_filled}) : au lieu d'afficher chaque
+athlète, elle colorie les zones du plan selon la \emph{concentration}
+d'athlètes. Plus une zone est claire, plus les athlètes y sont nombreux.
+En affichant une facette par discipline, on compare directement les «
+empreintes » côte à côte. Nous complétons par une seconde vue où toutes
+les disciplines sont superposées sur un même plan, avec une
+\textbf{ellipse de confiance à 95 \%} par discipline, qui résume d'un
+seul trait la zone occupée par chaque sport.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/q19_densite_morpho-1.pdf}}
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/q19_ellipses-1.pdf}}
+
+\subsubsection{Interprétation}\label{interpruxe9tation-19}
+
+Les deux graphiques confirment nettement notre hypothèse :
+\textbf{chaque discipline occupe sa propre région du plan taille ×
+poids}, et les empreintes se chevauchent peu.
+
+\begin{itemize}
+\tightlist
+\item
+  La \textbf{Gymnastique (Artistique)} forme une tache compacte en bas à
+  gauche : athlètes petits (≈ 163 cm) et légers (≈ 58 kg), profil idéal
+  pour les figures acrobatiques.
+\item
+  Le \textbf{Basketball} se situe à l'opposé, en haut à droite : grands
+  (≈ 193 cm) et lourds (≈ 100 kg).
+\item
+  L'\textbf{Aviron (Rowing)} et la \textbf{Natation (Swimming)}
+  dessinent des nuages allongés de grande taille mais de poids modéré
+  (gabarits longs et secs).
+\item
+  L'\textbf{Haltérophilie (Weightlifting)} est remarquable : taille
+  moyenne (≈ 175 cm) mais poids extrêmement variable (jusqu'à
+  \textasciitilde150 kg), d'où une empreinte très étirée verticalement
+  --- reflet des catégories de poids, des poids plumes aux super-lourds.
+\item
+  Le \textbf{Ski de fond (Cross-Country Skiing)} occupe une zone
+  d'endurance : gabarit intermédiaire et resserré.
+\end{itemize}
+
+Les ellipses de confiance résument ce constat : elles se touchent à
+peine. Autrement dit, la nuée globale observée en Question 17 était bien
+la \textbf{superposition de plusieurs populations distinctes}. La
+morphologie n'est pas le fruit du hasard : c'est une signature de la
+discipline.
+
+\subsubsection{Conclusion}\label{conclusion-2}
+
+La densité 2D s'avère bien plus parlante qu'un nuage de points classique
+: elle révèle que la question « quelle est la morphologie d'un athlète
+olympique ? » n'a pas de réponse unique, mais une réponse \textbf{par
+discipline}. Cela ouvre naturellement la question suivante : peut-on
+résumer ces gabarits par un indicateur unique, l'IMC, et classer les
+disciplines de la plus « légère » à la plus « lourde » ?
+
+\section{Question 20 : Peut-on classer les disciplines selon un «
+gabarit type » mesuré par l'IMC
+?}\label{question-20-peut-on-classer-les-disciplines-selon-un-gabarit-type-mesuruxe9-par-limc}
+
+La Question 19 a montré des empreintes morphologiques distinctes. Nous
+proposons ici de les \textbf{résumer par un seul indicateur}, l'Indice
+de Masse Corporelle (IMC = poids / taille²), et de \textbf{classer les
+33 disciplines} du gabarit le plus léger au plus lourd.
+
+\textbf{Hypothèse :} les sports de saut, de glisse et d'esthétique (saut
+à ski, gymnastique, cyclisme) afficheront un IMC faible, tandis que les
+sports de force pure (haltérophilie, lutte) afficheront un IMC très
+élevé. Nous nous attendons à un classement progressif et cohérent.
+
+\subsubsection{Choix du graphique}\label{choix-du-graphique-9}
+
+Nous utilisons des \textbf{violons horizontaux} (\texttt{geom\_violin}),
+qui montrent toute la \emph{distribution} de l'IMC dans chaque
+discipline (et pas seulement la moyenne), complétés par une
+\textbf{boîte à moustaches fine} au centre pour repérer la médiane et
+les quartiles. Les disciplines sont \textbf{ordonnées par IMC médian
+croissant}, et colorées par un \textbf{dégradé} (du violet « léger » au
+jaune « lourd ») afin que le classement saute aux yeux.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/q20_imc_disciplines-1.pdf}}
+
+\subsubsection{Interprétation}\label{interpruxe9tation-20}
+
+Le classement obtenu est d'une \textbf{cohérence frappante} et valide
+notre hypothèse :
+
+\begin{itemize}
+\tightlist
+\item
+  Tout en bas (IMC le plus faible) : le \textbf{Saut à ski} (IMC médian
+  ≈ 19,2), suivi du \textbf{Cyclisme}, de la \textbf{Gymnastique} et du
+  \textbf{Patinage artistique} (≈ 21). Ce sont des sports où la légèreté
+  est un avantage mécanique direct (porter, sauter, tourner).
+\item
+  Au centre (IMC ≈ 22--24) : la majorité des sports « polyvalents »
+  (natation, escrime, tennis, aviron, athlétisme).
+\item
+  Tout en haut (IMC le plus élevé) : la \textbf{Lutte} (≈ 31,3) et
+  surtout l'\textbf{Haltérophilie} (≈ 33,2), où la masse musculaire est
+  directement productrice de performance. La forme très étirée du violon
+  de l'haltérophilie traduit la coexistence de catégories de poids très
+  différentes.
+\end{itemize}
+
+L'écart entre les deux extrêmes est considérable (≈ 14 points d'IMC), ce
+qui montre à quel point les exigences physiques diffèrent d'un sport à
+l'autre.
+
+\subsubsection{Conclusion}\label{conclusion-3}
+
+L'IMC se révèle un excellent indicateur synthétique pour « cartographier
+» les disciplines : il résume en une dimension ce que la Question 19
+montrait en deux. Après avoir épuisé l'angle \emph{morphologique}, nous
+changeons d'échelle pour nous intéresser non plus à l'athlète, mais à la
+\textbf{nation} : l'histoire et le rang d'un pays expliquent-ils son
+palmarès ?
+
+\section{Question 21 : L'ancienneté olympique et le rang historique
+d'une nation prédisent-ils son palmarès
+?}\label{question-21-lanciennetuxe9-olympique-et-le-rang-historique-dune-nation-pruxe9disent-ils-son-palmaruxe8s}
+
+Nous quittons l'athlète pour la \textbf{nation}. Le jeu de données
+contient des agrégats par pays : l'année de première participation
+(\texttt{country\_first\_participation}), le total historique de
+médailles (\texttt{country\_total\_medals}) et le meilleur classement
+jamais atteint (\texttt{country\_best\_rank}). Nous nous demandons si
+ces variables sont liées : \textbf{un pays présent depuis longtemps, ou
+très bien classé, gagne-t-il davantage de médailles ?}
+
+\textbf{Hypothèse :} les nations historiques (présentes dès 1896) et
+celles ayant déjà atteint le sommet du classement (rang 1) ont accumulé
+un palmarès bien supérieur. Nous anticipons une corrélation négative
+entre l'année de première participation et le total de médailles (plus
+on arrive tôt, plus on accumule), et une corrélation négative entre le
+meilleur rang et le total (meilleur rang = chiffre plus petit = plus de
+médailles).
+
+\subsubsection{Choix du graphique}\label{choix-du-graphique-10}
+
+Les agrégats \texttt{country\_*} ne prennent \textbf{qu'une seule valeur
+par pays} : nous réduisons donc le jeu de données à une ligne par pays.
+Nous traçons ensuite deux \textbf{nuages de points} avec une
+\textbf{droite de régression linéaire}
+(\texttt{geom\_smooth(method\ =\ "lm")}) pour matérialiser la tendance.
+Comme le total de médailles varie énormément (de 5 à plus de 2600), nous
+passons l'axe vertical en \textbf{échelle logarithmique} pour rendre le
+graphique lisible. Quelques pays remarquables sont annotés.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/q21_panneau_anciennete-1.pdf}}
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/q21_panneau_rang-1.pdf}}
+
+\subsubsection{Interprétation}\label{interpruxe9tation-21}
+
+Les deux panneaux valident notre hypothèse, avec des forces différentes
+:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Ancienneté (r ≈ -0,37) :} la tendance est réelle mais modérée.
+  Les nations fondatrices (États-Unis, France, Grande-Bretagne,
+  Allemagne, toutes présentes dès 1896) figurent bien parmi les plus
+  médaillées. Mais la corrélation est loin d'être parfaite : la
+  \textbf{Chine} (1ère participation en 1932) et l'\textbf{Union
+  soviétique} (1952) sont arrivées tardivement tout en figurant parmi
+  les toutes premières nations du palmarès. L'ancienneté aide, mais la
+  puissance démographique et l'investissement comptent davantage.
+\item
+  \textbf{Meilleur rang (r ≈ -0,63) :} la corrélation est nettement plus
+  forte. Avoir déjà atteint le rang 1 va presque systématiquement de
+  pair avec un énorme total de médailles. C'est logique : il s'agit de
+  deux mesures de la même domination sportive.
+\end{itemize}
+
+L'échelle logarithmique est ici indispensable : sans elle, les
+États-Unis (≈ 2638 médailles) écraseraient à eux seuls tout le
+graphique.
+
+\subsubsection{Conclusion}\label{conclusion-4}
+
+Le rang historique est un bien meilleur prédicteur du palmarès que la
+simple ancienneté. Mais toutes les médailles ne se valent pas : un pays
+peut accumuler beaucoup de podiums sans dominer. La dernière question
+affine donc l'analyse en s'intéressant à la \textbf{qualité} du palmarès
+- la part d'or.
+
+\section{Question 22 : Quelles nations sont des « machines à or » et
+lesquelles sont des « collectionneuses de médailles »
+?}\label{question-22-quelles-nations-sont-des-machines-uxe0-or-et-lesquelles-sont-des-collectionneuses-de-muxe9dailles}
+
+Le total de médailles (Question 21) mélange l'or, l'argent et le bronze.
+Or gagner beaucoup de médailles n'est pas la même chose que
+\textbf{dominer}. Nous calculons donc le \textbf{ratio d'or} de chaque
+nation : la part de médailles d'or dans son palmarès total
+(\texttt{country\_total\_gold\ /\ country\_total\_medals}).
+
+\textbf{Hypothèse :} certaines nations « dominatrices » transforment une
+grande part de leurs podiums en or, tandis que d'autres « collectionnent
+» des médailles sans souvent atteindre la première marche. Nous nous
+attendons aussi à voir émerger des \textbf{spécialistes} : de petits
+pays gold-riches sur une poignée de disciplines.
+
+\subsubsection{Choix du graphique}\label{choix-du-graphique-11}
+
+Nous utilisons un \textbf{graphique en sucettes} (\emph{lollipop chart}
+: un segment terminé par un point), plus léger visuellement qu'un
+diagramme en barres pour comparer 49 pays. Les pays sont ordonnés par
+ratio d'or décroissant. La \textbf{taille du point} représente le total
+de médailles (pour distinguer les géants des petites délégations) et sa
+\textbf{couleur} reprend le ratio d'or. Nous écartons les pays ayant
+moins de 30 médailles au total, car un ratio calculé sur un trop petit
+dénominateur serait statistiquement fragile.
+
+\pandocbounded{\includegraphics[keepaspectratio]{rapport_files/rapport_files/figure-latex/q22_ratio_or-1.pdf}}
+
+\subsubsection{Interprétation}\label{interpruxe9tation-22}
+
+Le graphique révèle \textbf{trois profils de nations} :
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Les géants dominateurs} (gros points en haut) : l'Union
+  soviétique (42 \%), la \textbf{Chine} (41 \%) et les
+  \textbf{États-Unis} (40 \%) cumulent à la fois un énorme volume de
+  médailles et un ratio d'or élevé. Ce sont les vraies puissances :
+  elles ne se contentent pas de participer aux podiums, elles les
+  gagnent.
+\item
+  \textbf{Les spécialistes} (petits points, ratio élevé) :
+  l'\textbf{Éthiopie} (44 \%), le \textbf{Nigeria} (41 \%) ou la
+  \textbf{Turquie} (40 \%) affichent un ratio d'or aussi haut que les
+  géants, mais sur un volume bien plus faible. Ce sont des nations qui
+  dominent un \textbf{petit nombre de disciplines} (l'Éthiopie est
+  historiquement reine du fond), ce qui est cohérent avec la réalité
+  sportive.
+\item
+  \textbf{Les collectionneuses} (bas du classement) : le
+  \textbf{Mexique} (19 \%), la \textbf{Pologne}, la \textbf{Bulgarie} ou
+  le \textbf{Brésil} (≈ 24 \%) accumulent les podiums mais transforment
+  rarement en or.
+\end{itemize}
+
+On note tout de même que l'éventail des ratios reste resserré (≈ 19 \% à
+44 \%), ce qui invite à la prudence : sur ce jeu de données, la part
+d'or tourne globalement autour de 30--40 \%. La taille des points (le
+volume) reste donc le meilleur séparateur entre vraies puissances et
+nations de niche.
+
+\subsubsection{Conclusion}\label{conclusion-5}
+
+En croisant le \textbf{volume} (taille des points) et la
+\textbf{qualité} (ratio d'or), ce dernier graphique synthétise
+élégamment la hiérarchie olympique : il distingue les nations qui
+gagnent gros, celles qui gagnent juste, et celles qui gagnent souvent
+sans gagner le titre.
+
+\section{Question 23 : Application Shiny --- un explorateur
+morphologique
+interactif}\label{question-23-application-shiny-un-explorateur-morphologique-interactif}
+
+Pour permettre au lecteur d'explorer lui-même les empreintes
+morphologiques vues en Question 19, nous avons développé une
+\textbf{application Shiny} (dossier \texttt{/shiny/}). Plutôt que de
+figer un seul graphique, elle laisse l'utilisateur \textbf{choisir la
+discipline, la saison et le genre}, et observer en temps réel comment se
+déplace le nuage taille × poids et comment évolue la distribution de
+l'IMC.
+
+\emph{Les figures ci-dessous n'ont pas été générées directement dans ce
+rapport : ce sont des captures d'écran de l'application Shiny. Pour
+interagir avec ces graphiques, il faut lancer l'application
+(\texttt{/shiny/app.R}).}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.8\linewidth]{Shiny_1_filtre} 
+
+}
+
+\caption{Onglet 1 de l'application Shiny : nuage taille x poids filtré par discipline, saison et genre, points colorés selon la médaille obtenue.}\label{fig:unnamed-chunk-32}
+\end{figure}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.8\linewidth]{Shiny2_violon_interactif} 
+
+}
+
+\caption{Onglet 2 de l'application Shiny : distribution de l'IMC pour les disciplines sélectionnées (violon interactif).}\label{fig:unnamed-chunk-33}
+\end{figure}
+
+La première capture (nuage taille × poids) confirme de manière
+interactive ce que la Question 19 montrait : en sélectionnant
+successivement « Basketball » puis « Gymnastics (Artistic) », le nuage
+se déplace radicalement dans le plan, illustrant en direct la
+spécialisation des gabarits. Le filtre par saison et par genre permet en
+outre de vérifier que ces empreintes restent stables (les femmes suivent
+la même logique morphologique que les hommes, simplement décalée vers
+des gabarits un peu plus légers).
+
+La seconde capture (violon d'IMC) permet de comparer interactivement
+deux ou trois disciplines au choix, et retrouve le classement de la
+Question 20 : l'haltérophilie domine toujours en IMC, la gymnastique
+reste tout en bas.
+
+\subsubsection{Conclusion}\label{conclusion-6}
+
+L'application Shiny transforme une analyse figée en outil d'exploration
+: elle apporte une valeur ajoutée réelle par rapport à un graphique
+statique, puisqu'elle laisse le lecteur poser ses propres
+sous-questions.
+
+\end{document}
