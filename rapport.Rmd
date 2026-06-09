@@ -1263,3 +1263,80 @@ ces gabarits par un indicateur unique, l'IMC, et classer les disciplines de la p
 à la plus « lourde » ?
 
 
+# Question 20 : Peut-on classer les disciplines selon un « gabarit type » mesuré par l'IMC ?
+
+La Question 19 a montré des empreintes morphologiques distinctes. Nous proposons ici de les
+**résumer par un seul indicateur**, l'Indice de Masse Corporelle (IMC = poids / taille²), et de
+**classer les 33 disciplines** du gabarit le plus léger au plus lourd.
+
+**Hypothèse :** les sports de saut, de glisse et d'esthétique (saut à ski, gymnastique, cyclisme)
+afficheront un IMC faible, tandis que les sports de force pure (haltérophilie, lutte) afficheront
+un IMC très élevé. Nous nous attendons à un classement progressif et cohérent.
+
+### Choix du graphique
+
+Nous utilisons des **violons horizontaux** (`geom_violin`), qui montrent toute la *distribution*
+de l'IMC dans chaque discipline (et pas seulement la moyenne), complétés par une **boîte à
+moustaches fine** au centre pour repérer la médiane et les quartiles. Les disciplines sont
+**ordonnées par IMC médian croissant**, et colorées par un **dégradé** (du violet « léger » au
+jaune « lourd ») afin que le classement saute aux yeux.
+
+```{r q20_imc_disciplines, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 9, fig.height = 9}
+# --- Chargement des données ---
+imc_data <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
+
+# --- Calcul de l'IMC : poids (kg) / taille (m)^2. La taille est convertie cm -> m. ---
+imc_data <- imc_data %>%
+  mutate(imc = weight_kg / (height_cm / 100)^2)
+
+# --- Calcul de l'IMC médian par discipline, pour ORDONNER l'axe vertical ---
+ordre_sports <- imc_data %>%
+  group_by(sport) %>%
+  summarise(imc_median = median(imc), .groups = "drop") %>%
+  arrange(imc_median)
+
+# On transforme 'sport' en facteur dont l'ordre des niveaux = ordre d'IMC médian.
+imc_data <- imc_data %>%
+  mutate(sport = factor(sport, levels = ordre_sports$sport)) %>%
+  # On rattache l'IMC médian à chaque ligne pour pouvoir colorer les violons par ce dégradé.
+  left_join(ordre_sports, by = "sport")
+
+# --- Graphique : violons horizontaux colorés par l'IMC médian ---
+ggplot(imc_data, aes(x = imc, y = sport, fill = imc_median)) +
+  # scale = "width" : tous les violons ont la même largeur max (comparaison des formes).
+  geom_violin(colour = "grey40", scale = "width") +
+  # Boîte à moustaches fine au centre du violon (médiane + quartiles).
+  geom_boxplot(width = 0.12, fill = "white", alpha = 0.6, outlier.shape = NA) +
+  # Dégradé de couleur du plus léger (sombre) au plus lourd (clair).
+  scale_fill_viridis_c(option = "plasma") +
+  labs(
+    title    = "Du gabarit le plus léger au plus lourd : l'IMC par discipline",
+    subtitle = "Disciplines ordonnées par IMC médian croissant (33 disciplines)",
+    x = "Indice de Masse Corporelle (IMC)", y = "Discipline sportive",
+    fill = "IMC médian"
+  ) +
+  theme_minimal()
+```
+
+### Interprétation
+
+Le classement obtenu est d'une **cohérence frappante** et valide notre hypothèse :
+
+- Tout en bas (IMC le plus faible) : le **Saut à ski** (IMC médian ≈ 19,2), suivi du **Cyclisme**,
+  de la **Gymnastique** et du **Patinage artistique** (≈ 21). Ce sont des sports où la légèreté est
+  un avantage mécanique direct (porter, sauter, tourner).
+- Au centre (IMC ≈ 22–24) : la majorité des sports « polyvalents » (natation, escrime, tennis,
+  aviron, athlétisme).
+- Tout en haut (IMC le plus élevé) : la **Lutte** (≈ 31,3) et surtout l'**Haltérophilie** (≈ 33,2),
+  où la masse musculaire est directement productrice de performance. La forme très étirée du violon
+  de l'haltérophilie traduit la coexistence de catégories de poids très différentes.
+
+L'écart entre les deux extrêmes est considérable (≈ 14 points d'IMC), ce qui montre à quel point
+les exigences physiques diffèrent d'un sport à l'autre.
+
+### Conclusion
+
+L'IMC se révèle un excellent indicateur synthétique pour « cartographier » les disciplines : il
+résume en une dimension ce que la Question 19 montrait en deux. Après avoir épuisé l'angle
+*morphologique*, nous changeons d'échelle pour nous intéresser non plus à l'athlète, mais à la
+**nation** : l'histoire et le rang d'un pays expliquent-ils son palmarès ?
