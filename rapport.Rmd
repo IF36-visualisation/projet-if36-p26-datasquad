@@ -1163,3 +1163,103 @@ La comparaison des hauteurs de barres permet d'observer immédiatement quelle co
 
 Si la barre correspondant aux Jeux d'Été est nettement plus élevée, cela confirme que cette compétition possède une envergure plus importante en termes de participation.
 
+# Question 19 : Chaque discipline possède-t-elle une « empreinte morphologique » qui lui est propre ?
+
+La Question 17 a montré une corrélation globale entre la taille et le poids des athlètes,
+toutes disciplines confondues. Mais cette nuée de points globale cache peut-être plusieurs
+*sous-populations* : un basketteur et un gymnaste n'ont rien à voir physiquement.
+Nous cherchons donc ici à savoir si chaque discipline occupe une **zone distincte** du plan
+taille × poids, formant une véritable « empreinte morphologique ».
+
+**Hypothèse :** chaque discipline impose des contraintes physiques spécifiques. On devrait
+donc observer des nuages de densité nettement séparés (les basketteurs grands et lourds,
+les gymnastes petits et légers, les haltérophiles courts mais très massifs, etc.).
+
+### Choix du graphique
+
+Pour répondre, un simple nuage de points serait illisible (8500 points superposés).
+Nous utilisons donc une **carte de densité 2D** (`geom_density_2d_filled`) : au lieu d'afficher
+chaque athlète, elle colorie les zones du plan selon la *concentration* d'athlètes. Plus une
+zone est claire, plus les athlètes y sont nombreux. En affichant une facette par discipline,
+on compare directement les « empreintes » côte à côte. Nous complétons par une seconde vue où
+toutes les disciplines sont superposées sur un même plan, avec une **ellipse de confiance à 95 %**
+par discipline, qui résume d'un seul trait la zone occupée par chaque sport.
+
+```{r q19_densite_morpho, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 9, fig.height = 7}
+# --- Chargement des données (même fichier que tout le rapport) ---
+# show_col_types = FALSE évite l'affichage technique du détail des colonnes.
+morpho <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
+
+# --- Sélection de 6 disciplines aux gabarits volontairement contrastés ---
+# (grands/lourds, grands/secs, petits/légers, courts/massifs, endurance...)
+sports_cibles <- c("Basketball", "Rowing", "Swimming",
+                    "Weightlifting", "Gymnastics (Artistic)", "Cross-Country Skiing")
+
+# On ne conserve que ces disciplines pour garder des contours lisibles.
+morpho_sel <- morpho %>%
+  filter(sport %in% sports_cibles)
+
+# --- Graphique : carte de densité 2D taille x poids, une facette par sport ---
+ggplot(morpho_sel, aes(x = height_cm, y = weight_kg)) +
+  # geom_density_2d_filled estime la densité des athlètes et la colorie par niveaux.
+  # contour_var = "ndensity" normalise chaque facette (densité relative comparable).
+  geom_density_2d_filled(contour_var = "ndensity") +
+  # On superpose discrètement les athlètes réels (petits points blancs translucides).
+  geom_point(size = 0.4, alpha = 0.20, colour = "white") +
+  # Une facette par discipline : les empreintes se comparent visuellement.
+  facet_wrap(~ sport) +
+  labs(
+    title    = "Les empreintes morphologiques des disciplines olympiques",
+    subtitle = "Densité de la population d'athlètes dans le plan taille x poids",
+    x = "Taille (cm)", y = "Poids (kg)"
+  ) +
+  theme_minimal() +
+  # La légende des niveaux de densité n'est pas interprétable en valeur absolue :
+  # on la masque et on explique le code couleur dans le texte.
+  theme(legend.position = "none")
+```
+
+```{r q19_ellipses, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 9, fig.height = 6}
+# --- Vue complémentaire : toutes les disciplines sur un même plan ---
+# Une ellipse de confiance (95 %) par discipline résume la zone occupée.
+ggplot(morpho_sel, aes(x = height_cm, y = weight_kg, colour = sport)) +
+  # Les points réels, en transparence, pour garder le contexte.
+  geom_point(alpha = 0.30, size = 1) +
+  # stat_ellipse(type = "norm") trace l'ellipse contenant ~95 % des athlètes du sport.
+  # type = "norm" n'utilise que le package de base (compilation garantie).
+  stat_ellipse(type = "norm", level = 0.95) +
+  labs(
+    title  = "Séparation morphologique des disciplines (ellipses de confiance 95 %)",
+    x = "Taille (cm)", y = "Poids (kg)", colour = "Discipline"
+  ) +
+  theme_minimal()
+```
+
+### Interprétation
+
+Les deux graphiques confirment nettement notre hypothèse : **chaque discipline occupe sa propre
+région du plan taille × poids**, et les empreintes se chevauchent peu.
+
+- La **Gymnastique (Artistique)** forme une tache compacte en bas à gauche : athlètes petits
+  (≈ 163 cm) et légers (≈ 58 kg), profil idéal pour les figures acrobatiques.
+- Le **Basketball** se situe à l'opposé, en haut à droite : grands (≈ 193 cm) et lourds (≈ 100 kg).
+- L'**Aviron (Rowing)** et la **Natation (Swimming)** dessinent des nuages allongés de grande taille
+  mais de poids modéré (gabarits longs et secs).
+- L'**Haltérophilie (Weightlifting)** est remarquable : taille moyenne (≈ 175 cm) mais poids
+  extrêmement variable (jusqu'à ~150 kg), d'où une empreinte très étirée verticalement — reflet
+  des catégories de poids, des poids plumes aux super-lourds.
+- Le **Ski de fond (Cross-Country Skiing)** occupe une zone d'endurance : gabarit intermédiaire et resserré.
+
+Les ellipses de confiance résument ce constat : elles se touchent à peine. Autrement dit, la
+nuée globale observée en Question 17 était bien la **superposition de plusieurs populations
+distinctes**. La morphologie n'est pas le fruit du hasard : c'est une signature de la discipline.
+
+### Conclusion
+
+La densité 2D s'avère bien plus parlante qu'un nuage de points classique : elle révèle que la
+question « quelle est la morphologie d'un athlète olympique ? » n'a pas de réponse unique, mais
+une réponse **par discipline**. Cela ouvre naturellement la question suivante : peut-on résumer
+ces gabarits par un indicateur unique, l'IMC, et classer les disciplines de la plus « légère »
+à la plus « lourde » ?
+
+
