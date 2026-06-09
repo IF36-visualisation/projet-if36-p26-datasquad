@@ -3,7 +3,8 @@ title: "Rapport"
 author: "data-squad"
 date: "2026-04-21"
 output:
-  pdf_document: default
+  pdf_document:
+    latex_engine: xelatex
   html_document:
     df_print: paged
 ---
@@ -99,6 +100,12 @@ library(ggplot2)
 dataset = read_csv("data/olympics_athletes_dataset.csv")
 ```
 
+# Partie 1 - Les Jeux Olympiques à l'échelle mondiale : nations et représentativité
+
+Cette partie répond à la question :
+
+> Comment les pays sont-ils représentés et quels sont les plus performants ?
+
 # Question 1: Quels sont les pays qui ont accumulé le plus de médailles d’or au cours de l'histoire des Jeux Olympiques ?
 
 Nous pouvons imaginer que les pays ayant gagné le plus de médailles sont les pays les plus influents dans le monde tels que les Etats-Unis ou l’Europe, qui ont plus de ressources et de moyens pour développer le niveau de leurs athlètes.
@@ -142,7 +149,7 @@ bottom_5$type <- "Moins représentés"
 comparison <- rbind(top_5, bottom_5)
 ```
 
-## Graphe 1 — Pays les plus représentés
+## Graphe 1 - Pays les plus représentés
 
 ### Choix du graphique
 
@@ -169,7 +176,7 @@ L’un des avantages de ce graphique est qu’il permet de lire des valeurs pré
 
 Cela montre une forte concentration des données autour de quelques nationalités dominantes. Cette situation peut s’expliquer par la taille des délégations, la régularité de participation aux Jeux olympiques ou encore les ressources sportives plus importantes de certains pays.
 
-## Graphe 2 — Pays les moins représentés
+## Graphe 2 - Pays les moins représentés
 
 ### Choix du graphique
 
@@ -192,11 +199,11 @@ ggplot(bottom_10, aes(x = reorder(country, n), y = n)) +
 
 Ce graphique met en évidence les nationalités les moins représentées dans le dataset. Contrairement au premier graphique, les effectifs observés ici sont très faibles et relativement proches les uns des autres.
 
-Cela signifie qu’un grand nombre de pays occupent une place très marginale dans les données. Cette faible représentation peut s’expliquer par une participation plus récente, une présence limitée à certaines disciplines ou des moyens sportifs plus faibles.
+Cela signifie qu’un grand nombre de pays occupent une place très marginale dans les données. Cette faible représentation peut s’expliquer par une participation plus récente, une présence limitée à certaines disciplines ou des moyens sportives plus faibles.
 
 Ce graphique complète donc le premier en montrant que la représentativité des nationalités n’est pas uniforme : quelques pays dominent, tandis que beaucoup d’autres sont très peu présents.
 
-## Graphe 3 — Comparaison
+## Graphe 3 - Comparaison
 
 ### Choix du graphique
 
@@ -230,91 +237,344 @@ L’analyse de ces trois graphiques montre que la représentativité des nationa
 
 Le premier graphique permet d’identifier les pays dominants avec des valeurs précises. Le deuxième montre que de nombreux pays occupent une place marginale. Enfin, le troisième met directement en évidence l’écart entre ces deux groupes. L’ensemble confirme donc une structure déséquilibrée de la répartition des nationalités.
 
-# Question 3: Est-ce que la taille/poids d'un athlète influence sa performance ?
+# Question 5 : Le pays hôte affiche-t-il une augmentation de son ratio de médailles par rapport à sa moyenne historique ?
 
-Cette partie analyse si la corpulence d'un athlète (mesurée par l'Indice de Masse Corporelle - IMC) constitue un avantage déterminant pour ses performances.
+Nous cherchons, dans cette question, a chercher si il y a un nombre plus élevé de médailles pour les pays hôte des Jeux Olympiques, l'année où ils sont hôtes, par rapport a la valeur globale des médailles de ce pays.
+
+Notre hypothèse est que pendant les années où un pays est hôte, le pays surperforme grâce à l’aide mentale qu’apporte le soutien du public, le support mental du fait de vouloir performer dans son pays, ainsi que les investissements massifs entrainés par la présence des Jeux Olympiques.
+
+Pour répondre à cette question, nous allons utiliser un bar chart, qui nous montrera une comparaison entre la moyenne du nombre de médailles qui les pays ont pendant les années des Jeux Olympiques, et le nombre de médailles que le pays gagne quand il est hôte des Jeux Olympiques. La complication de cette question était de relier les valeurs de la variable host_city avec la variable nationality, ce qui a été fait en utilisant la fonction tibble::tribble.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+
+
+host_mapping <- tibble::tribble(
+  ~host_city,                ~host_country_code,
+  "Athens",                  "GRE",
+  "Squaw Valley",            "USA",
+  "Lake Placid",             "USA",
+  "London",                  "GBR",
+  "Paris",                   "FRA",
+  "St. Louis",               "USA",
+  "Atlanta",                 "USA",
+  "Albertville",             "FRA",
+  "Sydney",                  "AUS",
+  "Nagano",                  "JPN",
+  "Antwerp",                 "BEL",
+  "Stockholm",               "SWE",
+  "Calgary",                 "CAN",
+  "Tokyo",                   "JPN",
+  "Rio de Janeiro",          "BRA",
+  "Innsbruck",               "AUT",
+  "Oslo",                    "NOR",
+  "Garmisch-Partenkirchen",  "GER",
+  "PyeongChang",             "KOR",
+  "Chamonix",                "FRA",
+  "Beijing",                 "CHN",
+  "Cortina d'Ampezzo",       "ITA",
+  "Lillehammer",             "NOR",
+  "Vancouver",               "CAN",
+  "Grenoble",                "FRA",
+  "St. Moritz",              "SUI",
+  "Sarajevo",                "SRB",
+  "Turin",                   "ITA",
+  "Sapporo",                 "JPN",
+  "Salt Lake City",          "USA",
+  "Sochi",                   "RUS"
+)
+
+data_hosts <- dataset %>%
+  filter(nationality %in% host_mapping$host_country_code) %>%
+  group_by(nationality) %>%
+  summarize(country_total_medals = first(country_total_medals), .groups = "drop")
+
+data_graphique <- data_hosts %>%
+  mutate(
+    Moyenne_Historique = round(country_total_medals / 28, 1),
+    Medailles_Domicile = round(Moyenne_Historique * 1.35, 1)
+  ) %>%
+  pivot_longer(
+    cols = c(Moyenne_Historique, Medailles_Domicile),
+    names_to = "Type_Performance",
+    values_to = "Nb_Medailles"
+  )
+
+ggplot(data_graphique, aes(x = reorder(nationality, -Nb_Medailles), y = Nb_Medailles, fill = Type_Performance)) +
+  geom_col(position = "dodge", color = "white", width = 0.7) +
+  scale_fill_manual(
+    values = c("Moyenne_Historique" = "grey", "Medailles_Domicile" = "yellow"),
+    labels = c("Performance à Domicile", "Moyenne Historique par édition")
+  ) +
+  labs(
+    title = "Comparaison des médailles par édition pour les nations hôtes du dataset",
+    x = "Code Pays (CIO)",
+    y = "Nombre total de médailles par édition",
+    fill = "Indicateur :"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "top"
+  )
+```
+
+#### Interprétation : 
+
+On peut donc voir dans ce graphique qu’il y a pour chaque pays analysé, la barre des années où le pays est hôte est plus haute, à peu près de 30 % en moyenne, que la moyenne des pays pendant les Jeux Olympiques. On peut donc en comprendre que notre hypothèse est validée, il y a bien un avantage à domicile, qui fait qu’il y a plus de médailles les années ou le pays est hôte des Jeux Olympiques.
+
+# Question 10 : L'efficacité des délégations (Ratio Participation/Succès)
+
+**Question :** Quelles sont les nationalités qui possèdent le meilleur "taux de transformation" (nombre de médailles remportées divisé par le nombre d'athlètes uniques envoyés) ?
+
+**Hypothèse :** Les grandes nations (avec un grand nombre d'athlètes) remportent le plus grand volume de médailles, mais certaines plus petites délégations ciblées affichent un taux d'efficacité (médailles par athlète) exceptionnel.
+
+Pour répondre à cette question, nous allons croiser le nombre d'athlètes uniques envoyés par pays avec le nombre total de médailles obtenues. Le graphique proposé est un **Scatter Plot (nuage de points)** où : - L'abscisse (X) représente le nombre d'athlètes uniques envoyés par pays. - L'ordonnée (Y) représente le nombre total de médailles remportées. - La taille et la couleur des points reflètent le **taux de transformation** (le pourcentage d'athlètes de la délégation repartant avec une médaille).
+
+Nous filtrons les pays ayant envoyé moins de 10 athlètes pour éviter les cas extrêmes de petites délégations qui fausseraient les statistiques d'efficacité globale.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
-df_morpho <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
-# Nettoyage spécifique pour l'analyse IMC
-df_morpho <- olympics %>%
-  mutate(
-    weight_kg = as.numeric(weight_kg),
-    height_cm = as.numeric(height_cm),
-    result_value = as.numeric(result_value),
-    imc = weight_kg / (height_cm / 100)^2
+# Calcul du nombre d'athlètes et de médailles par pays
+data_efficacite <- dataset %>%
+  group_by(country_name) %>%
+  summarize(
+    nb_athletes = n_distinct(athlete_id),
+    nb_medailles = sum(medal %in% c("Gold", "Silver", "Bronze")),
+    taux_transformation = (nb_medailles / nb_athletes) * 100,
+    .groups = "drop"
   ) %>%
-  filter(!is.na(imc) & !is.na(result_value))
+  filter(nb_athletes >= 10)
+
+# Définition des étiquettes pour les pays notables (forte efficacité ou forte délégation)
+data_efficacite <- data_efficacite %>%
+  mutate(label = ifelse(taux_transformation > 20 | nb_athletes > 150, country_name, ""))
+
+# Création du Scatter Plot
+ggplot(data_efficacite, aes(x = nb_athletes, y = nb_medailles, label = label)) +
+  geom_point(aes(size = taux_transformation, color = taux_transformation), alpha = 0.7) +
+  geom_text(vjust = -0.7, hjust = 0.5, size = 3, check_overlap = TRUE) +
+  scale_color_gradient(low = "blue", high = "red", name = "Taux (%)") +
+  labs(
+    title = "Efficacité des délégations : Volume vs Efficacité",
+    x = "Nombre d'athlètes uniques envoyés",
+    y = "Nombre total de médailles remportées",
+    size = "Taux de transformation (%)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14)
+  )
 ```
 
-## Force de l'influence de l'IMC par discipline
+#### Interprétation :
 
-Ce graphique permet d'identifier les disciplines où la corpulence a l'influence la plus forte sur le résultat (chrono, points, distance).
+Le nuage de points permet de distinguer deux stratégies ou dynamiques différentes chez les nations olympiques : 1. **Les géants olympiques :** Situés en haut à droite (grand nombre d'athlètes et grand nombre de médailles). Ces pays envoient d'immenses délégations et convertissent une part significative de leurs athlètes en médaillés. 2. **Les délégations ultra-efficaces :** Situées plus haut par rapport à leur position horizontale (les points rouges/chauds). Ces pays ont un taux de transformation élevé, ce qui signifie qu'une grande partie des athlètes qu'ils envoient réussissent à décrocher une médaille.
 
-```{r correlation_sport,echo = FALSE, warning = FALSE, message = FALSE}
-corelation_globale <- df_morpho %>%
-    group_by(sport) %>%
-    summarise(
-        correlation = cor(imc, result_value, use = "complete.obs"),
-        nb_athletes = n()
-    ) %>%
-    filter(nb_athletes >= 20) %>% 
-    arrange(desc(abs(correlation)))
+Ce graphique illustre parfaitement le compromis entre la quantité d'athlètes engagés et l'optimisation des performances par athlète individuel.
 
-ggplot(corelation_globale, aes(x = reorder(sport, abs(correlation)), y = abs(correlation))) +
-    geom_col(fill = "darkcyan") +
-    coord_flip() + 
-    labs(
-        title = "Intensité de la corrélation IMC / Performance",
-        x = "Discipline Sportive",
-        y = "Valeur absolue du coefficient de corrélation (|r|)"
-    ) +
-    theme_minimal()
+# Question 21 : L'ancienneté olympique et le rang historique d'une nation prédisent-ils son palmarès ?
+
+Nous quittons l'athlète pour la **nation**. Le jeu de données contient des agrégats par pays :
+l'année de première participation (`country_first_participation`), le total historique de médailles
+(`country_total_medals`) et le meilleur classement jamais atteint (`country_best_rank`). Nous nous
+demandons si ces variables sont liées : **un pays présent depuis longtemps, ou très bien classé,
+gagne-t-il davantage de médailles ?**
+
+**Hypothèse :** les nations historiques (présentes dès 1896) et celles ayant déjà atteint le
+sommet du classement (rang 1) ont accumulé un palmarès bien supérieur. Nous anticipons une
+corrélation négative entre l'année de première participation et le total de médailles (plus on
+arrive tôt, plus on accumule), et une corrélation négative entre le meilleur rang et le total
+(meilleur rang = chiffre plus petit = plus de médailles).
+
+### Choix du graphique
+
+Les agrégats `country_*` ne prennent **qu'une seule valeur par pays** : nous réduisons donc le jeu
+de données à une ligne par pays. Nous traçons ensuite deux **nuages de points** avec une **droite
+de régression linéaire** (`geom_smooth(method = "lm")`) pour matérialiser la tendance. Comme le
+total de médailles varie énormément (de 5 à plus de 2600), nous passons l'axe vertical en **échelle
+logarithmique** pour rendre le graphique lisible. Quelques pays remarquables sont annotés.
+
+```{r q21_prepare, echo = FALSE, warning = FALSE, message = FALSE}
+# --- Chargement et réduction à une ligne par pays ---
+pays_data <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
+
+# Chaque colonne country_* étant constante au sein d'un pays, min == max : on prend min/max.
+agg_pays <- pays_data %>%
+  group_by(country_name) %>%
+  summarise(
+    premiere_part = min(country_first_participation),  # année de 1ère participation
+    total_medals  = max(country_total_medals),         # total historique de médailles
+    meilleur_rang = min(country_best_rank),            # meilleur classement (1 = meilleur)
+    .groups = "drop"
+  )
+
+# Coefficients de corrélation de Pearson (calculés sur les valeurs brutes).
+r_anciennete <- round(cor(agg_pays$premiere_part, agg_pays$total_medals), 3)
+r_rang       <- round(cor(agg_pays$meilleur_rang, agg_pays$total_medals), 3)
 ```
 
-## Zoom sur les sports clés
-
-Pour comprendre l'impact réel, nous isolons deux sports aux tendances opposées.
-
-### Archery (Tir à l'arc) : Une corrélation positive
-
-En tir à l'arc, le résultat est en **points** (plus c'est haut, mieux c'est).
-
-```{r zoom_archery,echo = FALSE, warning = FALSE, message = FALSE}
-df_morpho %>%
-  filter(sport == "Archery") %>%
-  ggplot(aes(x = imc, y = result_value)) +
-  geom_point(alpha = 0.5, color = "#2ecc71") +
-  geom_smooth(method = "lm", color = "black") +
-  labs(title = "Archery : IMC vs Points",
-       x = "IMC", y = "Points obtenus") +
+```{r q21_panneau_anciennete, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 8, fig.height = 5}
+# --- Panneau A : année de 1ère participation vs total de médailles ---
+ggplot(agg_pays, aes(x = premiere_part, y = total_medals)) +
+  # Taille des points proportionnelle au palmarès, pour repérer les grandes nations.
+  geom_point(aes(size = total_medals), alpha = 0.6, colour = "#2C7FB8") +
+  # Droite de régression linéaire (tendance) + intervalle de confiance.
+  geom_smooth(method = "lm", se = TRUE, colour = "red", linetype = "dashed") +
+  # Annotation des pays au très gros palmarès (> 600 médailles).
+  geom_text(data = subset(agg_pays, total_medals > 600),
+            aes(label = country_name), vjust = -1, size = 3, check_overlap = TRUE) +
+  # Échelle log : sans elle, les petits pays seraient écrasés en bas du graphique.
+  scale_y_log10() +
+  labs(
+    title    = "Ancienneté olympique et palmarès des nations",
+    subtitle = paste0("Corrélation de Pearson r = ", r_anciennete,
+                      " (échelle verticale logarithmique)"),
+    x = "Année de première participation", y = "Total historique de médailles",
+    size = "Total médailles"
+  ) +
   theme_minimal()
 ```
 
-**Interprétation :** On observe une pente montante. Cela signifie qu'un IMC plus élevé est globalement associé à un meilleur score en points. Une plus grande masse corporelle pourrait offrir une meilleure assise et stabilité face au vent ou lors de la tension de l'arc.
-
-### Swimming (Natation) : Une corrélation négative
-
-En natation, le résultat est souvent en **secondes** (plus c'est bas, mieux c'est).
-
-```{r zoom_swimming,echo = FALSE, warning = FALSE, message = FALSE}
-df_morpho %>%
-  filter(sport == "Swimming") %>%
-  ggplot(aes(x = imc, y = result_value)) +
-  geom_point(alpha = 0.5, color = "#e74c3c") +
-  geom_smooth(method = "lm", color = "black") +
-  labs(title = "Swimming : IMC vs Chrono (secondes)",
-       x = "IMC", y = "Secondes") +
-  theme_minimal()
+```{r q21_panneau_rang, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 8, fig.height = 5}
+# --- Panneau B : meilleur rang historique vs total de médailles ---
+ggplot(agg_pays, aes(x = meilleur_rang, y = total_medals)) +
+  geom_point(alpha = 0.6, colour = "#D95F0E", size = 2) +
+  geom_smooth(method = "lm", se = TRUE, colour = "red", linetype = "dashed") +
+  geom_text(data = subset(agg_pays, total_medals > 600),
+            aes(label = country_name), vjust = -1, size = 3, check_overlap = TRUE) +
+  scale_y_log10() +
+  labs(
+    title    = "Meilleur classement historique et palmarès des nations",
+    subtitle = paste0("Corrélation de Pearson r = ", r_rang,
+                      " (échelle verticale logarithmique)"),
+    x = "Meilleur classement historique (1 = meilleur)",
+    y = "Total historique de médailles"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.title  = element_text(face = "bold"),
+    axis.title  = element_text(face = "bold")
+  )
 ```
 
-**Interprétation :** La pente est descendante. Comme le résultat est exprimé en secondes, une baisse du temps signifie une amélioration. On peut en conclure qu'un IMC plus élevé est souvent un avantage pour la propulsion et la puissance dans l'eau chez les nageurs Olympiques.
+### Interprétation
 
-### Conclusion sur la morphologie
+Les deux panneaux valident notre hypothèse, avec des forces différentes :
 
-En conclusion, notre analyse confirme que l'influence de l'IMC est bien réelle, mais qu'elle est spécifique à chaque discipline. Il est important de noter que les athlètes Olympiques sont, par définition, déjà à leur **poids de forme** optimal pour leur sport. Cette spécialisation extrême des corps signifie que même si des corrélations existent, elles s'appliquent à un groupe d'individus déjà physiquement optimisés pour la haute performance.
+- **Ancienneté (r ≈ -0,37) :** la tendance est réelle mais modérée. Les nations fondatrices
+  (États-Unis, France, Grande-Bretagne, Allemagne, toutes présentes dès 1896) figurent bien parmi
+  les plus médaillées. Mais la corrélation est loin d'être parfaite : la **Chine** (1ère
+  participation en 1932) et l'**Union soviétique** (1952) sont arrivées tardivement tout en figurant
+  parmi les toutes premières nations du palmarès. L'ancienneté aide, mais la puissance démographique
+  et l'investissement comptent davantage.
+- **Meilleur rang (r ≈ -0,63) :** la corrélation est nettement plus forte. Avoir déjà atteint le
+  rang 1 va presque systématiquement de pair avec un énorme total de médailles. C'est logique : il
+  s'agit de deux mesures de la même domination sportive.
 
-Dans les sports de précision, une masse stable favorise la régularité, tandis que dans les sports de puissance, un IMC élevé est souvent le reflet d'une musculature nécessaire à la propulsion. La morphologie est donc un facteur de réussite, mais elle doit être interprétée selon les exigences physiques propres à chaque épreuve.
+L'échelle logarithmique est ici indispensable : sans elle, les États-Unis (≈ 2638 médailles)
+écraseraient à eux seuls tout le graphique.
+
+### Conclusion
+
+Le rang historique est un bien meilleur prédicteur du palmarès que la simple ancienneté. Mais
+toutes les médailles ne se valent pas : un pays peut accumuler beaucoup de podiums sans dominer.
+La dernière question affine donc l'analyse en s'intéressant à la **qualité** du palmarès - la part
+d'or.
+
+# Question 22 : Quelles nations sont des « machines à or » et lesquelles sont des « collectionneuses de médailles » ?
+
+Le total de médailles (Question 21) mélange l'or, l'argent et le bronze. Or gagner beaucoup de
+médailles n'est pas la même chose que **dominer**. Nous calculons donc le **ratio d'or** de chaque
+nation : la part de médailles d'or dans son palmarès total
+(`country_total_gold / country_total_medals`).
+
+**Hypothèse :** certaines nations « dominatrices » transforment une grande part de leurs podiums en
+or, tandis que d'autres « collectionnent » des médailles sans souvent atteindre la première marche.
+Nous nous attendons aussi à voir émerger des **spécialistes** : de petits pays gold-riches sur une
+poignée de disciplines.
+
+### Choix du graphique
+
+Nous utilisons un **graphique en sucettes** (*lollipop chart* : un segment terminé par un point),
+plus léger visuellement qu'un diagramme en barres pour comparer 49 pays. Les pays sont ordonnés par
+ratio d'or décroissant. La **taille du point** représente le total de médailles (pour distinguer
+les géants des petites délégations) et sa **couleur** reprend le ratio d'or. Nous écartons les pays
+ayant moins de 30 médailles au total, car un ratio calculé sur un trop petit dénominateur serait
+statistiquement fragile.
+
+```{r q22_ratio_or, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 9, fig.height = 10}
+# --- Chargement et calcul du ratio d'or par pays ---
+or_data <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
+
+ratio_pays <- or_data %>%
+  group_by(country_name) %>%
+  summarise(
+    total_or     = max(country_total_gold),
+    total_medals = max(country_total_medals),
+    .groups = "drop"
+  ) %>%
+  # On écarte les pays au dénominateur trop faible (ratio peu fiable).
+  filter(total_medals >= 30) %>%
+  # Ratio d'or en pourcentage.
+  mutate(ratio_or = total_or / total_medals * 100)
+
+# --- Graphique en sucettes (lollipop) ordonné par ratio d'or ---
+ggplot(ratio_pays, aes(x = ratio_or, y = reorder(country_name, ratio_or))) +
+  # Le "bâton" de la sucette : un segment de 0 jusqu'à la valeur du pays.
+  geom_segment(aes(xend = 0, yend = country_name), colour = "grey75") +
+  # La "tête" de la sucette : taille = total médailles, couleur = ratio d'or.
+  geom_point(aes(size = total_medals, colour = ratio_or)) +
+  scale_colour_viridis_c(option = "inferno", end = 0.9) +
+  labs(
+    title    = "Ratio d'or des nations : part de l'or dans le palmarès total",
+    subtitle = "Pays ayant au moins 30 médailles au total",
+    x = "% de médailles d'or", y = "Pays",
+    size = "Total médailles", colour = "% d'or"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.title  = element_text(face = "bold"),
+    axis.title  = element_text(face = "bold")
+  )
+```
+
+### Interprétation
+
+Le graphique révèle **trois profils de nations** :
+
+- **Les géants dominateurs** (gros points en haut) : l'Union soviétique (42 %), la **Chine**
+  (41 %) et les **États-Unis** (40 %) cumulent à la fois un énorme volume de médailles et un ratio
+  d'or élevé. Ce sont les vraies puissances : elles ne se contentent pas de participer aux podiums,
+  elles les gagnent.
+- **Les spécialistes** (petits points, ratio élevé) : l'**Éthiopie** (44 %), le **Nigeria** (41 %)
+  ou la **Turquie** (40 %) affichent un ratio d'or aussi haut que les géants, mais sur un volume
+  bien plus faible. Ce sont des nations qui dominent un **petit nombre de disciplines** (l'Éthiopie
+  est historiquement reine du fond), ce qui est cohérent avec la réalité sportive.
+- **Les collectionneuses** (bas du classement) : le **Mexique** (19 %), la **Pologne**, la
+  **Bulgarie** ou le **Brésil** (≈ 24 %) accumulent les podiums mais transforment rarement en or.
+
+On note tout de même que l'éventail des ratios reste resserré (≈ 19 % à 44 %), ce qui invite à la
+prudence : sur ce jeu de données, la part d'or tourne globalement autour de 30–40 %. La taille des
+points (le volume) reste donc le meilleur séparateur entre vraies puissances et nations de niche.
+
+### Conclusion
+
+En croisant le **volume** (taille des points) et la **qualité** (ratio d'or), ce dernier graphique
+synthétise élégamment la hiérarchie olympique : il distingue les nations qui gagnent gros, celles
+qui gagnent juste, et celles qui gagnent souvent sans gagner le titre.
+
+**Transition :**
+Après avoir étudié les performances des nations, nous nous intéressons désormais aux caractéristiques des athlètes qui composent ces délégations.
+
+---
+
+# Partie 2 - Qui sont les athlètes olympiques ?
+
+Cette partie cherche à comprendre :
+
+> Quel est le profil des athlètes présents aux Jeux Olympiques ?
 
 # Question 4 : Y a-t-il un genre plus représenté que l'autre ?
 
@@ -451,95 +711,9 @@ data %>%
 
 L'ensemble de l'analyse permet de répondre à notre problématique initiale : aucun genre n'est massivement privilégié dans ce jeu de données.
 
-En résumé : \* Les disparités observées par discipline sont souvent liées à la structure historique des sports. \* Le volume total de participations est quasiment identique entre les deux sexes. \* Le nombre d'athlètes uniques révèle une légère prédominance masculine, mais la tendance globale penche vers la parité.
+En résumé : \* Les disparités observées par discipline sont souvent liées à la structure historique des sports. \* Le volume total de participations est quasiment identique entre les deux sexes. \* Le nombre d'athlètes uniques reveals une légère prédominance masculine, mais la tendance globale penche vers la parité.
 
 Cette évolution témoigne probablement des efforts institutionnels pour promouvoir l'égalité dans le sport olympique. Enfin, une analyse sur l'évolution temporelle de cette répartition permettrait de mieux comprendre ces dynamiques historiques.
-
-# Question 5 : Le pays hôte affiche-t-il une augmentation de son ratio de médailles par rapport à sa moyenne historique ?
-
-Nous cherchons, dans cette question, a chercher si il y a un nombre plus élevé de médailles pour les pays hôte des Jeux Olympiques, l'année où ils sont hôtes, par rapport a la valeur globale des médailles de ce pays.
-
-Notre hypothèse est que pendant les années où un pays est hôte, le pays surperforme grâce à l’aide mentale qu’apporte le soutien du public, le support mental du fait de vouloir performer dans son pays, ainsi que les investissements massifs entrainés par la présence des Jeux Olympiques.
-
-Pour répondre à cette question, nous allons utiliser un bar chart, qui nous montrera une comparaison entre la moyenne du nombre de médailles qui les pays ont pendant les années des Jeux Olympiques, et le nombre de médailles que le pays gagne quand il est hôte des Jeux Olympiques. La complication de cette question était de relier les valeurs de la variable host_city avec la variable nationality, ce qui a été fait en utilisant la fonction tibble::tribble.
-
-```{r, echo = FALSE, warning = FALSE, message = FALSE}
-
-
-host_mapping <- tibble::tribble(
-  ~host_city,                ~host_country_code,
-  "Athens",                  "GRE",
-  "Squaw Valley",            "USA",
-  "Lake Placid",             "USA",
-  "London",                  "GBR",
-  "Paris",                   "FRA",
-  "St. Louis",               "USA",
-  "Atlanta",                 "USA",
-  "Albertville",             "FRA",
-  "Sydney",                  "AUS",
-  "Nagano",                  "JPN",
-  "Antwerp",                 "BEL",
-  "Stockholm",               "SWE",
-  "Calgary",                 "CAN",
-  "Tokyo",                   "JPN",
-  "Rio de Janeiro",          "BRA",
-  "Innsbruck",               "AUT",
-  "Oslo",                    "NOR",
-  "Garmisch-Partenkirchen",  "GER",
-  "PyeongChang",             "KOR",
-  "Chamonix",                "FRA",
-  "Beijing",                 "CHN",
-  "Cortina d'Ampezzo",       "ITA",
-  "Lillehammer",             "NOR",
-  "Vancouver",               "CAN",
-  "Grenoble",                "FRA",
-  "St. Moritz",              "SUI",
-  "Sarajevo",                "SRB",
-  "Turin",                   "ITA",
-  "Sapporo",                 "JPN",
-  "Salt Lake City",          "USA",
-  "Sochi",                   "RUS"
-)
-
-data_hosts <- dataset %>%
-  filter(nationality %in% host_mapping$host_country_code) %>%
-  group_by(nationality) %>%
-  summarize(country_total_medals = first(country_total_medals), .groups = "drop")
-
-data_graphique <- data_hosts %>%
-  mutate(
-    Moyenne_Historique = round(country_total_medals / 28, 1),
-    Medailles_Domicile = round(Moyenne_Historique * 1.35, 1)
-  ) %>%
-  pivot_longer(
-    cols = c(Moyenne_Historique, Medailles_Domicile),
-    names_to = "Type_Performance",
-    values_to = "Nb_Medailles"
-  )
-
-ggplot(data_graphique, aes(x = reorder(nationality, -Nb_Medailles), y = Nb_Medailles, fill = Type_Performance)) +
-  geom_col(position = "dodge", color = "white", width = 0.7) +
-  scale_fill_manual(
-    values = c("Moyenne_Historique" = "grey", "Medailles_Domicile" = "yellow"),
-    labels = c("Performance à Domicile", "Moyenne Historique par édition")
-  ) +
-  labs(
-    title = "Comparaison des médailles par édition pour les nations hôtes du dataset",
-    x = "Code Pays (CIO)",
-    y = "Nombre total de médailles par édition",
-    fill = "Indicateur :"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 14),
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    legend.position = "top"
-  )
-```
-
-#### Interprétation : 
-
-On peut donc voir dans ce graphique qu’il y a pour chaque pays analysé, la barre des années où le pays est hôte est plus haute, à peu près de 30 % en moyenne, que la moyenne des pays pendant les Jeux Olympiques. On peut donc en comprendre que notre hypothèse est validée, il y a bien un avantage à domicile, qui fait qu’il y a plus de médailles les années ou le pays est hôte des Jeux Olympiques.
 
 # Question 6 : L'âge moyen des athlètes médaillés a-t-il augmenté ou diminué tout au long de l'histoire des Jeux Olympiques ?
 
@@ -610,7 +784,7 @@ ggplot(data_morphology, aes(x = games_type, y = weight_kg, fill = games_type)) +
 
 #### Interprétation :
 
-On peut voir que la distribution de poids est très similiare sur les deux saisons, ce qui ne valide pas notre hypothèse. La forme des violons est presque identique, et les médianes sont au même niveau, ce qui montre que la moyenne des profils sur les deux saisons est similaire. Mais une partie de notre hypothèse est bonne quand même, car on voit des profils beaucoup plus lourds sur les Jeux d'été, qui peuvent venir des sports de lancer, ou de combats, ou d'autres sports, qui ne sont pas présents aux Jeux d'hiver.
+On peut voir que la distribution de poids est très similiare sur les deux saisons, ce qui ne valide pas notre hypothèse. La forme des violons est presque identique, et les médianes sont au même niveau, ce qui montre que la moyenne des profils sur les deux saisons is similaire. Mais une partie de notre hypothèse est bonne quand même, car on voit des profils beaucoup plus lourds sur les Jeux d'été, qui peuvent venir des sports de lancer, ou de combats, ou d'autres sports, qui ne sont pas présents aux Jeux d'hiver.
 
 # Question 8 : Quelles sont les disciplines sportives qui comptent le plus grand nombre d'athlètes enregistrés ?
 
@@ -659,151 +833,11 @@ ggplot(data_top_sports, aes(x = nb_athletes, y = reorder(sport, nb_athletes))) +
 
 #### Interprétation :
 
-On peut voir que les 5 sports avec le plus d'athlètes ne sont pas les sports les plsu "gros" auxquels ont pensait pendant notre hypothèse, mais ce sont d'autres sports. Ces 5 sport ont seulement une différence de 10 athlètes, ce qui est très peu.
+Le graphique montre que les disciplines sportives sont représentées de manière relativement homogène dans notre jeu de données. Les effectifs varient seulement entre environ 230 et 285 athlètes, ce qui constitue un écart limité au regard de la taille totale du dataset.
 
-On peu donc en tirer que soit notre jeu de données n'est pas une liste de juste tous les athlètes, mais est un échantillon choisit de manière équilibrée pour avoir une représentativité équivalente pour tous les sports, soit il y a plus d'athlètes dans ces 5 sports, que dans les "grands" sports comme la natation ou l'athétisme.
+Contrairement à notre hypothèse initiale, les sports traditionnellement les plus médiatisés comme l'athlétisme ou la natation ne sont pas ceux qui comptent le plus d'athlètes dans les données. Les disciplines les plus représentées sont le luge, la boxe, le biathlon, le bobsleigh et le judo.
 
-# Question 9 : Corrélation entre expérience olympique et succès
-
-**Question :** Existe-t-il un "pic d'efficacité" en fonction du nombre de participations (`total_olympics_attended`) ? Est-on plus susceptible de gagner l'or à sa 1ère, 2ème ou 3ème participation ?
-
-**Hypothèse :** La performance maximale (médaille d'or) survient plus souvent lors de la deuxième participation (équilibre entre jeunesse et expérience).
-
-Pour répondre à cette question sans être biaisé par le fait qu'il y a beaucoup plus d'athlètes réalisant une seule participation par rapport à ceux en cumulant plusieurs, nous allons créer une **Heatmap (Carte de chaleur)**. Elle affichera la proportion (en pourcentage) de chaque type de résultat selon le nombre de participations.
-
-```{r,echo = FALSE, warning = FALSE, message = FALSE}
-# Filtrage et préparation des données
-data_experience <- dataset %>%
-  filter(!is.na(total_olympics_attended) & !is.na(medal)) %>%
-  mutate(medal = factor(medal, levels = c("None", "Bronze", "Silver", "Gold")))
-
-# Calcul des pourcentages par groupe de participation
-heatmap_data <- data_experience %>%
-  group_by(total_olympics_attended, medal) %>%
-  summarize(count = n(), .groups = "drop") %>%
-  group_by(total_olympics_attended) %>%
-  mutate(proportion = count / sum(count) * 100) %>%
-  ungroup()
-
-# Création de la Heatmap des proportions
-ggplot(heatmap_data, aes(x = as.factor(total_olympics_attended), y = medal, fill = proportion)) +
-  geom_tile(color = "white") +
-  scale_fill_gradient(low = "white", high = "darkcyan", name = "Proportion (%)") +
-  geom_text(aes(label = sprintf("%.1f%%", proportion)), color = "black", size = 3.5) +
-  labs(
-    title = "Heatmap des chances de médailles selon le nombre de participations",
-    x = "Nombre total de participations",
-    y = "Type de résultat (Médaille)"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 13)
-  )
-```
-
-#### Interprétation :
-
-La carte de chaleur permet de visualiser de façon claire la probabilité d'obtenir une médaille (Or, Argent, Bronze) ou aucune ("None") selon l'expérience olympique de l'athlète. On remarque généralement que la proportion de "None" baisse à mesure que le nombre de participations augmente, ce qui indique que les athlètes plus expérimentés ont de meilleures chances globales de repartir avec une médaille.
-
-Concernant l'Or spécifiquement, cette visualisation permet de confirmer ou d'infirmer l'hypothèse d'un "pic d'efficacité" : les athlètes participant pour la deuxième ou troisième fois sont statistiquement l'élite de leur discipline, ce qui se reflète souvent par un pourcentage de réussite plus important comparé aux premières participations. L'expérience est donc un facteur clé de succès aux Jeux Olympiques.
-
-# Question 10 : L'efficacité des délégations (Ratio Participation/Succès)
-
-**Question :** Quelles sont les nationalités qui possèdent le meilleur "taux de transformation" (nombre de médailles remportées divisé par le nombre d'athlètes uniques envoyés) ?
-
-**Hypothèse :** Les grandes nations (avec un grand nombre d'athlètes) remportent le plus grand volume de médailles, mais certaines plus petites délégations ciblées affichent un taux d'efficacité (médailles par athlète) exceptionnel.
-
-Pour répondre à cette question, nous allons croiser le nombre d'athlètes uniques envoyés par pays avec le nombre total de médailles obtenues. Le graphique proposé est un **Scatter Plot (nuage de points)** où : - L'abscisse (X) représente le nombre d'athlètes uniques envoyés par pays. - L'ordonnée (Y) représente le nombre total de médailles remportées. - La taille et la couleur des points reflètent le **taux de transformation** (le pourcentage d'athlètes de la délégation repartant avec une médaille).
-
-Nous filtrons les pays ayant envoyé moins de 10 athlètes pour éviter les cas extrêmes de petites délégations qui fausseraient les statistiques d'efficacité globale.
-
-```{r,echo = FALSE, warning = FALSE, message = FALSE}
-# Calcul du nombre d'athlètes et de médailles par pays
-data_efficacite <- dataset %>%
-  group_by(country_name) %>%
-  summarize(
-    nb_athletes = n_distinct(athlete_id),
-    nb_medailles = sum(medal %in% c("Gold", "Silver", "Bronze")),
-    taux_transformation = (nb_medailles / nb_athletes) * 100,
-    .groups = "drop"
-  ) %>%
-  filter(nb_athletes >= 10)
-
-# Définition des étiquettes pour les pays notables (forte efficacité ou forte délégation)
-data_efficacite <- data_efficacite %>%
-  mutate(label = ifelse(taux_transformation > 20 | nb_athletes > 150, country_name, ""))
-
-# Création du Scatter Plot
-ggplot(data_efficacite, aes(x = nb_athletes, y = nb_medailles, label = label)) +
-  geom_point(aes(size = taux_transformation, color = taux_transformation), alpha = 0.7) +
-  geom_text(vjust = -0.7, hjust = 0.5, size = 3, check_overlap = TRUE) +
-  scale_color_gradient(low = "blue", high = "red", name = "Taux (%)") +
-  labs(
-    title = "Efficacité des délégations : Volume vs Efficacité",
-    x = "Nombre d'athlètes uniques envoyés",
-    y = "Nombre total de médailles remportées",
-    size = "Taux de transformation (%)"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 14)
-  )
-```
-
-#### Interprétation :
-
-Le nuage de points permet de distinguer deux stratégies ou dynamiques différentes chez les nations olympiques : 1. **Les géants olympiques :** Situés en haut à droite (grand nombre d'athlètes et grand nombre de médailles). Ces pays envoient d'immenses délégations et convertissent une part significative de leurs athlètes en médaillés. 2. **Les délégations ultra-efficaces :** Situées plus haut par rapport à leur position horizontale (les points rouges/chauds). Ces pays ont un taux de transformation élevé, ce qui signifie qu'une grande partie des athlètes qu'ils envoient réussissent à décrocher une médaille.
-
-Ce graphique illustre parfaitement le compromis entre la quantité d'athlètes engagés et l'optimisation des performances par athlète individuel.
-
-# Question 11 : L'évolution morphologique temporelle (La spécialisation des corps)
-
-Nous avons vu précédemment que l'IMC impacte la performance aujourd'hui. Mais est-ce que cette optimisation a toujours existé ? Les athlètes sont-ils devenus physiquement plus "extrêmes" au fil des décennies dans certaines disciplines ?
-
-**Hypothèse :** Avec la professionnalisation du sport, le physique des athlètes s'est ultra-spécialisé. La taille moyenne des basketteurs a augmenté, tandis que celle des gymnastes a diminué par rapport aux premières éditions des Jeux Olympiques.
-
-Pour valider cette hypothèse, nous croisons les variables d'année, de taille et de discipline pour deux sports aux besoins morphologiques opposés : le Basketball et la Gymnastique Artistique.
-
-```{r, echo = FALSE, warning = FALSE, message = FALSE}
-data_morpho_temp <- dataset %>%
-  filter(sport %in% c("Basketball", "Gymnastics (Artistic)")) %>%
-  group_by(year, sport) %>%
-  summarize(
-    taille_moyenne = mean(height_cm, na.rm = TRUE),
-    poids_moyen = mean(weight_kg, na.rm = TRUE),
-    .groups = "drop"
-  )
-
-ggplot(data_morpho_temp, aes(x = year, y = taille_moyenne, color = sport)) +
-  geom_line(linewidth = 1) +
-  geom_point(size = 2) +
-  geom_smooth(method = "loess", formula = y ~ x, linetype = "dashed", se = FALSE, linewidth = 0.8) +
-  scale_color_manual(
-    values = c("Basketball" = "#2c3e50", "Gymnastics (Artistic)" = "#e74c3c"),
-    labels = c("Basketball", "Gymnastique (Artistique)")
-  ) +
-  labs(
-    title = "Évolution de la taille moyenne des athlètes (1896-2024)",
-    subtitle = "Spécialisation morphologique opposée entre le Basketball et la Gymnastique",
-    x = "Année des Jeux Olympiques",
-    y = "Taille moyenne (cm)",
-    color = "Discipline :"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 13),
-    plot.subtitle = element_text(face = "italic", size = 10),
-    legend.position = "top"
-  )
-```
-
-#### Interprétation :
-
-Le graphique confirme notre hypothèse d'ultra-spécialisation des corps, visible à travers la divergence progressive des deux courbes de tendance (en pointillés).
-
-Malgré un creux de données entre 1930 et 1980 pour ces disciplines, l'évolution sur plus d'un siècle est marquée : 1. **Basketball :** La courbe de tendance montre une augmentation globale, passant d'environ 1m91 à plus de 1m94. Sur les éditions récentes (après 2000), on observe même un pic au-dessus de 2 mètres en moyenne, prouvant que les profils de très grande taille sont toujours plus recherchés. 2. **Gymnastique (Artistique) :** À l'inverse, la tendance est à la baisse. Partant d'environ 1m65 au début du siècle dernier, la taille moyenne diminue pour s'établir autour de 1m61 de nos jours, avec des creux récents sous la barre des 1m60. Un centre de gravité plus bas facilite en effet l'exécution de figures acrobatiques complexes.
-
-Cette évolution opposée met en évidence que les caractéristiques physiques ne sont pas dues au hasard : elles s'optimisent et se spécialisent pour répondre de plus en plus précisément aux exigences spécifiques de chaque discipline de haut niveau.
+L'écart très faible observé entre les disciplines laisse penser que le dataset a probablement été construit à partir d'un échantillon relativement équilibré entre les sports plutôt qu'à partir de l'ensemble réel des participants olympiques. Les résultats obtenus reflètent donc davantage la structure du jeu de données que la répartition réelle des athlètes aux Jeux Olympiques.
 
 # Question 12 : Le phénomène de l'Effet d'Âge Relatif (Relative Age Effect)
 
@@ -937,8 +971,154 @@ Comment expliquer cela ? Les sports individuels incluent un grand nombre de disc
 
 Les boîtes (l'écart interquartile) montrent également que la grande majorité des vainqueurs se situent entre 22 et 35 ans dans les deux catégories, démontrant que la performance olympique maximale culmine globalement dans cette fenêtre, mais avec une "prime à l'expérience" paradoxalement plus forte en individuel.
 
+**Transition :**
+Maintenant que nous avons décrit les athlètes olympiques, nous pouvons nous demander quels facteurs expliquent leur réussite sportive.
 
-## Question 14 — Les athlètes ayant la plus grande longévité sont-ils aussi ceux qui ont participé à la plus grande diversité d’épreuves ?
+---
+
+# Partie 3 - Les facteurs de la performance olympique
+
+Question centrale :
+
+> Quels éléments favorisent le succès sportif ?
+
+# Question 3: Est-ce que la taille/poids d'un athlète influence sa performance ?
+
+Cette partie analyse si la corpulence d'un athlète (mesurée par l'Indice de Masse Corporelle - IMC) constitue un avantage déterminant pour ses performances.
+
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
+df_morpho <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
+# Nettoyage spécifique pour l'analyse IMC
+df_morpho <- olympics %>%
+  mutate(
+    weight_kg = as.numeric(weight_kg),
+    height_cm = as.numeric(height_cm),
+    result_value = as.numeric(result_value),
+    imc = weight_kg / (height_cm / 100)^2
+  ) %>%
+  filter(!is.na(imc) & !is.na(result_value))
+```
+
+## Force de l'influence de l'IMC par discipline
+
+Ce graphique permet d'identifier les disciplines où la corpulence a l'influence la plus forte sur le résultat (chrono, points, distance).
+
+```{r correlation_sport,echo = FALSE, warning = FALSE, message = FALSE}
+corelation_globale <- df_morpho %>%
+    group_by(sport) %>%
+    summarise(
+        correlation = cor(imc, result_value, use = "complete.obs"),
+        nb_athletes = n()
+    ) %>%
+    filter(nb_athletes >= 20) %>% 
+    arrange(desc(abs(correlation)))
+
+ggplot(corelation_globale, aes(x = reorder(sport, abs(correlation)), y = abs(correlation))) +
+    geom_col(fill = "darkcyan") +
+    coord_flip() + 
+    labs(
+        title = "Intensité de la corrélation IMC / Performance",
+        x = "Discipline Sportive",
+        y = "Valeur absolue du coefficient de corrélation (|r|)"
+    ) +
+    theme_minimal()
+```
+
+## Zoom sur les sports clés
+
+Pour comprendre l'impact réel, nous isolons deux sports aux tendances opposées.
+
+### Archery (Tir à l'arc) : Une corrélation positive
+
+En tir à l'arc, le résultat est en **points** (plus c'est haut, mieux c'est).
+
+```{r zoom_archery,echo = FALSE, warning = FALSE, message = FALSE}
+df_morpho %>%
+  filter(sport == "Archery") %>%
+  ggplot(aes(x = imc, y = result_value)) +
+  geom_point(alpha = 0.5, color = "#2ecc71") +
+  geom_smooth(method = "lm", color = "black") +
+  labs(title = "Archery : IMC vs Points",
+       x = "IMC", y = "Points obtenus") +
+  theme_minimal()
+```
+
+**Interprétation :** On observe une pente montante. Cela signifie qu'un IMC plus élevé est globalement associé à un meilleur score en points. Une plus grande masse corporelle pourrait offrir une meilleure assise et stabilité face au vent ou lors de la tension de l'arc.
+
+### Swimming (Natation) : Une corrélation négative
+
+En natation, le résultat est souvent en **secondes** (plus c'est bas, mieux c'est).
+
+```{r zoom_swimming,echo = FALSE, warning = FALSE, message = FALSE}
+df_morpho %>%
+  filter(sport == "Swimming") %>%
+  ggplot(aes(x = imc, y = result_value)) +
+  geom_point(alpha = 0.5, color = "#e74c3c") +
+  geom_smooth(method = "lm", color = "black") +
+  labs(title = "Swimming : IMC vs Chrono (secondes)",
+       x = "IMC", y = "Secondes") +
+  theme_minimal()
+```
+
+**Interprétation :** La pente est descendante. Comme le résultat est exprimé en secondes, une baisse du temps signifie une amélioration. On peut en conclure qu'un IMC plus élevé est souvent un avantage pour la propulsion et la puissance dans l'eau chez les nageurs Olympiques.
+
+### Conclusion sur la morphologie
+
+En conclusion, notre analyse confirme que l'influence de l'IMC est bien réelle, mais qu'elle est spécifique à chaque discipline. Il est important de noter que les athlètes Olympiques sont, par définition, déjà à leur **poids de forme** optimal pour leur sport. Cette spécialisation extrême des corps signifie que même si des corrélations existent, elles s'appliquent à un groupe d'individus déjà physiquement optimisés pour la haute performance.
+
+Dans les sports de précision, une masse stable favorise la régularité, tandis que dans les sports de puissance, un IMC élevé est souvent le reflet d'une musculature nécessaire à la propulsion. La morphologie est donc un facteur de réussite, mais elle doit être interprétée selon les exigences physiques propres à chaque épreuve.
+
+# Question 9 : Corrélation entre expérience olympique et succès
+
+**Question :** Existe-t-il un "pic d'efficacité" en fonction du nombre de participations (`total_olympics_attended`) ? Est-on plus susceptible de gagner l'or à sa 1ère, 2ème ou 3ème participation ?
+
+**Hypothèse :** La performance maximale (médaille d'or) survient plus souvent lors de la deuxième participation (équilibre entre jeunesse et expérience).
+
+Pour répondre à cette question sans être biaisé par le fait qu'il y a beaucoup plus d'athlètes réalisant une seule participation par rapport à ceux en cumulant plusieurs, nous allons créer une **Heatmap (Carte de chaleur)**. Elle affichera la proportion (en pourcentage) de chaque type de résultat selon le nombre de participations.
+
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
+# Filtrage et préparation des données
+data_experience <- dataset %>%
+  filter(!is.na(total_olympics_attended) & !is.na(medal)) %>%
+  mutate(medal = factor(medal, levels = c("None", "Bronze", "Silver", "Gold")))
+
+# Calcul des pourcentages par groupe de participation
+heatmap_data <- data_experience %>%
+  group_by(total_olympics_attended, medal) %>%
+  summarize(count = n(), .groups = "drop") %>%
+  group_by(total_olympics_attended) %>%
+  mutate(proportion = count / sum(count) * 100) %>%
+  ungroup()
+
+# Création de la Heatmap des proportions
+ggplot(heatmap_data, aes(x = as.factor(total_olympics_attended), y = medal, fill = proportion)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "white", high = "darkcyan", name = "Proportion (%)") +
+  geom_text(aes(label = sprintf("%.1f%%", proportion)), color = "black", size = 3.5) +
+  labs(
+    title = "Heatmap des chances de médailles selon le nombre de participations",
+    x = "Nombre total de participations",
+    y = "Type de résultat (Médaille)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 13)
+  )
+```
+
+#### Interprétation :
+
+La carte de chaleur permet de visualiser la répartition des résultats obtenus en fonction du nombre de participations olympiques.
+
+On observe tout d'abord que la majorité des athlètes ne remportent aucune médaille, quelle que soit leur expérience olympique. La proportion de résultats sans médaille reste relativement stable, entre 75 % et 78 % selon le nombre de participations.
+
+Concernant les médailles d'or, notre hypothèse n'est pas totalement vérifiée. En effet, la proportion de médailles d'or augmente entre la première participation (7,2 %) et la troisième participation (8,5 %), ce qui semble indiquer un effet positif de l'expérience. Cependant, cette progression n'est pas régulière puisque la proportion diminue lors de la quatrième participation (6,9 %) avant d'atteindre son maximum à la cinquième participation (9,2 %).
+
+Les résultats suggèrent donc que l'expérience olympique peut constituer un avantage, mais ils ne permettent pas d'identifier clairement un « pic d'efficacité » à la deuxième ou à la troisième participation. Les variations observées restent relativement faibles et pourraient également être influencées par la taille des groupes d'athlètes dans chaque catégorie.
+
+Cette analyse met néanmoins en évidence que les athlètes ayant participé plusieurs fois aux Jeux Olympiques conservent des chances de succès comparables, voire légèrement supérieures, à celles des nouveaux participants.
+
+## Question 14 - Les athlètes ayant la plus grande longévité sont-ils aussi ceux qui ont participé à la plus grande diversité d’épreuves ?
 
 ### Hypothèse
 
@@ -981,7 +1161,7 @@ Ce graphique permet de voir si les athlètes ayant une carrière plus longue par
 
 Ce graphique permet de tester l’hypothèse selon laquelle la polyvalence favorise une carrière plus longue. Il met en relation la durée de carrière des athlètes avec leur diversité d’épreuves, afin de voir si les athlètes les plus polyvalents sont aussi ceux qui restent le plus longtemps dans les Jeux olympiques.
 
-## Question 15 — L'écart-type de la taille des athlètes au sein d'une même discipline a-t-il diminué entre 1924 et 2024 ?
+## Question 15 - L'écart-type de la taille des athlètes au sein d'une même discipline a-t-il diminué entre 1924 et 2024 ?
 
 ### Hypothèse
 
@@ -1030,11 +1210,11 @@ Si la courbe diminue progressivement au fil du temps, cela signifie que les tail
 
 Cette analyse permet d'étudier l'évolution de la diversité physique des athlètes au sein d'une même discipline. Une diminution de l'écart-type de la taille au cours du temps constituerait un indice de spécialisation progressive des profils physiques.
 
-## Question 16 — La taille des athlètes influence-t-elle davantage les performances mesurées en distance (mètres) que celles mesurées en temps (secondes) ?
+## Question 16 - La taille des athlètes influence-t-elle davantage les performances mesurées en distance (mètres) que celles mesurées en temps (secondes) ?
 
 ### Hypothèse
 
-Nous supposons que la taille constitue un avantage plus important dans les disciplines où la performance est mesurée en distance. Des membres plus longs peuvent favoriser certaines actions comme les lancers ou les sauts.
+Nous supposons que la taille constitue un avantage mais est plus important dans les disciplines où la performance est mesurée en distance. Des membres plus longs peuvent favoriser certaines actions comme les lancers ou les sauts.
 
 À l'inverse, dans les disciplines chronométrées, la performance dépend davantage de facteurs tels que la vitesse, l'endurance ou la technique. L'influence directe de la taille pourrait donc être moins marquée.
 
@@ -1076,7 +1256,69 @@ Dans les épreuves mesurées en mètres, une tendance croissante entre la taille
 Dans les épreuves mesurées en secondes, la relation peut être différente. Une dispersion importante des points ou l'absence de tendance visible suggérerait que la taille n'est pas le principal facteur expliquant la performance.
 La comparaison des deux graphiques permet ainsi de déterminer si l'influence de la taille est plus forte dans les disciplines de distance que dans les disciplines chronométrées.
 
-## Question 17 — Existe-t-il une corrélation visuelle entre la taille et le poids des athlètes, toutes disciplines confondues ?
+**Transition :**
+Les résultats précédents montrent que la morphologie joue un rôle important dans la performance. Nous approfondissons donc cet aspect.
+
+---
+
+# Partie 4 - La morphologie des champions
+
+C'est la partie la plus originale du rapport.
+
+Question centrale :
+
+> Existe-t-il un corps idéal pour réussir aux Jeux Olympiques ?
+
+# Question 11 : L'évolution morphologique temporelle (La spécialisation des corps)
+
+Nous avons vu précédemment que l'IMC impacte la performance aujourd'hui. Mais est-ce que cette optimisation a toujours existé ? Les athlètes sont-ils devenus physiquement plus "extrêmes" au fil des décennies dans certaines disciplines ?
+
+**Hypothèse :** Avec la professionnalisation du sport, le physique des athlètes s'est ultra-spécialisé. La taille moyenne des basketteurs a augmenté, tandis que celle des gymnastes a diminué par rapport aux premières éditions des Jeux Olympiques.
+
+Pour valider cette hypothèse, nous croisons les variables d'année, de taille et de discipline pour deux sports aux besoins morphologiques opposés : le Basketball et la Gymnastique Artistique.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+data_morpho_temp <- dataset %>%
+  filter(sport %in% c("Basketball", "Gymnastics (Artistic)")) %>%
+  group_by(year, sport) %>%
+  summarize(
+    taille_moyenne = mean(height_cm, na.rm = TRUE),
+    poids_moyen = mean(weight_kg, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+ggplot(data_morpho_temp, aes(x = year, y = taille_moyenne, color = sport)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  geom_smooth(method = "loess", formula = y ~ x, linetype = "dashed", se = FALSE, linewidth = 0.8) +
+  scale_color_manual(
+    values = c("Basketball" = "#2c3e50", "Gymnastics (Artistic)" = "#e74c3c"),
+    labels = c("Basketball", "Gymnastique (Artistique)")
+  ) +
+  labs(
+    title = "Évolution de la taille moyenne des athlètes (1896-2024)",
+    subtitle = "Spécialisation morphologique opposée entre le Basketball et la Gymnastique",
+    x = "Année des Jeux Olympiques",
+    y = "Taille moyenne (cm)",
+    color = "Discipline :"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 13),
+    plot.subtitle = element_text(face = "italic", size = 10),
+    legend.position = "top"
+  )
+```
+
+#### Interprétation :
+
+Le graphique confirme notre hypothèse d'ultra-spécialisation des corps, visible à travers la divergence progressive des deux courbes de tendance (en pointillés).
+
+Malgré un creux de données entre 1930 et 1980 pour ces disciplines, l'évolution sur plus d'un siècle est marquée : 1. **Basketball :** La courbe de tendance montre une augmentation globale, passant d'environ 1m91 à plus de 1m94. Sur les éditions récentes (après 2000), on observe même un pic au-dessus de 2 mètres en moyenne, prouvant que les profils de très grande taille sont toujours plus recherchés. 2. **Gymnastique (Artistique) :** À l'inverse, la tendance est à la baisse. Partant d'environ 1m65 au début du siècle dernier, la taille moyenne diminue pour s'établir autour de 1m61 de nos jours, avec des creux récents sous la barre des 1m60. Un centre de gravité plus bas facilite en effet l'exécution de figures acrobatiques complexes.
+
+Cette évolution opposée met en évidence que les caractéristiques physiques ne sont pas dues au hasard : elles s'optimisent et se spécialisent pour répondre de plus en plus précisément aux exigences spécifiques de chaque discipline de haut niveau.
+
+## Question 17 - Existe-t-il une corrélation visuelle entre la taille et le poids des athlètes, toutes disciplines confondues ?
 
 ## Hypothèse
 
@@ -1119,7 +1361,7 @@ Chaque point représente un athlète. L'axe horizontal correspond à sa taille e
 Si les points suivent globalement une trajectoire ascendante et que la ligne de tendance est croissante, cela indique une corrélation positive entre la taille et le poids. Les athlètes les plus grands ont alors tendance à être également les plus lourds.
 Le nuage de points permet également d'identifier des valeurs atypiques. Par exemple, un athlète très grand mais extrêmement léger, ou inversement très petit mais particulièrement lourd, apparaîtrait éloigné du reste des observations.
 
-# Question 18 — Combien d'athlètes participent aux Jeux Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver ?
+# Question 18 - Combien d'athlètes participent aux Jeux Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver ?
 
 ## Hypothèse
 
@@ -1259,7 +1501,7 @@ région du plan taille × poids**, et les empreintes se chevauchent peu.
 - L'**Aviron (Rowing)** et la **Natation (Swimming)** dessinent des nuages allongés de grande taille
   mais de poids modéré (gabarits longs et secs).
 - L'**Haltérophilie (Weightlifting)** est remarquable : taille moyenne (≈ 175 cm) mais poids
-  extrêmement variable (jusqu'à ~150 kg), d'où une empreinte très étirée verticalement — reflet
+  extrêmement variable (jusqu'à ~150 kg), d'où une empreinte très étirée verticalement - reflet
   des catégories de poids, des poids plumes aux super-lourds.
 - Le **Ski de fond (Cross-Country Skiing)** occupe une zone d'endurance : gabarit intermédiaire et resserré.
 
@@ -1273,8 +1515,7 @@ La densité 2D s'avère bien plus parlante qu'un nuage de points classique : ell
 question « quelle est la morphologie d'un athlète olympique ? » n'a pas de réponse unique, mais
 une réponse **par discipline**. Cela ouvre naturellement la question suivante : peut-on résumer
 ces gabarits par un indicateur unique, l'IMC, et classer les disciplines de la plus « légère »
-à la plus « lourde » ?
-
+à la plus « lourde ? »
 
 # Question 20 : Peut-on classer les disciplines selon un « gabarit type » mesuré par l'IMC ?
 
@@ -1359,202 +1600,14 @@ résume en une dimension ce que la Question 19 montrait en deux. Après avoir é
 *morphologique*, nous changeons d'échelle pour nous intéresser non plus à l'athlète, mais à la
 **nation** : l'histoire et le rang d'un pays expliquent-ils son palmarès ?
 
+**Conclusion de la partie :**
+Il n'existe pas une morphologie olympique unique mais une spécialisation morphologique propre à chaque discipline.
 
-# Question 21 : L'ancienneté olympique et le rang historique d'une nation prédisent-ils son palmarès ?
+---
 
-Nous quittons l'athlète pour la **nation**. Le jeu de données contient des agrégats par pays :
-l'année de première participation (`country_first_participation`), le total historique de médailles
-(`country_total_medals`) et le meilleur classement jamais atteint (`country_best_rank`). Nous nous
-demandons si ces variables sont liées : **un pays présent depuis longtemps, ou très bien classé,
-gagne-t-il davantage de médailles ?**
+# Partie 5 - Application interactive
 
-**Hypothèse :** les nations historiques (présentes dès 1896) et celles ayant déjà atteint le
-sommet du classement (rang 1) ont accumulé un palmarès bien supérieur. Nous anticipons une
-corrélation négative entre l'année de première participation et le total de médailles (plus on
-arrive tôt, plus on accumule), et une corrélation négative entre le meilleur rang et le total
-(meilleur rang = chiffre plus petit = plus de médailles).
-
-### Choix du graphique
-
-Les agrégats `country_*` ne prennent **qu'une seule valeur par pays** : nous réduisons donc le jeu
-de données à une ligne par pays. Nous traçons ensuite deux **nuages de points** avec une **droite
-de régression linéaire** (`geom_smooth(method = "lm")`) pour matérialiser la tendance. Comme le
-total de médailles varie énormément (de 5 à plus de 2600), nous passons l'axe vertical en **échelle
-logarithmique** pour rendre le graphique lisible. Quelques pays remarquables sont annotés.
-
-```{r q21_prepare, echo = FALSE, warning = FALSE, message = FALSE}
-# --- Chargement et réduction à une ligne par pays ---
-pays_data <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
-
-# Chaque colonne country_* étant constante au sein d'un pays, min == max : on prend min/max.
-agg_pays <- pays_data %>%
-  group_by(country_name) %>%
-  summarise(
-    premiere_part = min(country_first_participation),  # année de 1ère participation
-    total_medals  = max(country_total_medals),         # total historique de médailles
-    meilleur_rang = min(country_best_rank),            # meilleur classement (1 = meilleur)
-    .groups = "drop"
-  )
-
-# Coefficients de corrélation de Pearson (calculés sur les valeurs brutes).
-r_anciennete <- round(cor(agg_pays$premiere_part, agg_pays$total_medals), 3)
-r_rang       <- round(cor(agg_pays$meilleur_rang, agg_pays$total_medals), 3)
-```
-
-```{r q21_panneau_anciennete, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 8, fig.height = 5}
-# --- Panneau A : année de 1ère participation vs total de médailles ---
-ggplot(agg_pays, aes(x = premiere_part, y = total_medals)) +
-  # Taille des points proportionnelle au palmarès, pour repérer les grandes nations.
-  geom_point(aes(size = total_medals), alpha = 0.6, colour = "#2C7FB8") +
-  # Droite de régression linéaire (tendance) + intervalle de confiance.
-  geom_smooth(method = "lm", se = TRUE, colour = "red", linetype = "dashed") +
-  # Annotation des pays au très gros palmarès (> 600 médailles).
-  geom_text(data = subset(agg_pays, total_medals > 600),
-            aes(label = country_name), vjust = -1, size = 3, check_overlap = TRUE) +
-  # Échelle log : sans elle, les petits pays seraient écrasés en bas du graphique.
-  scale_y_log10() +
-  labs(
-    title    = "Ancienneté olympique et palmarès des nations",
-    subtitle = paste0("Corrélation de Pearson r = ", r_anciennete,
-                      " (échelle verticale logarithmique)"),
-    x = "Année de première participation", y = "Total historique de médailles",
-    size = "Total médailles"
-  ) +
-  theme_minimal()
-```
-
-```{r q21_panneau_rang, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 8, fig.height = 5}
-# --- Panneau B : meilleur rang historique vs total de médailles ---
-ggplot(agg_pays, aes(x = meilleur_rang, y = total_medals)) +
-  geom_point(alpha = 0.6, colour = "#D95F0E", size = 2) +
-  geom_smooth(method = "lm", se = TRUE, colour = "red", linetype = "dashed") +
-  geom_text(data = subset(agg_pays, total_medals > 600),
-            aes(label = country_name), vjust = -1, size = 3, check_overlap = TRUE) +
-  scale_y_log10() +
-  labs(
-    title    = "Meilleur classement historique et palmarès des nations",
-    subtitle = paste0("Corrélation de Pearson r = ", r_rang,
-                      " (échelle verticale logarithmique)"),
-    x = "Meilleur classement historique (1 = meilleur)",
-    y = "Total historique de médailles"
-  ) +
-  theme_minimal() +
-  theme(
-    legend.position = "none",
-    plot.title  = element_text(face = "bold"),
-    axis.title  = element_text(face = "bold")
-  )
-```
-
-### Interprétation
-
-Les deux panneaux valident notre hypothèse, avec des forces différentes :
-
-- **Ancienneté (r ≈ -0,37) :** la tendance est réelle mais modérée. Les nations fondatrices
-  (États-Unis, France, Grande-Bretagne, Allemagne, toutes présentes dès 1896) figurent bien parmi
-  les plus médaillées. Mais la corrélation est loin d'être parfaite : la **Chine** (1ère
-  participation en 1932) et l'**Union soviétique** (1952) sont arrivées tardivement tout en figurant
-  parmi les toutes premières nations du palmarès. L'ancienneté aide, mais la puissance démographique
-  et l'investissement comptent davantage.
-- **Meilleur rang (r ≈ -0,63) :** la corrélation est nettement plus forte. Avoir déjà atteint le
-  rang 1 va presque systématiquement de pair avec un énorme total de médailles. C'est logique : il
-  s'agit de deux mesures de la même domination sportive.
-
-L'échelle logarithmique est ici indispensable : sans elle, les États-Unis (≈ 2638 médailles)
-écraseraient à eux seuls tout le graphique.
-
-### Conclusion
-
-Le rang historique est un bien meilleur prédicteur du palmarès que la simple ancienneté. Mais
-toutes les médailles ne se valent pas : un pays peut accumuler beaucoup de podiums sans dominer.
-La dernière question affine donc l'analyse en s'intéressant à la **qualité** du palmarès - la part
-d'or.
-
-
-# Question 22 : Quelles nations sont des « machines à or » et lesquelles sont des « collectionneuses de médailles » ?
-
-Le total de médailles (Question 21) mélange l'or, l'argent et le bronze. Or gagner beaucoup de
-médailles n'est pas la même chose que **dominer**. Nous calculons donc le **ratio d'or** de chaque
-nation : la part de médailles d'or dans son palmarès total
-(`country_total_gold / country_total_medals`).
-
-**Hypothèse :** certaines nations « dominatrices » transforment une grande part de leurs podiums en
-or, tandis que d'autres « collectionnent » des médailles sans souvent atteindre la première marche.
-Nous nous attendons aussi à voir émerger des **spécialistes** : de petits pays gold-riches sur une
-poignée de disciplines.
-
-### Choix du graphique
-
-Nous utilisons un **graphique en sucettes** (*lollipop chart* : un segment terminé par un point),
-plus léger visuellement qu'un diagramme en barres pour comparer 49 pays. Les pays sont ordonnés par
-ratio d'or décroissant. La **taille du point** représente le total de médailles (pour distinguer
-les géants des petites délégations) et sa **couleur** reprend le ratio d'or. Nous écartons les pays
-ayant moins de 30 médailles au total, car un ratio calculé sur un trop petit dénominateur serait
-statistiquement fragile.
-
-```{r q22_ratio_or, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 9, fig.height = 10}
-# --- Chargement et calcul du ratio d'or par pays ---
-or_data <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
-
-ratio_pays <- or_data %>%
-  group_by(country_name) %>%
-  summarise(
-    total_or     = max(country_total_gold),
-    total_medals = max(country_total_medals),
-    .groups = "drop"
-  ) %>%
-  # On écarte les pays au dénominateur trop faible (ratio peu fiable).
-  filter(total_medals >= 30) %>%
-  # Ratio d'or en pourcentage.
-  mutate(ratio_or = total_or / total_medals * 100)
-
-# --- Graphique en sucettes (lollipop) ordonné par ratio d'or ---
-ggplot(ratio_pays, aes(x = ratio_or, y = reorder(country_name, ratio_or))) +
-  # Le "bâton" de la sucette : un segment de 0 jusqu'à la valeur du pays.
-  geom_segment(aes(xend = 0, yend = country_name), colour = "grey75") +
-  # La "tête" de la sucette : taille = total médailles, couleur = ratio d'or.
-  geom_point(aes(size = total_medals, colour = ratio_or)) +
-  scale_colour_viridis_c(option = "inferno", end = 0.9) +
-  labs(
-    title    = "Ratio d'or des nations : part de l'or dans le palmarès total",
-    subtitle = "Pays ayant au moins 30 médailles au total",
-    x = "% de médailles d'or", y = "Pays",
-    size = "Total médailles", colour = "% d'or"
-  ) +
-  theme_minimal() +
-  theme(
-    legend.position = "none",
-    plot.title  = element_text(face = "bold"),
-    axis.title  = element_text(face = "bold")
-  )
-```
-
-### Interprétation
-
-Le graphique révèle **trois profils de nations** :
-
-- **Les géants dominateurs** (gros points en haut) : l'Union soviétique (42 %), la **Chine**
-  (41 %) et les **États-Unis** (40 %) cumulent à la fois un énorme volume de médailles et un ratio
-  d'or élevé. Ce sont les vraies puissances : elles ne se contentent pas de participer aux podiums,
-  elles les gagnent.
-- **Les spécialistes** (petits points, ratio élevé) : l'**Éthiopie** (44 %), le **Nigeria** (41 %)
-  ou la **Turquie** (40 %) affichent un ratio d'or aussi haut que les géants, mais sur un volume
-  bien plus faible. Ce sont des nations qui dominent un **petit nombre de disciplines** (l'Éthiopie
-  est historiquement reine du fond), ce qui est cohérent avec la réalité sportive.
-- **Les collectionneuses** (bas du classement) : le **Mexique** (19 %), la **Pologne**, la
-  **Bulgarie** ou le **Brésil** (≈ 24 %) accumulent les podiums mais transforment rarement en or.
-
-On note tout de même que l'éventail des ratios reste resserré (≈ 19 % à 44 %), ce qui invite à la
-prudence : sur ce jeu de données, la part d'or tourne globalement autour de 30–40 %. La taille des
-points (le volume) reste donc le meilleur séparateur entre vraies puissances et nations de niche.
-
-### Conclusion
-
-En croisant le **volume** (taille des points) et la **qualité** (ratio d'or), ce dernier graphique
-synthétise élégamment la hiérarchie olympique : il distingue les nations qui gagnent gros, celles
-qui gagnent juste, et celles qui gagnent souvent sans gagner le titre.
-
-# Question 23 : Application Shiny — un explorateur morphologique interactif
+# Question 23 : Application Shiny - un explorateur morphologique interactif
 
 Pour permettre au lecteur d'explorer lui-même les empreintes morphologiques vues en Question 19,
 nous avons développé une **application Shiny** (dossier `/shiny/`). Plutôt que de figer un seul
