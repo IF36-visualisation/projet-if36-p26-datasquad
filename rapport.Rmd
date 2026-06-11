@@ -100,6 +100,8 @@ library(ggplot2)
 dataset = read_csv("data/olympics_athletes_dataset.csv")
 ```
 
+\newpage
+
 # Partie 1 - Les Jeux Olympiques à l'échelle mondiale : nations et représentativité
 
 Cette partie répond à la question :
@@ -113,6 +115,9 @@ Nous pouvons imaginer que les pays ayant gagné le plus de médailles sont les p
 Avant de débuter l’analyse, une étape de préparation a été nécessaire sur le jeu de données. Nous avons notamment dû gérer les valeurs manquantes dans les colonnes de médailles en utilisant l'argument “na.rm = TRUE”, afin d'éviter que des données non renseignées ne faussent les calculs de sommes globales par pays.
 
 Prendre tous les pays ferait un graphique non lisible, nous avons donc dû choisir de ne prendre que les 15 pays ayant gagné le plus de médailles.
+
+### Choix du graphique
+Nous utilisons un diagramme en barres (barchart) pour comparer le nombre de médailles d'or obtenues par pays.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 dataset %>% group_by(country_name) %>% summarize(country_golds = sum(country_total_gold, na.rm=TRUE)) %>% slice_max(order_by=country_golds, n = 15) %>% ggplot( mapping = aes(x = country_golds, y = reorder(country_name, country_golds)))+geom_col() + labs(title = "Nombre de médailles d'or par pays", x = "Nombre de médailles", y = "Pays")
@@ -152,8 +157,7 @@ comparison <- rbind(top_5, bottom_5)
 ## Graphe 1 - Pays les plus représentés
 
 ### Choix du graphique
-
-Nous avons choisi un diagramme en barres pour représenter les nationalités les plus présentes dans le dataset. Ce type de graphique est particulièrement adapté à la comparaison de valeurs quantitatives entre différentes catégories. Le choix d’un Top 15 permet d’obtenir une vision suffisamment large des pays dominants tout en conservant une bonne lisibilité.
+Nous utilisons un diagramme en barres (barchart) pour comparer le nombre d'athlètes par pays.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 ggplot(top_15, aes(x = reorder(country, n), y = n)) +
@@ -170,17 +174,12 @@ ggplot(top_15, aes(x = reorder(country, n), y = n)) +
 
 ## Interprétation
 
-Ce graphique met en évidence les nationalités les plus représentées dans le dataset. Chaque barre correspond à un pays, et sa longueur indique le nombre d’athlètes.
-
-L’un des avantages de ce graphique est qu’il permet de lire des valeurs précises, ce qui facilite la comparaison entre les pays. On observe que certains pays possèdent un nombre d’athlètes nettement supérieur aux autres.
-
-Cela montre une forte concentration des données autour de quelques nationalités dominantes. Cette situation peut s’expliquer par la taille des délégations, la régularité de participation aux Jeux olympiques ou encore les ressources sportives plus importantes de certains pays.
+Ce graphique met en évidence les nationalités les plus représentées dans le dataset. L'Allemagne, la Grèce, la Hongrie et l'Autriche figurent parmi les pays comptant le plus grand nombre d'athlètes. Les écarts restent relativement faibles entre les différentes nationalités du Top 15, ce qui montre une présence importante de plusieurs pays dans le jeu de données.
 
 ## Graphe 2 - Pays les moins représentés
 
 ### Choix du graphique
-
-Nous avons également choisi un diagramme en barres pour les pays les moins représentés afin de garder une cohérence visuelle avec le premier graphique. Ce choix facilite la comparaison entre les extrêmes du dataset.
+Nous utilisons également un diagramme en barres (barchart) par cohérence visuelle.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 ggplot(bottom_10, aes(x = reorder(country, n), y = n)) +
@@ -197,17 +196,12 @@ ggplot(bottom_10, aes(x = reorder(country, n), y = n)) +
 
 ## Interprétation
 
-Ce graphique met en évidence les nationalités les moins représentées dans le dataset. Contrairement au premier graphique, les effectifs observés ici sont très faibles et relativement proches les uns des autres.
-
-Cela signifie qu’un grand nombre de pays occupent une place très marginale dans les données. Cette faible représentation peut s’expliquer par une participation plus récente, une présence limitée à certaines disciplines ou des moyens sportives plus faibles.
-
-Ce graphique complète donc le premier en montrant que la représentativité des nationalités n’est pas uniforme : quelques pays dominent, tandis que beaucoup d’autres sont très peu présents.
+Ce graphique présente les nationalités les moins représentées dans le dataset. Les effectifs observés sont nettement plus faibles que ceux du premier graphique, avec moins de 70 athlètes pour chacun de ces pays. Cela montre que certaines nationalités occupent une place beaucoup plus marginale dans les données.
 
 ## Graphe 3 - Comparaison
 
 ### Choix du graphique
-
-Ce graphique a été choisi pour comparer directement les extrêmes du dataset, c’est-à-dire les pays les plus représentés et les moins représentés. Le fait de les regrouper dans un même espace visuel permet de mettre en évidence immédiatement l’écart entre les deux groupes.
+Nous utilisons un diagramme en barres (barchart) pour comparer directement les deux groupes d'extrêmes.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 ggplot(comparison, aes(x = reorder(country, n), y = n, fill = type)) +
@@ -225,11 +219,7 @@ ggplot(comparison, aes(x = reorder(country, n), y = n, fill = type)) +
 
 ## Interprétation
 
-Ce graphique montre clairement l’écart entre les pays les plus représentés et les pays les moins représentés. Les différences de hauteur entre les barres sont très importantes, ce qui rend la comparaison immédiate.
-
-On constate que les pays les plus représentés possèdent un nombre d’athlètes largement supérieur à celui des pays les moins représentés. Cette différence met en évidence une forte inégalité de représentativité dans le dataset.
-
-Ce graphique permet donc de synthétiser les résultats des deux premiers graphes : la distribution des nationalités est fortement déséquilibrée, avec une concentration importante autour de quelques pays.
+Ce graphique met directement en évidence l'écart entre les pays les plus représentés et les moins représentés du dataset. On observe que les nationalités les plus présentes proviennent majoritairement de pays développés ou historiquement influents dans le mouvement olympique, comme l'Allemagne, l'Autriche ou la Grèce. À l'inverse, plusieurs pays moins représentés disposent généralement de ressources économiques et sportives plus limitées, ce qui peut réduire leur participation aux compétitions internationales. L'analyse suggère ainsi que le niveau de développement et les investissements dans le sport jouent un rôle important dans la représentativité des nations au sein du dataset.
 
 ### Conclusion pour Représentativité
 
@@ -244,6 +234,9 @@ Nous cherchons, dans cette question, a chercher si il y a un nombre plus élevé
 Notre hypothèse est que pendant les années où un pays est hôte, le pays surperforme grâce à l’aide mentale qu’apporte le soutien du public, le support mental du fait de vouloir performer dans son pays, ainsi que les investissements massifs entrainés par la présence des Jeux Olympiques.
 
 Pour répondre à cette question, nous allons utiliser un bar chart, qui nous montrera une comparaison entre la moyenne du nombre de médailles qui les pays ont pendant les années des Jeux Olympiques, et le nombre de médailles que le pays gagne quand il est hôte des Jeux Olympiques. La complication de cette question était de relier les valeurs de la variable host_city avec la variable nationality, ce qui a été fait en utilisant la fonction tibble::tribble.
+
+### Choix du graphique
+Nous utilisons un diagramme en barres (barchart) pour comparer la moyenne historique avec la performance à domicile.
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -333,6 +326,9 @@ Pour répondre à cette question, nous allons croiser le nombre d'athlètes uniq
 
 Nous filtrons les pays ayant envoyé moins de 10 athlètes pour éviter les cas extrêmes de petites délégations qui fausseraient les statistiques d'efficacité globale.
 
+### Choix du graphique
+Nous utilisons un nuage de points (scatter plot) pour croiser le nombre d'athlètes et de médailles.
+
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 # Calcul du nombre d'athlètes et de médailles par pays
 data_efficacite <- dataset %>%
@@ -386,14 +382,6 @@ corrélation négative entre l'année de première participation et le total de 
 arrive tôt, plus on accumule), et une corrélation négative entre le meilleur rang et le total
 (meilleur rang = chiffre plus petit = plus de médailles).
 
-### Choix du graphique
-
-Les agrégats `country_*` ne prennent **qu'une seule valeur par pays** : nous réduisons donc le jeu
-de données à une ligne par pays. Nous traçons ensuite deux **nuages de points** avec une **droite
-de régression linéaire** (`geom_smooth(method = "lm")`) pour matérialiser la tendance. Comme le
-total de médailles varie énormément (de 5 à plus de 2600), nous passons l'axe vertical en **échelle
-logarithmique** pour rendre le graphique lisible. Quelques pays remarquables sont annotés.
-
 ```{r q21_prepare, echo = FALSE, warning = FALSE, message = FALSE}
 # --- Chargement et réduction à une ligne par pays ---
 pays_data <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
@@ -412,6 +400,9 @@ agg_pays <- pays_data %>%
 r_anciennete <- round(cor(agg_pays$premiere_part, agg_pays$total_medals), 3)
 r_rang       <- round(cor(agg_pays$meilleur_rang, agg_pays$total_medals), 3)
 ```
+
+### Choix du graphique
+Nous utilisons un nuage de points (scatter plot) avec droite de régression pour analyser la corrélation avec l'ancienneté.
 
 ```{r q21_panneau_anciennete, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 8, fig.height = 5}
 # --- Panneau A : année de 1ère participation vs total de médailles ---
@@ -434,6 +425,9 @@ ggplot(agg_pays, aes(x = premiere_part, y = total_medals)) +
   ) +
   theme_minimal()
 ```
+
+### Choix du graphique
+Nous utilisons un nuage de points (scatter plot) avec droite de régression pour analyser la corrélation avec le meilleur rang historique.
 
 ```{r q21_panneau_rang, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 8, fig.height = 5}
 # --- Panneau B : meilleur rang historique vs total de médailles ---
@@ -495,13 +489,7 @@ Nous nous attendons aussi à voir émerger des **spécialistes** : de petits pay
 poignée de disciplines.
 
 ### Choix du graphique
-
-Nous utilisons un **graphique en sucettes** (*lollipop chart* : un segment terminé par un point),
-plus léger visuellement qu'un diagramme en barres pour comparer 49 pays. Les pays sont ordonnés par
-ratio d'or décroissant. La **taille du point** représente le total de médailles (pour distinguer
-les géants des petites délégations) et sa **couleur** reprend le ratio d'or. Nous écartons les pays
-ayant moins de 30 médailles au total, car un ratio calculé sur un trop petit dénominateur serait
-statistiquement fragile.
+Nous utilisons un graphique en sucettes (lollipop chart) pour comparer les ratios de 49 pays.
 
 ```{r q22_ratio_or, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 9, fig.height = 10}
 # --- Chargement et calcul du ratio d'or par pays ---
@@ -568,7 +556,7 @@ qui gagnent juste, et celles qui gagnent souvent sans gagner le titre.
 **Transition :**
 Après avoir étudié les performances des nations, nous nous intéressons désormais aux caractéristiques des athlètes qui composent ces délégations.
 
----
+\newpage
 
 # Partie 2 - Qui sont les athlètes olympiques ?
 
@@ -583,6 +571,9 @@ Ici, nous cherchons à déterminer s'il existe un déséquilibre de représentat
 Historiquement, les hommes ont été davantage représentés dans le sport de haut niveau. Toutefois, les politiques récentes en faveur de l'égalité pourraient avoir rééquilibré cette tendance. Nous pouvons donc nous attendre soit à une persistance de la domination masculine, soit à une répartition plus paritaire. Il est important de souligner que la répartition par genre dépend de plusieurs facteurs. Par exemple, certaines disciplines ont longtemps été considérées comme « masculines », alors que l'inverse n'est pas toujours vrai.
 
 Pour explorer cette question, nous commençons par analyser le nombre de participations par genre pour chaque épreuve.
+
+### Choix du graphique
+Nous utilisons un diagramme en barres (barchart) pour comparer la participation par genre et épreuve.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 library(ggplot2)
@@ -613,6 +604,9 @@ Ce graphique démontre qu'une analyse par épreuve spécifique est trop complexe
 
 Nous avons sélectionné les 8 sports où l'écart numérique entre les participants masculins et féminins est le plus marqué.
 
+### Choix du graphique
+Nous utilisons un diagramme en barres (barchart) pour comparer les effectifs par genre dans les sports les plus disproportionnés.
+
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 library(tidyr)
 
@@ -642,6 +636,9 @@ data %>%
 ```
 
 Ce graphique permet d'identifier immédiatement les disciplines où la parité est la moins respectée. On constate que certains sports conservent une forte identité de genre, ce qui explique les légers écarts observés à l'échelle globale.
+
+### Choix du graphique
+Nous utilisons un diagramme en barres (barchart) pour comparer le total global des participations par genre.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 data %>%
@@ -675,6 +672,9 @@ data %>%
 Ces valeurs sont extrêmement proches, ce qui suggère une quasi-parité en termes de participations totales.
 
 Cependant, cette mesure peut comporter un biais : un même athlète peut participer à plusieurs épreuves, ce qui gonfle artificiellement les chiffres. Il est donc nécessaire d'affiner l'analyse.
+
+### Choix du graphique
+Nous utilisons un diagramme en barres (barchart) pour comparer le nombre d'athlètes uniques par genre.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 data %>%
@@ -721,7 +721,8 @@ Nous cherchons donc a regarder l'âge médian des médaillés dans les Jeux Olym
 
 Notre hypothèse est que l'âge moyen pourrait augmenter en fonction de l'année, grâce aux avancements de la médecine et de la technologie, qui permettraient aux athlètes d'avoir une carière plus longue, et de rester au maximum de leurs capacités pendant plus longtemps.
 
-Pour cela nous allons donc faire un line chart, pour pouvoir avoir l'évolution, et une courbe de tendance globale, pour pouvoir voir une plus grande variété de résultats.
+### Choix du graphique
+Nous utilisons un graphique en lignes (line chart) pour analyser l'évolution temporelle de l'âge moyen.
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -757,7 +758,8 @@ Le but de cette question est de comparer les poids des athlètes des jeux d'ét�
 
 Notre hypothèse est qu'il y aura une petite différence de poids, car les sports de Jeux d'hiver se basent sur l'inertie, ce qui pourrait nécessiter une masse supérieure, même si on suppose qu'il y aura des extrèmes plus importants pour l'été, avec par exemple des sport de lancer, qui ne nécessitent pas d'être plus léger.
 
-Pour répondre à cette question, nous allons utiliser un graphique en violon, qui permet de bien voir la distribution, en utilisant aussi des lignes pour voir les différents quantiles, et de pouvoir voir les extrêmes.
+### Choix du graphique
+Nous utilisons un diagramme en violon (violin plot) pour comparer la distribution des poids par saison.
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 data_morphology <- dataset %>%
@@ -792,7 +794,8 @@ Le but de cette question est de voir quels sont les sports avec le plus d'athèl
 
 Notre hypothèse est que les sport les plus "gros" et les plus suivis, tels que la natation ou l'athlétisme, auront le plus d'athlètes.
 
-Pour répondre à cette question, nous allons utiliser un diagramme en barres horizontales, en triant par odre décroissant.
+### Choix du graphique
+Nous utilisons un diagramme en barres horizontales (barchart) ordonné pour comparer l'ensemble des disciplines.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 data_all_sports <- dataset %>%
@@ -812,6 +815,9 @@ ggplot(data_all_sports, aes(x = nb_athletes, y = reorder(sport, nb_athletes))) +
 #### Interprétation :
 
 Dans ce graphique, le nom des sports est difficilement lisilble, nous allons donc en faire un second avec seuelement le top 5 des sports, mais on peut quand même voir avec ce graphique que la différence entre le nombre d'athlètes entre les plus représentés et les moins représentés n'est pas énorme, tous les sports ayant entre 200 et 300 athlètes.
+
+### Choix du graphique
+Nous utilisons un zoom sous forme de diagramme en barres (barchart) sur le Top 5 pour une meilleure lisibilité.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 data_top_sports <- dataset %>%
@@ -846,6 +852,9 @@ Ce phénomène est un grand classique de la data science sportive. Il s'agit de 
 **Hypothèse :** Les athlètes nés en début d'année (janvier, février, mars) sont surreprésentés. Dans les catégories de jeunes, ils sont physiquement plus matures de quelques mois que ceux nés en fin d'année, ce qui les place plus facilement dans les filières d'élite (le fameux "Relative Age Effect").
 
 Pour vérifier cela, nous allons extraire le mois de naissance de chaque athlète et observer la distribution comparée à une répartition théorique parfaite (environ 8.33% par mois).
+
+### Choix du graphique
+Nous utilisons un diagramme en barres (barchart) pour comparer les proportions mensuelles.
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 library(lubridate)
@@ -883,13 +892,18 @@ ggplot(data_rae, aes(x = mois_naissance, y = pourcentage)) +
 
 #### Interprétation :
 
-Si la ligne de tendance théorique (en rouge) était parfaitement respectée, chaque mois regrouperait environ 8.33% des naissances. En observant la répartition réelle via les barres du graphique, on peut voir si les mois de début d'année (Janvier, Février, Mars) dépassent cette ligne rouge de manière significative. Le cas échéant, cela confirmera que la sélection précoce dans les filières sportives durant l'enfance offre un avantage mesurable et durable aux enfants nés en début d'année, avantage qui se répercute jusqu'aux Jeux Olympiques.
+Si la date de naissance n'avait aucune influence sur les chances de devenir athlète olympique, chaque mois devrait représenter environ 8,33 % des naissances. Le graphique montre que les proportions observées sont très proches de cette valeur théorique pour l'ensemble des mois. Les écarts restent faibles et aucune surreprésentation marquée des athlètes nés en début d'année (janvier, février, mars) n'apparaît clairement.
+
+Ainsi, l'hypothèse d'un effet d'âge relatif important à l'échelle de l'ensemble des athlètes olympiques n'est pas validée par ce graphique. La répartition des naissances semble globalement homogène, ce qui suggère que le mois de naissance n'exerce pas d'influence majeure sur la probabilité d'atteindre le niveau olympique dans ce jeu de données.
 
 ### Dans quels sports cet effet est-il le plus marqué ?
 
 Pour aller plus loin, nous pouvons identifier les disciplines où ce phénomène est le plus prononcé. L'hypothèse est que les sports nécessitant une grande maturité physique précoce (puissance, vitesse, taille) afficheront un effet d'âge relatif plus fort que les sports de pure technique.
 
 Nous allons calculer le pourcentage d'athlètes nés au premier trimestre (Janvier, Février, Mars) par sport. Théoriquement, si la naissance n'avait aucune influence, ce chiffre devrait être autour de **25%** (3 mois sur 12).
+
+### Choix du graphique
+Nous utilisons un diagramme en barres (barchart) pour comparer les taux entre disciplines.
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 data_rae_sport <- dataset %>%
@@ -926,15 +940,24 @@ ggplot(data_rae_sport, aes(x = pct_q1, y = reorder(sport, pct_q1))) +
 
 #### Interprétation :
 
-En filtrant les sports et en isolant la part d'athlètes nés dans le premier trimestre (Q1), le graphique met en évidence les disciplines où la date de naissance joue le rôle le plus crucial. La ligne rouge verticale représente l'espérance théorique (25%). Les sports qui s'en éloignent fortement vers la droite, comme le Patinage de Vitesse, la Lutte ou le Saut à ski, démontrent un "Relative Age Effect" très marqué. Dans ces sports physiques où les catégories d'âge dans l'enfance sont strictes, être né en tout début d'année offre un avantage physique temporaire décisif qui se transforme en un avantage de sélection durable menant jusqu'au plus haut niveau olympique.
+En filtrant les sports et en isolant la part d’athlètes nés dans le premier trimestre (Q1), le graphique met en évidence les disciplines où l’effet d’âge relatif semble le plus présent. La ligne rouge verticale représente la proportion théorique attendue (25 %) si le mois de naissance n’avait aucune influence.
+
+On observe que tous les sports présentés dépassent cette valeur théorique, avec des proportions comprises entre environ 26 % et 29 %. Le patinage de vitesse, la lutte et le saut à ski figurent parmi les disciplines les plus concernées. Ces résultats suggèrent qu’un effet d’âge relatif existe dans certains sports, même si l’écart observé reste relativement modéré.
+
+L’hypothèse est donc partiellement validée : les athlètes nés en début d’année semblent légèrement surreprésentés dans certaines disciplines, mais l’avantage observé n’est pas suffisamment important pour conclure à un effet massif.
 
 # Question 13 : Sports d'équipe vs Sports individuels : l'âge de l'or
 
 Dans cette partie, nous cherchons à savoir si la dynamique d'équipe influe sur la longévité de la performance au plus haut niveau (la médaille d'or). L'âge de la performance maximale diffère-t-il selon que le sport se pratique seul ou en équipe ?
 
-**Hypothèse :** L'âge médian des médaillés d'or est plus élevé dans les sports d'équipe (Team). L'intelligence tactique, l'expérience et la cohésion de groupe permettent de compenser le léger déclin physique lié à l'âge, là où l'explosivité pure prime davantage dans les sports individuels (Individual).
+**Hypothèse :**
+
+Nous supposons que les médaillés d'or des sports d'équipe sont en moyenne plus âgés que ceux des sports individuels. Dans les sports collectifs, l'expérience, la lecture du jeu et la coordination avec les coéquipiers peuvent compenser davantage la baisse des capacités physiques liée à l'âge. À l'inverse, les sports individuels reposent souvent davantage sur les performances physiques pures, ce qui pourrait favoriser des athlètes plus jeunes.
 
 Pour le vérifier, nous isolons tous les athlètes ayant remporté l'Or et comparons la distribution de leur âge selon la nature de leur épreuve (Individuelle ou Équipe).
+
+### Choix du graphique
+Nous avons choisi un boxplot pour comparer la répartition des âges des médaillés d’or entre deux catégories de sports.
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 data_team_indiv <- dataset %>%
@@ -963,18 +986,18 @@ ggplot(data_team_indiv, aes(x = team_or_individual, y = age, fill = team_or_indi
 
 #### Interprétation :
 
-Le graphique contredit notre hypothèse de départ de manière assez surprenante !
+Le graphique ne valide pas notre hypothèse initiale. La médiane des médaillés d'or est d'environ 30 ans dans les sports individuels contre 28 ans dans les sports d'équipe.
 
-En lisant la médiane (la ligne noire épaisse au milieu de chaque boîte), on constate que l'âge médian des médaillés d'or individuels est de **30 ans**, contre environ **28 ans** pour les sports d'équipe.
+Ce résultat montre que les athlètes des disciplines individuelles atteignent souvent leur meilleur niveau à un âge légèrement plus avancé. Cela peut s'expliquer par la présence de sports où la précision, la maîtrise technique et l'expérience jouent un rôle majeur, comme le tir, la voile ou encore l'équitation.
 
-Comment expliquer cela ? Les sports individuels incluent un grand nombre de disciplines où l'adresse, la précision et la technique priment sur l'explosivité physique pure (le tir, l'équitation, la voile, le golf, etc.), ce qui permet des carrières parfois très longues. À l'inverse, la majorité des sports d'équipe olympiques (comme le football, le basketball, le handball) exigent un engagement athlétique et cardiovasculaire intense, favorisant des athlètes légèrement plus jeunes dans la force de l'âge physique.
+À l'inverse, de nombreux sports collectifs olympiques, tels que le football, le basketball ou le handball, demandent une forte intensité physique et favorisent davantage des athlètes proches de leur pic de condition physique.
 
-Les boîtes (l'écart interquartile) montrent également que la grande majorité des vainqueurs se situent entre 22 et 35 ans dans les deux catégories, démontrant que la performance olympique maximale culmine globalement dans cette fenêtre, mais avec une "prime à l'expérience" paradoxalement plus forte en individuel.
+Les boîtes sont également très similaires, ce qui indique que la majorité des médaillés d'or se situent dans une tranche d'âge comprise entre environ 22 et 35 ans, quelle que soit la nature de l'épreuve. L'âge optimal pour atteindre le plus haut niveau olympique semble donc relativement proche entre les deux catégories, avec un léger avantage aux athlètes des sports individuels.
 
 **Transition :**
 Maintenant que nous avons décrit les athlètes olympiques, nous pouvons nous demander quels facteurs expliquent leur réussite sportive.
 
----
+\newpage
 
 # Partie 3 - Les facteurs de la performance olympique
 
@@ -1002,6 +1025,9 @@ df_morpho <- olympics %>%
 ## Force de l'influence de l'IMC par discipline
 
 Ce graphique permet d'identifier les disciplines où la corpulence a l'influence la plus forte sur le résultat (chrono, points, distance).
+
+### Choix du graphique
+Nous utilisons un diagramme en barres (barchart) pour comparer la valeur de corrélation par sport.
 
 ```{r correlation_sport,echo = FALSE, warning = FALSE, message = FALSE}
 corelation_globale <- df_morpho %>%
@@ -1032,6 +1058,9 @@ Pour comprendre l'impact réel, nous isolons deux sports aux tendances opposées
 
 En tir à l'arc, le résultat est en **points** (plus c'est haut, mieux c'est).
 
+### Choix du graphique
+Nous utilisons un nuage de points (scatter plot) avec droite de tendance.
+
 ```{r zoom_archery,echo = FALSE, warning = FALSE, message = FALSE}
 df_morpho %>%
   filter(sport == "Archery") %>%
@@ -1049,6 +1078,9 @@ df_morpho %>%
 
 En natation, le résultat est souvent en **secondes** (plus c'est bas, mieux c'est).
 
+### Choix du graphique
+Nous utilisons un nuage de points (scatter plot) avec droite de tendance.
+
 ```{r zoom_swimming,echo = FALSE, warning = FALSE, message = FALSE}
 df_morpho %>%
   filter(sport == "Swimming") %>%
@@ -1064,9 +1096,7 @@ df_morpho %>%
 
 ### Conclusion sur la morphologie
 
-En conclusion, notre analyse confirme que l'influence de l'IMC est bien réelle, mais qu'elle est spécifique à chaque discipline. Il est important de noter que les athlètes Olympiques sont, par définition, déjà à leur **poids de forme** optimal pour leur sport. Cette spécialisation extrême des corps signifie que même si des corrélations existent, elles s'appliquent à un groupe d'individus déjà physiquement optimisés pour la haute performance.
-
-Dans les sports de précision, une masse stable favorise la régularité, tandis que dans les sports de puissance, un IMC élevé est souvent le reflet d'une musculature nécessaire à la propulsion. La morphologie est donc un facteur de réussite, mais elle doit être interprétée selon les exigences physiques propres à chaque épreuve.
+Notre analyse montre que l'IMC exerce une influence sur la performance dans certaines disciplines olympiques. Les graphiques détaillés de tir à l'arc et de natation mettent en évidence une tendance mesurable entre l'IMC et le résultat obtenu. Toutefois, les coefficients de corrélation observés restent relativement faibles, ce qui indique que l'IMC n'est pas un facteur déterminant à lui seul. La performance dépend également de nombreux autres éléments tels que la technique, l'expérience, l'entraînement ou les qualités physiques spécifiques à chaque discipline.
 
 # Question 9 : Corrélation entre expérience olympique et succès
 
@@ -1074,7 +1104,10 @@ Dans les sports de précision, une masse stable favorise la régularité, tandis
 
 **Hypothèse :** La performance maximale (médaille d'or) survient plus souvent lors de la deuxième participation (équilibre entre jeunesse et expérience).
 
-Pour répondre à cette question sans être biaisé par le fait qu'il y a beaucoup plus d'athlètes réalisant une seule participation par rapport à ceux en cumulant plusieurs, nous allons créer une **Heatmap (Carte de chaleur)**. Elle affichera la proportion (en pourcentage) de chaque type de résultat selon le nombre de participations.
+Pour répondre à cette question sans être biaisé par le fait qu'il y a beaucoup plus d'athlètes réalisant une seule participation par rapport à ceux en cumulant plusieurs, nous allons calculer la proportion de chaque type de résultat selon le nombre de participations.
+
+### Choix du graphique
+Nous utilisons une carte de chaleur (heatmap) pour comparer les taux de réussite.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 # Filtrage et préparation des données
@@ -1123,8 +1156,11 @@ Cette analyse met néanmoins en évidence que les athlètes ayant participé plu
 ### Hypothèse
 
 On suppose que les athlètes les plus polyvalents, c’est-à-dire ceux qui participent à plusieurs sports ou épreuves, peuvent avoir une carrière plus longue.
-```{r, echo = FALSE, warning = FALSE, message = FALSE}
 
+### Choix du graphique
+Nous utilisons un diagramme en boîte (boxplot) pour comparer la longévité selon le nombre d'épreuves.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 6, fig.height = 4, fig.align = "center"}
 athlete_longevity <- olympics |>
   filter(!is.na(athlete_name), !is.na(year)) |>
   group_by(athlete_name) |>
@@ -1138,77 +1174,112 @@ athlete_longevity <- olympics |>
     .groups = "drop"
   )
 
-ggplot(athlete_longevity, aes(x = longevity, y = n_events)) +
-  geom_point(color = "darkblue", alpha = 0.6) +
+ggplot(athlete_longevity, aes(x = as.factor(n_events), y = longevity, fill = as.factor(n_events))) +
+  geom_boxplot(alpha = 0.6) +
   labs(
-    title = "Relation entre longévité et diversité des épreuves",
-    x = "Longévité de carrière",
-    y = "Nombre d'épreuves différentes"
-  )
+    title = "Distribution de la longévité selon le nombre d'épreuves",
+    x = "Nombre d'épreuves différentes",
+    y = "Longévité de carrière (années)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
 ```
-
-### Choix du graphique
-
-Nous avons choisi un nuage de points car il permet d’étudier la relation entre deux variables quantitatives : la longévité de carrière et le nombre d’épreuves différentes pratiquées. Chaque point représente un athlète.
 
 ### Interprétation
 
-Ce graphique permet de voir si les athlètes ayant une carrière plus longue participent aussi à un plus grand nombre d’épreuves. Si les points montent lorsque la longévité augmente, cela indiquerait une relation positive entre polyvalence et durée de carrière.
-
-À l’inverse, si les points sont dispersés sans tendance claire, cela signifie que la longévité ne dépend pas forcément du nombre d’épreuves pratiquées. Dans ce cas, certains athlètes peuvent avoir une longue carrière tout en restant spécialisés dans une seule discipline.
-
-### Conclusion
-
-Ce graphique permet de tester l’hypothèse selon laquelle la polyvalence favorise une carrière plus longue. Il met en relation la durée de carrière des athlètes avec leur diversité d’épreuves, afin de voir si les athlètes les plus polyvalents sont aussi ceux qui restent le plus longtemps dans les Jeux olympiques.
+On observe une augmentation globale de la médiane de longévité lorsque le nombre d'épreuves pratiquées augmente. Les athlètes ayant participé à trois ou quatre épreuves différentes présentent des longévités généralement plus élevées que ceux spécialisés dans une seule épreuve. Ces résultats suggèrent qu'une plus grande diversité d'épreuves est associée à une présence plus longue dans les Jeux olympiques.
 
 ## Question 15 - L'écart-type de la taille des athlètes au sein d'une même discipline a-t-il diminué entre 1924 et 2024 ?
 
 ### Hypothèse
 
 Nous supposons qu'au fil du temps, les athlètes d'une même discipline ont développé des caractéristiques physiques de plus en plus similaires. Cette évolution traduirait une spécialisation progressive vers un profil physique considéré comme optimal pour chaque sport.
-```{r, echo = FALSE, warning = FALSE, message = FALSE}
 
+### Étape 1 : Identification de la discipline la plus pertinente à analyser
 
-swimming_data <- olympics |>
+Afin de déterminer quel sport est le plus pertinent à étudier, nous mesurons la tendance d'évolution (la pente) de l'écart-type de la taille pour chaque discipline ayant suffisamment de données historiques. Une pente négative indique que les tailles des athlètes s'homogénéisent au fil du temps (spécialisation physique).
+
+### Choix du graphique
+Nous utilisons un diagramme en barres (barchart) pour comparer les pentes d'homogénéisation par discipline.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 6, fig.height = 4, fig.align = "center"}
+sport_height_variation <- olympics %>%
+  filter(!is.na(height_cm), !is.na(year)) %>%
+  group_by(sport, year) %>%
+  summarise(
+    sd_height = sd(height_cm),
+    nb_athletes = n(),
+    .groups = "drop"
+  ) %>%
+  filter(nb_athletes >= 10)
+
+sport_trends <- sport_height_variation %>%
+  group_by(sport) %>%
+  filter(n() >= 8) %>%
+  summarise(
+    trend_slope = coef(lm(sd_height ~ year))[2] * 100, # Évolution par siècle
+    .groups = "drop"
+  ) %>%
+  filter(!is.na(trend_slope)) %>%
+  slice_min(order_by = trend_slope, n = 10) # Les 10 baisses les plus fortes
+
+ggplot(sport_trends, aes(x = trend_slope, y = reorder(sport, -trend_slope))) +
+  geom_col(fill = "darkcyan") +
+  labs(
+    title = "Sports avec la plus forte homogénéisation des tailles",
+    subtitle = "Baisse de l'écart-type de la taille (en cm par siècle)",
+    x = "Pente d'évolution (cm par siècle)",
+    y = "Discipline"
+  ) +
+  theme_minimal()
+```
+
+### Interprétation
+
+Le graphique met en évidence une diminution de la dispersion des tailles dans plusieurs disciplines. Le patinage de vitesse, le ski alpin et le skeleton présentent les baisses les plus importantes, tandis que la natation figure également parmi les sports concernés. Ces résultats suggèrent une homogénéisation progressive des profils physiques dans certaines disciplines olympiques.
+
+### Étape 2 : Zoom sur l'évolution temporelle de disciplines clés
+
+### Choix du graphique
+Nous utilisons un nuage de points (scatter plot) avec droites de régression pour comparer l'évolution de la dispersion des tailles par sport.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 6, fig.height = 4, fig.align = "center"}
+selected_sports_data <- olympics |>
   filter(
-    sport == "Swimming",
+    sport %in% c("Speed Skating", "Swimming", "Ice Hockey", "Skeleton", "Alpine Skiing"),
     !is.na(height_cm),
     !is.na(year)
   )
 
-height_variation <- swimming_data |>
-  group_by(year) |>
+height_variation <- selected_sports_data |>
+  group_by(sport, year) |>
   summarise(
     sd_height = sd(height_cm),
+    nb_athletes = n(),
     .groups = "drop"
-  )
+  ) %>%
+  filter(nb_athletes >= 10)
 
 ggplot(height_variation,
-       aes(x = year, y = sd_height)) +
-  geom_line(color = "blue") +
-  geom_point(color = "blue") +
+       aes(x = year, y = sd_height, color = sport)) +
+  geom_point(alpha = 0.7, size = 1.5) +
+  geom_smooth(method = "lm", se = FALSE, size = 0.8) +
   labs(
-    title = "Évolution de l'écart-type de la taille en natation",
-    x = "Année",
-    y = "Écart-type de la taille (cm)"
-  )
+    title = "Tendances d'homogénéisation de la taille par discipline",
+    x = "Année des Jeux Olympiques",
+    y = "Écart-type de la taille (cm)",
+    color = "Discipline"
+  ) +
+  theme_minimal()
 ```
-
-### Choix du graphique
-
-Nous avons choisi un graphique en lignes car nous souhaitons observer l'évolution d'une variable au cours du temps. Ce type de représentation permet de visualiser facilement les tendances et les variations de l'écart-type de la taille des athlètes d'une même discipline.
 
 ### Interprétation
 
-Chaque point représente l'écart-type de la taille des nageurs pour une année donnée. L'écart-type mesure la dispersion des tailles autour de la moyenne.
+Chaque point représente l'écart-type de la taille des athlètes pour une discipline et une année données (mesurant la dispersion des tailles autour de la moyenne).
 
-Si la courbe diminue progressivement au fil du temps, cela signifie que les tailles des athlètes deviennent plus homogènes. Cette évolution soutiendrait l'hypothèse d'une standardisation physique, où les sportifs tendent à se rapprocher d'un profil considéré comme optimal pour la discipline.
+Les droites de régression linéaire confirment la tendance d'homogénéisation progressive (pentes négatives) pour la majorité de ces disciplines clés au fil du temps, validant ainsi l'hypothèse de départ de spécialisation physique.
 
-À l'inverse, si l'écart-type reste stable ou augmente, cela suggère que la diversité physique demeure importante et que plusieurs profils morphologiques peuvent coexister au sein du même sport.
 
-### Conclusion
-
-Cette analyse permet d'étudier l'évolution de la diversité physique des athlètes au sein d'une même discipline. Une diminution de l'écart-type de la taille au cours du temps constituerait un indice de spécialisation progressive des profils physiques.
 
 ## Question 16 - La taille des athlètes influence-t-elle davantage les performances mesurées en distance (mètres) que celles mesurées en temps (secondes) ?
 
@@ -1217,6 +1288,9 @@ Cette analyse permet d'étudier l'évolution de la diversité physique des athl�
 Nous supposons que la taille constitue un avantage mais est plus important dans les disciplines où la performance est mesurée en distance. Des membres plus longs peuvent favoriser certaines actions comme les lancers ou les sauts.
 
 À l'inverse, dans les disciplines chronométrées, la performance dépend davantage de facteurs tels que la vitesse, l'endurance ou la technique. L'influence directe de la taille pourrait donc être moins marquée.
+
+### Choix du graphique
+Nous utilisons un nuage de points (scatter plot) facetté pour observer la relation entre taille et performance par type de mesure.
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -1243,11 +1317,6 @@ ggplot(
   ) +
   theme_minimal()
 ```
-
-### Choix du graphique
-
-Nous avons choisi un nuage de points car il permet d'étudier la relation entre deux variables quantitatives : la taille des athlètes et leur performance.
-Le graphique est divisé en deux parties selon l'unité de mesure du résultat (« metres » ou « seconds »). Cette séparation permet de comparer visuellement l'effet de la taille dans différents types d'épreuves.
 
 ## Interprétation
 
@@ -1276,6 +1345,9 @@ Nous avons vu précédemment que l'IMC impacte la performance aujourd'hui. Mais 
 **Hypothèse :** Avec la professionnalisation du sport, le physique des athlètes s'est ultra-spécialisé. La taille moyenne des basketteurs a augmenté, tandis que celle des gymnastes a diminué par rapport aux premières éditions des Jeux Olympiques.
 
 Pour valider cette hypothèse, nous croisons les variables d'année, de taille et de discipline pour deux sports aux besoins morphologiques opposés : le Basketball et la Gymnastique Artistique.
+
+### Choix du graphique
+Nous utilisons un graphique en lignes (line chart) pour comparer l'évolution de la taille moyenne entre Basketball et Gymnastique.
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 data_morpho_temp <- dataset %>%
@@ -1324,7 +1396,10 @@ Cette évolution opposée met en évidence que les caractéristiques physiques n
 
 Nous supposons qu'il existe une corrélation positive entre la taille et le poids des athlètes. En général, les athlètes les plus grands ont également tendance à être plus lourds.
 
-Nous nous attendons donc à observer une tendance croissante reliant ces deux variables. Cette analyse permet également de détecter d'éventuelles valeurs aberrantes ou incohérentes dans le dataset.arquée.
+Nous nous attendons donc à observer une tendance croissante reliant ces deux variables. Cette analyse permet également de détecter d'éventuelles valeurs aberrantes ou incohérentes dans le dataset.
+
+### Choix du graphique
+Nous utilisons un nuage de points (scatter plot) avec droite de régression pour analyser la corrélation taille/poids.
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -1349,12 +1424,6 @@ ggplot(height_weight,
   theme_minimal()
 ```
 
-
-### Choix du graphique
-
-Nous avons choisi un nuage de points car il permet de représenter la relation entre deux variables quantitatives : la taille et le poids.
-L'ajout d'une ligne de tendance linéaire facilite l'identification d'une corrélation générale entre ces deux caractéristiques physiques.
-
 ## Interprétation
 
 Chaque point représente un athlète. L'axe horizontal correspond à sa taille et l'axe vertical à son poids.
@@ -1368,6 +1437,9 @@ Le nuage de points permet également d'identifier des valeurs atypiques. Par exe
 Nous supposons que les Jeux Olympiques d'Été rassemblent un plus grand nombre d'athlètes que les Jeux Olympiques d'Hiver.
 
 Cette différence s'explique par le nombre plus élevé de disciplines sportives présentes aux Jeux d'Été ainsi que par la participation d'un plus grand nombre de pays.
+
+### Choix du graphique
+Nous utilisons un diagramme en barres (barchart) pour comparer le nombre d'athlètes selon la saison.
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 games_count <- olympics |>
@@ -1394,12 +1466,6 @@ ggplot(games_count,
   )
 ```
 
-### Choix du graphique
-
-Nous avons choisi un diagramme en barres car il permet de comparer facilement les effectifs de deux catégories distinctes : les Jeux d'Été et les Jeux d'Hiver.
-
-Ce type de représentation rend immédiatement visible la différence d'envergure entre les deux compétitions.
-
 ## Interprétation
 
 Chaque barre représente le nombre total d'athlètes participant à un type de Jeux Olympiques.
@@ -1421,14 +1487,7 @@ donc observer des nuages de densité nettement séparés (les basketteurs grands
 les gymnastes petits et légers, les haltérophiles courts mais très massifs, etc.).
 
 ### Choix du graphique
-
-Pour répondre, un simple nuage de points serait illisible (8500 points superposés).
-Nous utilisons donc une **carte de densité 2D** (`geom_density_2d_filled`) : au lieu d'afficher
-chaque athlète, elle colorie les zones du plan selon la *concentration* d'athlètes. Plus une
-zone est claire, plus les athlètes y sont nombreux. En affichant une facette par discipline,
-on compare directement les « empreintes » côte à côte. Nous complétons par une seconde vue où
-toutes les disciplines sont superposées sur un même plan, avec une **ellipse de confiance à 95 %**
-par discipline, qui résume d'un seul trait la zone occupée par chaque sport.
+Nous utilisons des cartes de densité 2D (density plot) facettées pour visualiser la répartition des athlètes.
 
 ```{r q19_densite_morpho, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 9, fig.height = 7}
 # --- Chargement des données (même fichier que tout le rapport) ---
@@ -1468,6 +1527,9 @@ ggplot(morpho_sel, aes(x = height_cm, y = weight_kg)) +
     axis.title  = element_text(face = "bold")
   )
 ```
+
+### Choix du graphique
+Nous utilisons des ellipses de confiance (confidence ellipses) à 95 % sur un même plan pour comparer les groupes.
 
 ```{r q19_ellipses, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 9, fig.height = 6}
 # --- Vue complémentaire : toutes les disciplines sur un même plan ---
@@ -1528,12 +1590,7 @@ afficheront un IMC faible, tandis que les sports de force pure (haltérophilie, 
 un IMC très élevé. Nous nous attendons à un classement progressif et cohérent.
 
 ### Choix du graphique
-
-Nous utilisons des **violons horizontaux** (`geom_violin`), qui montrent toute la *distribution*
-de l'IMC dans chaque discipline (et pas seulement la moyenne), complétés par une **boîte à
-moustaches fine** au centre pour repérer la médiane et les quartiles. Les disciplines sont
-**ordonnées par IMC médian croissant**, et colorées par un **dégradé** (du violet « léger » au
-jaune « lourd ») afin que le classement saute aux yeux.
+Nous utilisons des violons horizontaux (violin plot) avec boîtes à moustaches intégrées pour comparer les distributions d'IMC par discipline.
 
 ```{r q20_imc_disciplines, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 9, fig.height = 9}
 # --- Chargement des données ---

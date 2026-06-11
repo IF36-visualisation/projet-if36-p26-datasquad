@@ -1,0 +1,99 @@
+---
+title: "Question 15"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+olympics <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
+```
+
+## Question 15 - L'écart-type de la taille des athlètes au sein d'une même discipline a-t-il diminué entre 1924 et 2024 ?
+
+### Hypothèse
+
+Nous supposons qu'au fil du temps, les athlètes d'une même discipline ont développé des caractéristiques physiques de plus en plus similaires. Cette évolution traduirait une spécialisation progressive vers un profil physique considéré comme optimal pour chaque sport.
+
+### Étape 1 : Identification de la discipline la plus pertinente à analyser
+
+Afin de déterminer quel sport est le plus pertinent à étudier, nous mesurons la tendance d'évolution (la pente) de l'écart-type de la taille pour chaque discipline ayant suffisamment de données historiques. Une pente négative indique que les tailles des athlètes s'homogénéisent au fil du temps (spécialisation physique).
+
+### Choix du graphique
+Nous utilisons un diagramme en barres (barchart) pour comparer les pentes d'homogénéisation par discipline.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 6, fig.height = 4, fig.align = "center"}
+sport_height_variation <- olympics %>%
+  filter(!is.na(height_cm), !is.na(year)) %>%
+  group_by(sport, year) %>%
+  summarise(
+    sd_height = sd(height_cm),
+    nb_athletes = n(),
+    .groups = "drop"
+  ) %>%
+  filter(nb_athletes >= 10)
+
+sport_trends <- sport_height_variation %>%
+  group_by(sport) %>%
+  filter(n() >= 8) %>%
+  summarise(
+    trend_slope = coef(lm(sd_height ~ year))[2] * 100, # Évolution par siècle
+    .groups = "drop"
+  ) %>%
+  filter(!is.na(trend_slope)) %>%
+  slice_min(order_by = trend_slope, n = 10) # Les 10 baisses les plus fortes
+
+ggplot(sport_trends, aes(x = trend_slope, y = reorder(sport, -trend_slope))) +
+  geom_col(fill = "darkcyan") +
+  labs(
+    title = "Sports avec la plus forte homogénéisation des tailles",
+    subtitle = "Baisse de l'écart-type de la taille (en cm par siècle)",
+    x = "Pente d'évolution (cm par siècle)",
+    y = "Discipline"
+  ) +
+  theme_minimal()
+```
+
+### Interprétation
+
+Le graphique met en évidence une diminution de la dispersion des tailles dans plusieurs disciplines. Le patinage de vitesse, le ski alpin et le skeleton présentent les baisses les plus importantes, tandis que la natation figure également parmi les sports concernés. Ces résultats suggèrent une homogénéisation progressive des profils physiques dans certaines disciplines olympiques.
+
+### Étape 2 : Zoom sur l'évolution temporelle de disciplines clés
+
+### Choix du graphique
+Nous utilisons un nuage de points (scatter plot) avec droites de régression pour comparer l'évolution de la dispersion des tailles par sport.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 6, fig.height = 4, fig.align = "center"}
+selected_sports_data <- olympics |>
+  filter(
+    sport %in% c("Speed Skating", "Swimming", "Ice Hockey", "Skeleton", "Alpine Skiing"),
+    !is.na(height_cm),
+    !is.na(year)
+  )
+
+height_variation <- selected_sports_data |>
+  group_by(sport, year) |>
+  summarise(
+    sd_height = sd(height_cm),
+    nb_athletes = n(),
+    .groups = "drop"
+  ) %>%
+  filter(nb_athletes >= 10)
+
+ggplot(height_variation,
+       aes(x = year, y = sd_height, color = sport)) +
+  geom_point(alpha = 0.7, size = 1.5) +
+  geom_smooth(method = "lm", se = FALSE, size = 0.8) +
+  labs(
+    title = "Tendances d'homogénéisation de la taille par discipline",
+    x = "Année des Jeux Olympiques",
+    y = "Écart-type de la taille (cm)",
+    color = "Discipline"
+  ) +
+  theme_minimal()
+```
+
+### Interprétation
+
+Chaque point représente l'écart-type de la taille des athlètes pour une discipline et une année données (mesurant la dispersion des tailles autour de la moyenne).
+
+Les droites de régression linéaire confirment la tendance d'homogénéisation progressive (pentes négatives) pour la majorité de ces disciplines clés au fil du temps, validant ainsi l'hypothèse de départ de spécialisation physique.
