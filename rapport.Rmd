@@ -841,7 +841,7 @@ ggplot(data_rae, aes(x = mois_naissance, y = pourcentage)) +
 
 #### Interprétation :
 
-Si la ligne de tendance théorique (en rouge) était parfaitement respectée, chaque mois regrouperait environ 8.33% des naissances. En observant la répartition réelle via les barres du graphique, on peut voir si les mois de début d'année (Janvier, Février, Mars) dépassent cette ligne rouge de manière significative. Le cas échéant, cela confirmera que la sélection précoce dans les filières sportives durant l'enfance offre un avantage mesurable et durable aux enfants nés en début d'année, avantage qui se répercute jusqu'aux Jeux Olympiques.
+La ligne rouge représente la répartition théorique uniforme des naissances, soit environ 8,33 % des athlètes par mois. Les proportions observées sont globalement proches de cette valeur de référence, ce qui indique une répartition relativement homogène des mois de naissance parmi les athlètes olympiques. Bien que certains mois présentent des proportions légèrement supérieures ou inférieures à la moyenne théorique, les écarts restent faibles et aucune surreprésentation marquée des mois de début d’année n’apparaît clairement.
 
 ### Dans quels sports cet effet est-il le plus marqué ?
 
@@ -860,7 +860,7 @@ data_rae_sport <- dataset %>%
     q1 = sum(mois %in% c(1, 2, 3)),
     .groups = "drop"
   ) %>%
-  filter(total >= 100) %>% # Filtrer pour avoir un échantillon représentatif
+  filter(total >= 100) %>% 
   mutate(pct_q1 = q1 / total * 100) %>%
   arrange(desc(pct_q1)) %>%
   slice_head(n = 10)
@@ -963,9 +963,7 @@ Nous avons choisi un nuage de points car il permet d’étudier la relation entr
 
 ### Interprétation
 
-Ce graphique permet de voir si les athlètes ayant une carrière plus longue participent aussi à un plus grand nombre d’épreuves. Si les points montent lorsque la longévité augmente, cela indiquerait une relation positive entre polyvalence et durée de carrière.
-
-À l’inverse, si les points sont dispersés sans tendance claire, cela signifie que la longévité ne dépend pas forcément du nombre d’épreuves pratiquées. Dans ce cas, certains athlètes peuvent avoir une longue carrière tout en restant spécialisés dans une seule discipline.
+Ce graphique présente la relation entre la longévité de carrière des athlètes et le nombre d’épreuves différentes auxquelles ils ont participé. La majorité des observations se concentrent autour de 2 à 3 épreuves, quelle que soit la durée de la carrière. On n’observe pas de tendance clairement croissante indiquant que les athlètes ayant les carrières les plus longues participent à davantage d’épreuves. Bien que quelques athlètes cumulent une forte longévité et une plus grande diversité d’épreuves, ces cas restent isolés. Globalement, les résultats ne permettent pas de confirmer l’hypothèse selon laquelle la polyvalence favorise systématiquement une carrière plus longue. La durée de carrière semble donc relativement indépendante du nombre d’épreuves pratiquées dans ce dataset.
 
 ### Conclusion
 
@@ -1011,11 +1009,7 @@ Nous avons choisi un graphique en lignes car nous souhaitons observer l'évoluti
 
 ### Interprétation
 
-Chaque point représente l'écart-type de la taille des nageurs pour une année donnée. L'écart-type mesure la dispersion des tailles autour de la moyenne.
-
-Si la courbe diminue progressivement au fil du temps, cela signifie que les tailles des athlètes deviennent plus homogènes. Cette évolution soutiendrait l'hypothèse d'une standardisation physique, où les sportifs tendent à se rapprocher d'un profil considéré comme optimal pour la discipline.
-
-À l'inverse, si l'écart-type reste stable ou augmente, cela suggère que la diversité physique demeure importante et que plusieurs profils morphologiques peuvent coexister au sein du même sport.
+Ce graphique montre l'évolution de l'écart-type de la taille des nageurs au cours du temps. L'écart-type varie entre environ 8 et 11 cm selon les éditions des Jeux Olympiques. Bien que certaines fluctuations soient visibles d'une année à l'autre, une légère diminution de la dispersion des tailles semble apparaître sur les années les plus récentes. Cela suggère que les profils physiques des nageurs deviennent progressivement plus homogènes. Toutefois, les variations observées restent relativement importantes, ce qui indique qu'il existe encore une diversité de morphologies au sein de cette discipline. Ainsi, le graphique met en évidence une tendance modérée vers une standardisation des profils physiques, sans pour autant montrer une évolution parfaitement régulière.
 
 ### Conclusion
 
@@ -1143,11 +1137,7 @@ Ce type de représentation rend immédiatement visible la différence d'envergur
 
 ## Interprétation
 
-Chaque barre représente le nombre total d'athlètes participant à un type de Jeux Olympiques.
-
-La comparaison des hauteurs de barres permet d'observer immédiatement quelle compétition rassemble le plus grand nombre d'athlètes.
-
-Si la barre correspondant aux Jeux d'Été est nettement plus élevée, cela confirme que cette compétition possède une envergure plus importante en termes de participation.
+En comparant les deux barres, on constate que les Jeux d’Été rassemblent nettement plus d’athlètes que les Jeux d’Hiver. Avec plus de 5 000 participants contre environ 3 300, les Jeux d’Été apparaissent comme la compétition la plus importante en termes de participation dans ce dataset. Cette différence s'explique probablement par la diversité plus importante des sports représentés lors des Jeux d’Été.
 
 # Question 19 : Chaque discipline possède-t-elle une « empreinte morphologique » qui lui est propre ?
 
@@ -1287,7 +1277,6 @@ Nous quittons l'athlète pour la **nation**. Le jeu de données contient des agr
 Les agrégats `country_*` ne prennent **qu'une seule valeur par pays** : nous réduisons donc le jeu de données à une ligne par pays. Nous traçons ensuite deux **nuages de points** avec une **droite de régression linéaire** (`geom_smooth(method = "lm")`) pour matérialiser la tendance. Comme le total de médailles varie énormément (de 5 à plus de 2600), nous passons l'axe vertical en **échelle logarithmique** pour rendre le graphique lisible. Quelques pays remarquables sont annotés.
 
 ```{r q21_prepare, echo = FALSE, warning = FALSE, message = FALSE}
-# --- Chargement et réduction à une ligne par pays ---
 pays_data <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
 
 agg_pays <- pays_data %>%
