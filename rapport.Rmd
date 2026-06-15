@@ -142,7 +142,7 @@ bottom_5$type <- "Moins représentés"
 comparison <- rbind(top_5, bottom_5)
 ```
 
-## Graphe 1 — Pays les plus représentés
+## Graphe 1 - Pays les plus représentés
 
 ### Choix du graphique
 
@@ -169,7 +169,7 @@ L’un des avantages de ce graphique est qu’il permet de lire des valeurs pré
 
 Cela montre une forte concentration des données autour de quelques nationalités dominantes. Cette situation peut s’expliquer par la taille des délégations, la régularité de participation aux Jeux olympiques ou encore les ressources sportives plus importantes de certains pays.
 
-## Graphe 2 — Pays les moins représentés
+## Graphe 2 - Pays les moins représentés
 
 ### Choix du graphique
 
@@ -196,7 +196,7 @@ Cette faible représentation peut s’expliquer par une participation plus réce
 
 Ce graphique complète donc le premier en montrant que la représentativité des nationalités n’est pas uniforme : quelques pays dominent, tandis que d’autres sont très peu présents.
 
-## Graphe 3 — Comparaison
+## Graphe 3 - Comparaison
 
 ### Choix du graphique
 
@@ -247,74 +247,104 @@ df_morpho <- olympics %>%
   filter(!is.na(imc) & !is.na(result_value))
 ```
 
-## Force de l'influence de l'IMC par discipline
+### Force de l’influence de l’IMC par épreuve
 
-Ce graphique permet d'identifier les disciplines où la corpulence a l'influence la plus forte sur le résultat (chrono, points, distance).
+Afin d’obtenir une analyse plus précise, nous avons affiné notre approche en étudiant non plus uniquement les disciplines sportives globales, mais les couples **discipline + épreuve**.
+
+Cette granularité permet d’éviter qu’un sport regroupant des épreuves très différentes (par exemple la natation ou la gymnastique) masque des relations importantes entre morphologie et performance.
+
+Le graphique suivant présente les **10 épreuves pour lesquelles l’IMC présente la corrélation la plus forte avec la performance**, mesurée à l’aide du coefficient de corrélation de Pearson en valeur absolue.
 
 ```{r correlation_sport,echo = FALSE, warning = FALSE, message = FALSE}
 corelation_globale <- df_morpho %>%
-    group_by(sport) %>%
+    group_by(sport, event) %>%
     summarise(
         correlation = cor(imc, result_value, use = "complete.obs"),
-        nb_athletes = n()
+        nb_athletes = n(),
+        .groups = "drop"
     ) %>%
     filter(nb_athletes >= 20) %>% 
-    arrange(desc(abs(correlation)))
+    mutate(label_group = paste0(sport, " - ", event)) %>%
+    arrange(desc(abs(correlation))) %>%
+    slice_max(order_by = abs(correlation), n = 10)
 
-ggplot(corelation_globale, aes(x = reorder(sport, abs(correlation)), y = abs(correlation))) +
+ggplot(corelation_globale, aes(x = reorder(label_group, abs(correlation)), y = abs(correlation))) +
     geom_col(fill = "darkcyan") +
     coord_flip() + 
     labs(
-        title = "Intensité de la corrélation IMC / Performance",
-        x = "Discipline Sportive",
+        title = "Top 10 des corrélations IMC / Performance par épreuve",
+        x = "Discipline - Épreuve",
         y = "Valeur absolue du coefficient de corrélation (|r|)"
     ) +
     theme_minimal()
 ```
 
-## Zoom sur les sports clés
+### Interprétation
 
-Pour comprendre l'impact réel, nous isolons deux sports aux tendances opposées.
+Contrairement à l’analyse réalisée au niveau des sports globaux, l’analyse par épreuve révèle des corrélations nettement plus fortes, atteignant **|r| $\approx$ 0.57**.
 
-### Archery (Tir à l'arc) : Une corrélation positive
+Les épreuves présentant les corrélations les plus marquées sont :
 
-En tir à l'arc, le résultat est en **points** (plus c'est haut, mieux c'est).
+* **Gymnastics (Artistic) – Parallel Bars**
+* **Boxing – Lightweight**
+* **Gymnastics (Artistic) – All-Around**
+* **Swimming – 400m Freestyle**
 
-```{r zoom_archery,echo = FALSE, warning = FALSE, message = FALSE}
+Ces résultats montrent qu’une morphologie spécifique peut procurer un avantage mesurable dans certaines épreuves.
+
+Les sports techniques ou soumis à des contraintes physiques fortes (équilibre, explosivité, rapport poids/puissance) semblent particulièrement sensibles aux variations de morphologie.
+
+Cette analyse suggère également que **l’échelle d’analyse est cruciale** : observer un sport dans son ensemble peut masquer des tendances importantes visibles uniquement au niveau des épreuves individuelles.
+
+## Zoom sur les épreuves clés
+
+Pour comprendre l’impact réel, nous isolons deux épreuves aux tendances différentes.
+
+### Gymnastics (Artistic) – Parallel Bars : Corrélation positive
+
+Dans cette épreuve, la performance est mesurée en points : plus le score est élevé, meilleure est la performance.
+
+```{r zoom_gymnastics,echo = FALSE, warning = FALSE, message = FALSE}
 df_morpho %>%
-  filter(sport == "Archery") %>%
+  filter(sport == "Gymnastics (Artistic)" & event == "Parallel Bars") %>%
   ggplot(aes(x = imc, y = result_value)) +
   geom_point(alpha = 0.5, color = "#2ecc71") +
   geom_smooth(method = "lm", color = "black") +
-  labs(title = "Archery : IMC vs Points",
+  labs(title = "Gymnastics (Artistic) - Parallel Bars : IMC vs Points",
        x = "IMC", y = "Points obtenus") +
   theme_minimal()
 ```
 
-**Interprétation :** On observe une pente montante. Cela signifie qu'un IMC plus élevé est globalement associé à un meilleur score en points. Une plus grande masse corporelle pourrait offrir une meilleure assise et stabilité face au vent ou lors de la tension de l'arc.
+La droite de régression présente une pente montante, indiquant qu’un **IMC plus élevé est globalement associé à un meilleur score**.
 
-### Swimming (Natation) : Une corrélation négative
+Cela peut s’expliquer par l’importance d’un **rapport force/poids optimal**, essentiel pour exécuter des figures complexes tout en conservant stabilité et contrôle.
 
-En natation, le résultat est souvent en **secondes** (plus c'est bas, mieux c'est).
+### Swimming – 400m Freestyle : Corrélation négative
+
+En natation, la performance est exprimée en secondes : plus le chrono est faible, meilleure est la performance.
 
 ```{r zoom_swimming,echo = FALSE, warning = FALSE, message = FALSE}
 df_morpho %>%
-  filter(sport == "Swimming") %>%
+  filter(sport == "Swimming" & event == "400m Freestyle") %>%
   ggplot(aes(x = imc, y = result_value)) +
   geom_point(alpha = 0.5, color = "#e74c3c") +
   geom_smooth(method = "lm", color = "black") +
-  labs(title = "Swimming : IMC vs Chrono (secondes)",
-       x = "IMC", y = "Secondes") +
+  labs(title = "Swimming - 400m Freestyle : IMC vs Chrono (secondes)",
+       x = "IMC", y = "Temps (secondes)") +
   theme_minimal()
 ```
 
-**Interprétation :** La pente est descendante. Comme le résultat est exprimé en secondes, une baisse du temps signifie une amélioration. On peut en conclure qu'un IMC plus élevé est souvent un avantage pour la propulsion et la puissance dans l'eau chez les nageurs Olympiques.
+La pente descendante de la droite de régression indique qu’un **IMC plus élevé est associé à un temps plus faible**, donc à une meilleure performance.
+
+Cette relation peut s’expliquer par une meilleure capacité de propulsion, souvent liée à une masse musculaire plus importante.
 
 ### Conclusion sur la morphologie
 
-En conclusion, notre analyse confirme que l'influence de l'IMC est bien réelle, mais qu'elle est spécifique à chaque discipline. Il est important de noter que les athlètes Olympiques sont, par définition, déjà à leur **poids de forme** optimal pour leur sport. Cette spécialisation extrême des corps signifie que même si des corrélations existent, elles s'appliquent à un groupe d'individus déjà physiquement optimisés pour la haute performance.
+Notre analyse confirme que l’influence de l’IMC sur la performance est bien réelle, mais qu’elle dépend fortement de l’épreuve étudiée.
 
-Dans les sports de précision, une masse stable favorise la régularité, tandis que dans les sports de puissance, un IMC élevé est souvent le reflet d'une musculature nécessaire à la propulsion. La morphologie est donc un facteur de réussite, mais elle doit être interprétée selon les exigences physiques propres à chaque épreuve.
+L’analyse par épreuve s’est révélée plus pertinente que l’analyse par sport global, car elle met en évidence des corrélations plus fortes et plus significatives.
+
+Ces résultats montrent que la morphologie constitue un facteur important de performance, mais qu’elle ne peut être interprétée indépendamment des exigences biomécaniques propres à chaque épreuve.
 
 # Question 4 : Y a-t-il un genre plus représenté que l'autre ?
 
@@ -929,7 +959,7 @@ Comment expliquer cela ? Les sports individuels incluent un grand nombre de disc
 
 Les boîtes (l'écart interquartile) montrent également que la grande majorité des vainqueurs se situent entre 22 et 35 ans dans les deux catégories, démontrant que la performance olympique maximale culmine globalement dans cette fenêtre, mais avec une "prime à l'expérience" paradoxalement plus forte en individuel.
 
-## Question 14 — Les athlètes ayant la plus grande longévité sont-ils aussi ceux qui ont participé à la plus grande diversité d’épreuves ?
+## Question 14 - Les athlètes ayant la plus grande longévité sont-ils aussi ceux qui ont participé à la plus grande diversité d’épreuves ?
 
 On suppose que les athlètes les plus polyvalents, c’est-à-dire ceux qui participent à plusieurs sports ou épreuves, peuvent avoir une carrière plus longue.
 
@@ -969,7 +999,7 @@ Ce graphique présente la relation entre la longévité de carrière des athlèt
 
 Ce graphique permet de tester l’hypothèse selon laquelle la polyvalence favorise une carrière plus longue. Il met en relation la durée de carrière des athlètes avec leur diversité d’épreuves, afin de voir si les athlètes les plus polyvalents sont aussi ceux qui restent le plus longtemps dans les Jeux olympiques.
 
-## Question 15 — L'écart-type de la taille des athlètes au sein d'une même discipline a-t-il diminué entre 1924 et 2024 ?
+## Question 15 - L'écart-type de la taille des athlètes au sein d'une même discipline a-t-il diminué entre 1924 et 2024 ?
 
 ### Hypothèse
 
@@ -1015,7 +1045,7 @@ Ce graphique montre l'évolution de l'écart-type de la taille des nageurs au co
 
 Cette analyse permet d'étudier l'évolution de la diversité physique des athlètes au sein d'une même discipline. Une diminution de l'écart-type de la taille au cours du temps constituerait un indice de spécialisation progressive des profils physiques.
 
-## Question 16 — La taille des athlètes influence-t-elle davantage les performances mesurées en distance (mètres) que celles mesurées en temps (secondes) ?
+## Question 16 - La taille des athlètes influence-t-elle davantage les performances mesurées en distance (mètres) que celles mesurées en temps (secondes) ?
 
 ### Hypothèse
 
@@ -1057,7 +1087,7 @@ Nous avons choisi un nuage de points car il permet d'étudier la relation entre 
 
 Chaque point représente un athlète. L'axe horizontal correspond à sa taille et l'axe vertical à sa performance. Dans les épreuves mesurées en mètres, une tendance croissante entre la taille et le résultat pourrait indiquer qu'une plus grande taille favorise la performance. Cela peut s'expliquer par un avantage biomécanique dans certaines disciplines. Dans les épreuves mesurées en secondes, la relation peut être différente. Une dispersion importante des points ou l'absence de tendance visible suggérerait que la taille n'est pas le principal facteur expliquant la performance. La comparaison des deux graphiques permet ainsi de déterminer si l'influence de la taille est plus forte dans les disciplines de distance que dans les disciplines chronométrées.
 
-## Question 17 — Existe-t-il une corrélation visuelle entre la taille et le poids des athlètes, toutes disciplines confondues ?
+## Question 17 - Existe-t-il une corrélation visuelle entre la taille et le poids des athlètes, toutes disciplines confondues ?
 
 ## Hypothèse
 
@@ -1096,7 +1126,7 @@ Nous avons choisi un nuage de points car il permet de représenter la relation e
 
 Chaque point représente un athlète. L'axe horizontal correspond à sa taille et l'axe vertical à son poids. Si les points suivent globalement une trajectoire ascendante et que la ligne de tendance est croissante, cela indique une corrélation positive entre la taille et le poids. Les athlètes les plus grands ont alors tendance à être également les plus lourds. Le nuage de points permet également d'identifier des valeurs atypiques. Par exemple, un athlète très grand mais extrêmement léger, ou inversement très petit mais particulièrement lourd, apparaîtrait éloigné du reste des observations.
 
-# Question 18 — Combien d'athlètes participent aux Jeux Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver ?
+# Question 18 - Combien d'athlètes participent aux Jeux Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver ?
 
 ## Hypothèse
 
@@ -1197,10 +1227,10 @@ ggplot(morpho_sel, aes(x = height_cm, y = weight_kg, colour = sport)) +
 
 Les deux graphiques confirment nettement notre hypothèse : **chaque discipline occupe sa propre région du plan taille × poids**, et les empreintes se chevauchent peu.
 
--   La **Gymnastique (Artistique)** forme une tache compacte en bas à gauche : athlètes petits (≈ 163 cm) et légers (≈ 58 kg), profil idéal pour les figures acrobatiques.
--   Le **Basketball** se situe à l'opposé, en haut à droite : grands (≈ 193 cm) et lourds (≈ 100 kg).
+-   La **Gymnastique (Artistique)** forme une tache compacte en bas à gauche : athlètes petits ($\approx$ 163 cm) et légers ($\approx$ 58 kg), profil idéal pour les figures acrobatiques.
+-   Le **Basketball** se situe à l'opposé, en haut à droite : grands ($\approx$ 193 cm) et lourds ($\approx$ 100 kg).
 -   L'**Aviron (Rowing)** et la **Natation (Swimming)** dessinent des nuages allongés de grande taille mais de poids modéré (gabarits longs et secs).
--   L'**Haltérophilie (Weightlifting)** est remarquable : taille moyenne (≈ 175 cm) mais poids extrêmement variable (jusqu'à \~150 kg), d'où une empreinte très étirée verticalement — reflet des catégories de poids, des poids plumes aux super-lourds.
+-   L'**Haltérophilie (Weightlifting)** est remarquable : taille moyenne ($\approx$ 175 cm) mais poids extrêmement variable (jusqu'à \~150 kg), d'où une empreinte très étirée verticalement - reflet des catégories de poids, des poids plumes aux super-lourds.
 -   Le **Ski de fond (Cross-Country Skiing)** occupe une zone d'endurance : gabarit intermédiaire et resserré.
 
 Les ellipses de confiance résument ce constat : elles se touchent à peine. Autrement dit, la nuée globale observée en Question 17 était bien la **superposition de plusieurs populations distinctes**. La morphologie n'est pas le fruit du hasard : c'est une signature de la discipline.
@@ -1256,11 +1286,11 @@ ggplot(imc_data, aes(x = imc, y = sport, fill = imc_median)) +
 
 Le classement obtenu est d'une **cohérence frappante** et valide notre hypothèse :
 
--   Tout en bas (IMC le plus faible) : le **Saut à ski** (IMC médian ≈ 19,2), suivi du **Cyclisme**, de la **Gymnastique** et du **Patinage artistique** (≈ 21). Ce sont des sports où la légèreté est un avantage mécanique direct (porter, sauter, tourner).
--   Au centre (IMC ≈ 22–24) : la majorité des sports « polyvalents » (natation, escrime, tennis, aviron, athlétisme).
--   Tout en haut (IMC le plus élevé) : la **Lutte** (≈ 31,3) et surtout l'**Haltérophilie** (≈ 33,2), où la masse musculaire est directement productrice de performance. La forme très étirée du violon de l'haltérophilie traduit la coexistence de catégories de poids très différentes.
+-   Tout en bas (IMC le plus faible) : le **Saut à ski** (IMC médian $\approx$ 19,2), suivi du **Cyclisme**, de la **Gymnastique** et du **Patinage artistique** ($\approx$ 21). Ce sont des sports où la légèreté est un avantage mécanique direct (porter, sauter, tourner).
+-   Au centre (IMC $\approx$ 22–24) : la majorité des sports « polyvalents » (natation, escrime, tennis, aviron, athlétisme).
+-   Tout en haut (IMC le plus élevé) : la **Lutte** ($\approx$ 31,3) et surtout l'**Haltérophilie** ($\approx$ 33,2), où la masse musculaire est directement productrice de performance. La forme très étirée du violon de l'haltérophilie traduit la coexistence de catégories de poids très différentes.
 
-L'écart entre les deux extrêmes est considérable (≈ 14 points d'IMC), ce qui montre à quel point les exigences physiques diffèrent d'un sport à l'autre.
+L'écart entre les deux extrêmes est considérable ($\approx$ 14 points d'IMC), ce qui montre à quel point les exigences physiques diffèrent d'un sport à l'autre.
 
 ### Conclusion
 
@@ -1335,10 +1365,10 @@ ggplot(agg_pays, aes(x = meilleur_rang, y = total_medals)) +
 
 Les deux panneaux valident notre hypothèse, avec des forces différentes :
 
--   **Ancienneté (r ≈ -0,37) :** la tendance est réelle mais modérée. Les nations fondatrices (États-Unis, France, Grande-Bretagne, Allemagne, toutes présentes dès 1896) figurent bien parmi les plus médaillées. Mais la corrélation est loin d'être parfaite : la **Chine** (1ère participation en 1932) et l'**Union soviétique** (1952) sont arrivées tardivement tout en figurant parmi les toutes premières nations du palmarès. L'ancienneté aide, mais la puissance démographique et l'investissement comptent davantage.
--   **Meilleur rang (r ≈ -0,63) :** la corrélation est nettement plus forte. Avoir déjà atteint le rang 1 va presque systématiquement de pair avec un énorme total de médailles. C'est logique : il s'agit de deux mesures de la même domination sportive.
+-   **Ancienneté (r $\approx$ -0,37) :** la tendance est réelle mais modérée. Les nations fondatrices (États-Unis, France, Grande-Bretagne, Allemagne, toutes présentes dès 1896) figurent bien parmi les plus médaillées. Mais la corrélation est loin d'être parfaite : la **Chine** (1ère participation en 1932) et l'**Union soviétique** (1952) sont arrivées tardivement tout en figurant parmi les toutes premières nations du palmarès. L'ancienneté aide, mais la puissance démographique et l'investissement comptent davantage.
+-   **Meilleur rang (r $\approx$ -0,63) :** la corrélation est nettement plus forte. Avoir déjà atteint le rang 1 va presque systématiquement de pair avec un énorme total de médailles. C'est logique : il s'agit de deux mesures de la même domination sportive.
 
-L'échelle logarithmique est ici indispensable : sans elle, les États-Unis (≈ 2638 médailles) écraseraient à eux seuls tout le graphique.
+L'échelle logarithmique est ici indispensable : sans elle, les États-Unis ($\approx$ 2638 médailles) écraseraient à eux seuls tout le graphique.
 
 ### Conclusion
 
@@ -1391,15 +1421,15 @@ Le graphique révèle **trois profils de nations** :
 
 -   **Les géants dominateurs** (gros points en haut) : l'Union soviétique (42 %), la **Chine** (41 %) et les **États-Unis** (40 %) cumulent à la fois un énorme volume de médailles et un ratio d'or élevé. Ce sont les vraies puissances : elles ne se contentent pas de participer aux podiums, elles les gagnent.
 -   **Les spécialistes** (petits points, ratio élevé) : l'**Éthiopie** (44 %), le **Nigeria** (41 %) ou la **Turquie** (40 %) affichent un ratio d'or aussi haut que les géants, mais sur un volume bien plus faible. Ce sont des nations qui dominent un **petit nombre de disciplines** (l'Éthiopie est historiquement reine du fond), ce qui est cohérent avec la réalité sportive.
--   **Les collectionneuses** (bas du classement) : le **Mexique** (19 %), la **Pologne**, la **Bulgarie** ou le **Brésil** (≈ 24 %) accumulent les podiums mais transforment rarement en or.
+-   **Les collectionneuses** (bas du classement) : le **Mexique** (19 %), la **Pologne**, la **Bulgarie** ou le **Brésil** ($\approx$ 24 %) accumulent les podiums mais transforment rarement en or.
 
-On note tout de même que l'éventail des ratios reste resserré (≈ 19 % à 44 %), ce qui invite à la prudence : sur ce jeu de données, la part d'or tourne globalement autour de 30–40 %. La taille des points (le volume) reste donc le meilleur séparateur entre vraies puissances et nations de niche.
+On note tout de même que l'éventail des ratios reste resserré ($\approx$ 19 % à 44 %), ce qui invite à la prudence : sur ce jeu de données, la part d'or tourne globalement autour de 30–40 %. La taille des points (le volume) reste donc le meilleur séparateur entre vraies puissances et nations de niche.
 
 ### Conclusion
 
 En croisant le **volume** (taille des points) et la **qualité** (ratio d'or), ce dernier graphique synthétise élégamment la hiérarchie olympique : il distingue les nations qui gagnent gros, celles qui gagnent juste, et celles qui gagnent souvent sans gagner le titre.
 
-# Question 23 : Application Shiny — un explorateur morphologique interactif
+# Question 23 : Application Shiny - un explorateur morphologique interactif
 
 Pour permettre au lecteur d'explorer lui-même les empreintes morphologiques vues en Question 19, nous avons développé une **application Shiny** (dossier `/shiny/`). Plutôt que de figer un seul graphique, elle laisse l'utilisateur **choisir la discipline, la saison et le genre**, et observer en temps réel comment se déplace le nuage taille × poids et comment évolue la distribution de l'IMC.
 
