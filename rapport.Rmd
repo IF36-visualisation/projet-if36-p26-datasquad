@@ -1499,7 +1499,7 @@ Voici la répartition de la rédaction et de l'analyse des questions du rapport 
 
 -   **Question 5** : Est-ce que la taille/poids d'un athlète influence sa performance ?
 -   **Question 11** : L'efficacité des délégations (Ratio Participation/Succès)
--   
+-   **Question 17** : Le phénomène de l'Effet d'Âge Relatif (Relative Age Effect)
 -   **Question 20** : L'évolution morphologique temporelle (La spécialisation des corps)
 -   **Question 21** : Corrélation entre expérience olympique et succès
 
@@ -1522,7 +1522,6 @@ Voici la répartition de la rédaction et de l'analyse des questions du rapport 
 -   **Question 10** : Quelles nations sont des « machines à or » et lesquelles sont des « collectionneuses de médailles » ?
 -   **Question 13** : L'ancienneté olympique et le rang historique d'une nation prédisent-ils son palmarès ?
 -   **Question 14** : Y a-t-il un genre plus représenté que l'autre ?
--   **Question 17** : Le phénomène de l'Effet d'Âge Relatif (Relative Age Effect)
 -   **Question 18** : Combien d'athlètes participent aux Jeux Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver ?
 -   **Question 22** : Sports d'équipe vs Sports individuels : l'âge de l'or
 -   **Question 23** : Les athlètes ayant la plus grande longévité sont-ils aussi ceux qui ont participé à la plus grande diversité d’épreuves ?
