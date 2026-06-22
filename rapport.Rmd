@@ -29,20 +29,20 @@ Nous avons donc une base de données de 8500 athlètes, avec des données sur 30
 | 1 | `athlete_id` | String | ID unique (format ATH-00001 à ATH-08500) | Discrète (Identifiant) |
 | 2 | `athlete_name` | String | Nom complet (Prénom + Nom) | Discrète (Nominale) |
 | 3 | `gender` | String | Sexe de l'athlète (Male/Female) | Discrète (Nominale) |
-| 4 | `age` | Integer | Âge au moment de l'événement (15–42) | Discrète |
+| 4 | `age` | Integer | Âge au moment de l'événement (15-42) | Discrète |
 | 5 | `date_of_birth` | Date | Date de naissance (YYYY-MM-DD) | Continue (Temporelle) |
 | 6 | `nationality` | String | Code CIO du pays sur 3 lettres (ex: USA, FRA) | Discrète (Nominale) |
 | 7 | `country_name` | String | Nom complet du pays | Discrète (Nominale) |
 | 8 | `sport` | String | Discipline (ex: Athlétisme, Natation) | Discrète (Nominale) |
 | 9 | `event` | String | Épreuve spécifique (ex: 100m Sprint) | Discrète (Nominale) |
 | 10 | `games_type` | String | Type de jeux (Summer / Winter) | Discrète (Nominale) |
-| 11 | `year` | Integer | Année des JO (1896–2024) | Discrète (Temporelle) |
+| 11 | `year` | Integer | Année des JO (1896-2024) | Discrète (Temporelle) |
 | 12 | `host_city` | String | Ville hôte des Jeux | Discrète (Nominale) |
 | 13 | `team_or_individual` | String | Épreuve par équipe ou individuelle | Discrète (Nominale) |
 | 14 | `medal` | String | Médaille : Gold, Silver, Bronze ou None | Discrète (Ordinale) |
 | 15 | `result_value` | Float | Résultat chiffré (temps, distance, score) | Continue |
 | 16 | `result_unit` | String | Unité du résultat (seconds, metres, points, kg) | Discrète (Nominale) |
-| 17 | `total_olympics` | Integer | Nombre total de JO fréquentés (1–5) | Discrète |
+| 17 | `total_olympics` | Integer | Nombre total de JO fréquentés (1-5) | Discrète |
 | 18 | `total_medals_won` | Integer | Total de médailles en carrière | Discrète |
 | 19 | `gold_medals` | Integer | Nombre de médailles d'or en carrière | Discrète |
 | 20 | `silver_medals` | Integer | Nombre de médailles d'argent en carrière | Discrète |
@@ -99,7 +99,7 @@ library(ggplot2)
 dataset = read_csv("data/olympics_athletes_dataset.csv")
 ```
 
-# Question 1: Quels sont les pays qui ont accumulé le plus de médailles d’or au cours de l'histoire des Jeux Olympiques ?
+# Question 1 : Quels sont les pays qui ont accumulé le plus de médailles d’or au cours de l'histoire des Jeux Olympiques ?
 
 Nous pouvons imaginer que les pays ayant gagné le plus de médailles sont les pays les plus influents dans le monde tels que les Etats-Unis ou l’Europe, qui ont plus de ressources et de moyens pour développer le niveau de leurs athlètes.
 
@@ -119,7 +119,7 @@ Le graphique confirme en partie notre hypothèse. On constate que les États-Uni
 L’objectif de cette partie est d’analyser la représentativité des nationalités dans le dataset des athlètes olympiques.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
-olympics <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
+olympics <- dataset
 
 olympics_clean <- olympics |>
   filter(!is.na(nationality), nationality != "")
@@ -128,11 +128,9 @@ country_counts <- olympics_clean |>
   count(country_name, sort = TRUE) |>
   rename(country = country_name)
 
-# Top / Bottom
 top_15 <- country_counts[1:15, ]
 bottom_10 <- tail(country_counts, 10)
 
-# Comparaison
 top_5 <- country_counts[1:5, ]
 top_5$type <- "Plus représentés"
 
@@ -230,14 +228,12 @@ L’analyse de ces trois graphiques montre que la représentativité des nationa
 
 Le premier graphique permet d’identifier les pays dominants avec des valeurs précises. Le deuxième montre qu'il y a aussi des pays avec peu de représentants. Enfin, le troisième met directement en évidence l’écart entre ces deux groupes. L’ensemble confirme donc une structure déséquilibrée de la répartition des nationalités.
 
-# Question 3: Est-ce que la taille/poids d'un athlète influence sa performance ?
+# Question 3 : Est-ce que la taille/poids d'un athlète influence sa performance ?
 
 Cette partie analyse si la corpulence d'un athlète (mesurée par l'Indice de Masse Corporelle - IMC) constitue un avantage déterminant pour ses performances.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
-df_morpho <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
-# Nettoyage spécifique pour l'analyse IMC
-df_morpho <- olympics %>%
+df_morpho <- dataset %>%
   mutate(
     weight_kg = as.numeric(weight_kg),
     height_cm = as.numeric(height_cm),
@@ -285,10 +281,10 @@ Contrairement à l’analyse réalisée au niveau des sports globaux, l’analys
 
 Les épreuves présentant les corrélations les plus marquées sont :
 
-* **Gymnastics (Artistic) – Parallel Bars**
-* **Boxing – Lightweight**
-* **Gymnastics (Artistic) – All-Around**
-* **Swimming – 400m Freestyle**
+* **Gymnastics (Artistic) - Parallel Bars**
+* **Boxing - Lightweight**
+* **Gymnastics (Artistic) - All-Around**
+* **Swimming - 400m Freestyle**
 
 Ces résultats montrent qu’une morphologie spécifique peut procurer un avantage mesurable dans certaines épreuves.
 
@@ -300,7 +296,7 @@ Cette analyse suggère également que **l’échelle d’analyse est cruciale** 
 
 Pour comprendre l’impact réel, nous isolons deux épreuves aux tendances différentes.
 
-### Gymnastics (Artistic) – Parallel Bars : Corrélation positive
+### Gymnastics (Artistic) - Parallel Bars : Corrélation positive
 
 Dans cette épreuve, la performance est mesurée en points : plus le score est élevé, meilleure est la performance.
 
@@ -319,7 +315,7 @@ La droite de régression présente une pente montante, indiquant qu’un **IMC p
 
 Cela peut s’expliquer par l’importance d’un **rapport force/poids optimal**, essentiel pour exécuter des figures complexes tout en conservant stabilité et contrôle.
 
-### Swimming – 400m Freestyle : Corrélation négative
+### Swimming - 400m Freestyle : Corrélation négative
 
 En natation, la performance est exprimée en secondes : plus le chrono est faible, meilleure est la performance.
 
@@ -358,7 +354,7 @@ Pour explorer cette question, nous commençons par analyser le nombre de partici
 library(ggplot2)
 library(dplyr)
 
-data <- read.csv("data/olympics_athletes_dataset.csv")
+data <- dataset
 
 data %>%
   group_by(event, gender) %>%
@@ -384,7 +380,6 @@ Nous avons sélectionné les 8 sports où l'écart numérique entre les particip
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 library(tidyr)
 
-# Identification des 8 sports avec la plus grande différence absolue
 top_8_disparity <- data %>%
   group_by(sport, gender) %>%
   summarise(n = n(), .groups = "drop") %>%
@@ -393,7 +388,6 @@ top_8_disparity <- data %>%
   arrange(desc(disparity)) %>%
   slice_head(n = 8)
 
-# Graphique de ces 8 sports
 data %>%
   filter(sport %in% top_8_disparity$sport) %>%
   group_by(sport, gender) %>%
@@ -694,12 +688,10 @@ Notre hypothèse est que la performance maximale survient plus souvent lors de l
 Pour répondre à cette question sans être biaisé par le fait qu'il y a beaucoup plus d'athlètes réalisant une seule participation par rapport à ceux en cumulant plusieurs, nous allons créer une Heatmap (Carte de chaleur). Elle affichera la proportion (en pourcentage) de chaque type de résultat selon le nombre de participations.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
-# Filtrage et préparation des données
 data_experience <- dataset %>%
   filter(!is.na(total_olympics_attended) & !is.na(medal)) %>%
   mutate(medal = factor(medal, levels = c("None", "Bronze", "Silver", "Gold")))
 
-# Calcul des pourcentages par groupe de participation
 heatmap_data <- data_experience %>%
   group_by(total_olympics_attended, medal) %>%
   summarize(count = n(), .groups = "drop") %>%
@@ -707,7 +699,6 @@ heatmap_data <- data_experience %>%
   mutate(proportion = count / sum(count) * 100) %>%
   ungroup()
 
-# Création de la Heatmap des proportions
 ggplot(heatmap_data, aes(x = as.factor(total_olympics_attended), y = medal, fill = proportion)) +
   geom_tile(color = "white") +
   scale_fill_gradient(low = "white", high = "darkcyan", name = "Proportion (%)") +
@@ -740,7 +731,6 @@ Pour répondre à cette question, nous allons croiser le nombre d'athlètes uniq
 Nous filtrons les pays ayant envoyé moins de 10 athlètes pour éviter les cas extrêmes de petites délégations qui fausseraient les statistiques d'efficacité globale.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
-# Calcul du nombre d'athlètes et de médailles par pays
 data_efficacite <- dataset %>%
   group_by(country_name) %>%
   summarize(
@@ -751,11 +741,9 @@ data_efficacite <- dataset %>%
   ) %>%
   filter(nb_athletes >= 10)
 
-# Définition des étiquettes pour les pays notables (forte efficacité ou forte délégation)
 data_efficacite <- data_efficacite %>%
   mutate(label = ifelse(taux_transformation > 20 | nb_athletes > 150, country_name, ""))
 
-# Création du Scatter Plot
 ggplot(data_efficacite, aes(x = nb_athletes, y = nb_medailles, label = label)) +
   geom_point(aes(size = taux_transformation, color = taux_transformation), alpha = 0.7) +
   geom_text(vjust = -0.7, hjust = 0.5, size = 3, check_overlap = TRUE) +
@@ -959,7 +947,7 @@ Comment expliquer cela ? Les sports individuels incluent un grand nombre de disc
 
 Les boîtes (l'écart interquartile) montrent également que la grande majorité des vainqueurs se situent entre 22 et 35 ans dans les deux catégories, démontrant que la performance olympique maximale culmine globalement dans cette fenêtre, mais avec une "prime à l'expérience" paradoxalement plus forte en individuel.
 
-## Question 14 - Les athlètes ayant la plus grande longévité sont-ils aussi ceux qui ont participé à la plus grande diversité d’épreuves ?
+# Question 14 : Les athlètes ayant la plus grande longévité sont-ils aussi ceux qui ont participé à la plus grande diversité d’épreuves ?
 
 On suppose que les athlètes les plus polyvalents, c’est-à-dire ceux qui participent à plusieurs sports ou épreuves, peuvent avoir une carrière plus longue.
 
@@ -999,7 +987,7 @@ Ce graphique présente la relation entre la longévité de carrière des athlèt
 
 Ce graphique permet de tester l’hypothèse selon laquelle la polyvalence favorise une carrière plus longue. Il met en relation la durée de carrière des athlètes avec leur diversité d’épreuves, afin de voir si les athlètes les plus polyvalents sont aussi ceux qui restent le plus longtemps dans les Jeux olympiques.
 
-## Question 15 - L'écart-type de la taille des athlètes au sein d'une même discipline a-t-il diminué entre 1924 et 2024 ?
+# Question 15 : L'écart-type de la taille des athlètes au sein d'une même discipline a-t-il diminué entre 1924 et 2024 ?
 
 ### Hypothèse
 
@@ -1045,7 +1033,7 @@ Ce graphique montre l'évolution de l'écart-type de la taille des nageurs au co
 
 Cette analyse permet d'étudier l'évolution de la diversité physique des athlètes au sein d'une même discipline. Une diminution de l'écart-type de la taille au cours du temps constituerait un indice de spécialisation progressive des profils physiques.
 
-## Question 16 - La taille des athlètes influence-t-elle davantage les performances mesurées en distance (mètres) que celles mesurées en temps (secondes) ?
+# Question 16 : La taille des athlètes influence-t-elle davantage les performances mesurées en distance (mètres) que celles mesurées en temps (secondes) ?
 
 ### Hypothèse
 
@@ -1087,7 +1075,7 @@ Nous avons choisi un nuage de points car il permet d'étudier la relation entre 
 
 Chaque point représente un athlète. L'axe horizontal correspond à sa taille et l'axe vertical à sa performance. Dans les épreuves mesurées en mètres, une tendance croissante entre la taille et le résultat pourrait indiquer qu'une plus grande taille favorise la performance. Cela peut s'expliquer par un avantage biomécanique dans certaines disciplines. Dans les épreuves mesurées en secondes, la relation peut être différente. Une dispersion importante des points ou l'absence de tendance visible suggérerait que la taille n'est pas le principal facteur expliquant la performance. La comparaison des deux graphiques permet ainsi de déterminer si l'influence de la taille est plus forte dans les disciplines de distance que dans les disciplines chronométrées.
 
-## Question 17 - Existe-t-il une corrélation visuelle entre la taille et le poids des athlètes, toutes disciplines confondues ?
+# Question 17 : Existe-t-il une corrélation visuelle entre la taille et le poids des athlètes, toutes disciplines confondues ?
 
 ## Hypothèse
 
@@ -1126,7 +1114,7 @@ Nous avons choisi un nuage de points car il permet de représenter la relation e
 
 Chaque point représente un athlète. L'axe horizontal correspond à sa taille et l'axe vertical à son poids. Si les points suivent globalement une trajectoire ascendante et que la ligne de tendance est croissante, cela indique une corrélation positive entre la taille et le poids. Les athlètes les plus grands ont alors tendance à être également les plus lourds. Le nuage de points permet également d'identifier des valeurs atypiques. Par exemple, un athlète très grand mais extrêmement léger, ou inversement très petit mais particulièrement lourd, apparaîtrait éloigné du reste des observations.
 
-# Question 18 - Combien d'athlètes participent aux Jeux Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver ?
+# Question 18 : Combien d'athlètes participent aux Jeux Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver ?
 
 ## Hypothèse
 
@@ -1181,7 +1169,7 @@ Pour répondre, un simple nuage de points serait illisible (8500 points superpos
 
 ```{r q19_densite_morpho, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 9, fig.height = 7}
 
-morpho <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
+morpho <- dataset
 
 sports_cibles <- c("Basketball", "Rowing", "Swimming",
                     "Weightlifting", "Gymnastics (Artistic)", "Cross-Country Skiing")
@@ -1250,9 +1238,7 @@ La Question 19 a montré des empreintes morphologiques distinctes. Nous proposon
 Nous utilisons des **violons horizontaux** (`geom_violin`), qui montrent toute la *distribution* de l'IMC dans chaque discipline (et pas seulement la moyenne), complétés par une **boîte à moustaches fine** au centre pour repérer la médiane et les quartiles. Les disciplines sont **ordonnées par IMC médian croissant**, et colorées par un **dégradé** (du violet « léger » au jaune « lourd ») afin que le classement saute aux yeux.
 
 ```{r q20_imc_disciplines, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 9, fig.height = 9}
-imc_data <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
-
-imc_data <- imc_data %>%
+imc_data <- dataset %>%
   mutate(imc = weight_kg / (height_cm / 100)^2)
 
 ordre_sports <- imc_data %>%
@@ -1287,7 +1273,7 @@ ggplot(imc_data, aes(x = imc, y = sport, fill = imc_median)) +
 Le classement obtenu est d'une **cohérence frappante** et valide notre hypothèse :
 
 -   Tout en bas (IMC le plus faible) : le **Saut à ski** (IMC médian $\approx$ 19,2), suivi du **Cyclisme**, de la **Gymnastique** et du **Patinage artistique** ($\approx$ 21). Ce sont des sports où la légèreté est un avantage mécanique direct (porter, sauter, tourner).
--   Au centre (IMC $\approx$ 22–24) : la majorité des sports « polyvalents » (natation, escrime, tennis, aviron, athlétisme).
+-   Au centre (IMC $\approx$ 22-24) : la majorité des sports « polyvalents » (natation, escrime, tennis, aviron, athlétisme).
 -   Tout en haut (IMC le plus élevé) : la **Lutte** ($\approx$ 31,3) et surtout l'**Haltérophilie** ($\approx$ 33,2), où la masse musculaire est directement productrice de performance. La forme très étirée du violon de l'haltérophilie traduit la coexistence de catégories de poids très différentes.
 
 L'écart entre les deux extrêmes est considérable ($\approx$ 14 points d'IMC), ce qui montre à quel point les exigences physiques diffèrent d'un sport à l'autre.
@@ -1307,7 +1293,7 @@ Nous quittons l'athlète pour la **nation**. Le jeu de données contient des agr
 Les agrégats `country_*` ne prennent **qu'une seule valeur par pays** : nous réduisons donc le jeu de données à une ligne par pays. Nous traçons ensuite deux **nuages de points** avec une **droite de régression linéaire** (`geom_smooth(method = "lm")`) pour matérialiser la tendance. Comme le total de médailles varie énormément (de 5 à plus de 2600), nous passons l'axe vertical en **échelle logarithmique** pour rendre le graphique lisible. Quelques pays remarquables sont annotés.
 
 ```{r q21_prepare, echo = FALSE, warning = FALSE, message = FALSE}
-pays_data <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
+pays_data <- dataset
 
 agg_pays <- pays_data %>%
   group_by(country_name) %>%
@@ -1385,7 +1371,7 @@ Le total de médailles (Question 21) mélange l'or, l'argent et le bronze. Or ga
 Nous utilisons un **graphique en sucettes** (*lollipop chart* : un segment terminé par un point), plus léger visuellement qu'un diagramme en barres pour comparer 49 pays. Les pays sont ordonnés par ratio d'or décroissant. La **taille du point** représente le total de médailles (pour distinguer les géants des petites délégations) et sa **couleur** reprend le ratio d'or. Nous écartons les pays ayant moins de 30 médailles au total, car un ratio calculé sur un trop petit dénominateur serait statistiquement fragile.
 
 ```{r q22_ratio_or, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 9, fig.height = 10}
-or_data <- read_csv("data/olympics_athletes_dataset.csv", show_col_types = FALSE)
+or_data <- dataset
 
 ratio_pays <- or_data %>%
   group_by(country_name) %>%
@@ -1423,7 +1409,7 @@ Le graphique révèle **trois profils de nations** :
 -   **Les spécialistes** (petits points, ratio élevé) : l'**Éthiopie** (44 %), le **Nigeria** (41 %) ou la **Turquie** (40 %) affichent un ratio d'or aussi haut que les géants, mais sur un volume bien plus faible. Ce sont des nations qui dominent un **petit nombre de disciplines** (l'Éthiopie est historiquement reine du fond), ce qui est cohérent avec la réalité sportive.
 -   **Les collectionneuses** (bas du classement) : le **Mexique** (19 %), la **Pologne**, la **Bulgarie** ou le **Brésil** ($\approx$ 24 %) accumulent les podiums mais transforment rarement en or.
 
-On note tout de même que l'éventail des ratios reste resserré ($\approx$ 19 % à 44 %), ce qui invite à la prudence : sur ce jeu de données, la part d'or tourne globalement autour de 30–40 %. La taille des points (le volume) reste donc le meilleur séparateur entre vraies puissances et nations de niche.
+On note tout de même que l'éventail des ratios reste resserré ($\approx$ 19 % à 44 %), ce qui invite à la prudence : sur ce jeu de données, la part d'or tourne globalement autour de 30-40 %. La taille des points (le volume) reste donc le meilleur séparateur entre vraies puissances et nations de niche.
 
 ### Conclusion
 
@@ -1450,3 +1436,35 @@ La seconde capture (violon d'IMC) permet de comparer interactivement deux ou tro
 ### Conclusion
 
 L'application Shiny transforme une analyse figée en outil d'exploration : elle apporte une valeur ajoutée réelle par rapport à un graphique statique, puisqu'elle laisse le lecteur poser ses propres sous-questions.
+
+# Annexe : Répartition des questions
+
+Voici la répartition de la rédaction et de l'analyse des questions du rapport :
+
+### Simon Pereaux
+- **Question 3** : Est-ce que la taille/poids d'un athlète influence sa performance ?
+- **Question 8** : Quelles sont les disciplines sportives qui comptent le plus grand nombre d'athlètes enregistrés ?
+- **Question 9** : Corrélation entre expérience olympique et succès
+- **Question 10** : L'efficacité des délégations (Ratio Participation/Succès)
+- **Question 11** : L'évolution morphologique temporelle (La spécialisation des corps)
+
+### Autres membres de l'équipe (data-squad)
+- **Question 1** : Quels sont les pays qui ont accumulé le plus de médailles d’or au cours de l'histoire des Jeux Olympiques ?
+- **Question 2** : Quelles sont les nationalités les plus / moins représentées ?
+- **Question 4** : Y a-t-il un genre plus représenté que l'autre ?
+- **Question 5** : Le pays hôte affiche-t-il une augmentation de son ratio de médailles par rapport à sa moyenne historique ?
+- **Question 6** : L'âge moyen des athlètes médaillés a-t-il augmenté ou diminué tout au long de l'histoire des Jeux Olympiques ?
+- **Question 7** : Existe-t-il une différence en terme de poids, enre les athlètes participant aux Jeux D'été, et ceux des Jeux d'hiver ?
+- **Question 12** : Le phénomène de l'Effet d'Âge Relatif (Relative Age Effect)
+- **Question 13** : Sports d'équipe vs Sports individuels : l'âge de l'or
+- **Question 14** : Les athlètes ayant la plus grande longévité sont-ils aussi ceux qui ont participé à la plus grande diversité d’épreuves ?
+- **Question 15** : L'écart-type de la taille des athlètes au sein d'une même discipline a-t-il diminué entre 1924 et 2024 ?
+- **Question 16** : La taille des athlètes influence-t-elle davantage les performances mesurées en distance (mètres) que celles mesurées en temps (secondes) ?
+- **Question 17** : Existe-t-il une corrélation visuelle entre la taille et le poids des athlètes, toutes disciplines confondues ?
+- **Question 18** : Combien d'athlètes participent aux Jeux Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver ?
+- **Question 19** : Chaque discipline possède-t-elle une « empreinte morphologique » qui lui est propre ?
+- **Question 20** : Peut-on classer les disciplines selon un « gabarit type » mesuré par l'IMC ?
+- **Question 21** : L'ancienneté olympique et le rang historique d'une nation prédisent-ils son palmarès ?
+- **Question 22** : Quelles nations sont des « machines à or » et lesquelles sont des « collectionneuses de médailles » ?
+- **Question 23** : Application Shiny - un explorateur morphologique interactif
+
