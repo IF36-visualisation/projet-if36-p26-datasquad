@@ -25,7 +25,7 @@ Nous avons donc une base de données de 8500 athlètes, avec des données sur 30
 ## Types de données
 
 | \# | Nom de la colonne | Format donnée | Description | Type |
-|---------------|---------------|---------------|---------------|---------------|
+|----|----|----|----|----|
 | 1 | `athlete_id` | String | ID unique (format ATH-00001 à ATH-08500) | Discrète (Identifiant) |
 | 2 | `athlete_name` | String | Nom complet (Prénom + Nom) | Discrète (Nominale) |
 | 3 | `gender` | String | Sexe de l'athlète (Male/Female) | Discrète (Nominale) |
@@ -63,10 +63,10 @@ Nous avons donc une base de données de 8500 athlètes, avec des données sur 30
 
 Les questions sont structurées en 4 grands thèmes :
 
--   **MORPHOLOGIE : Impact sur performance** : Analyse des caractéristiques physiques des athlètes (taille, poids, IMC), de leur répartition par discipline, et de leur influence sur la performance (Questions 1 à 8).
--   **GÉOPOLITIQUE : Pays dominants** : Étude du succès national, de la domination historique de certains pays, de l'effet d'être pays hôte et de l'efficacité des délégations (Questions 9 à 13).
--   **ÉQUITÉ : Genre & représentativité** : Analyse de la parité hommes/femmes, de la représentativité des nationalités et des disciplines sportives, et de l'effet d'âge relatif (Questions 14 à 17).
--   **TEMPORALITÉ : Évolution des JO** : Étude de l'évolution de la participation par saison, de l'âge des médaillés, de l'expérience, de la spécialisation des corps dans le temps et de la longévité de carrière (Questions 18 à 23).
+- **MORPHOLOGIE : Impact sur performance** : Analyse des caractéristiques physiques des athlètes (taille, poids, IMC), de leur répartition par discipline, et de leur influence sur la performance (Questions 1 à 8).
+- **GÉOPOLITIQUE : Pays dominants** : Étude du succès national, de la domination historique de certains pays, de l'effet d'être pays hôte et de l'efficacité des délégations (Questions 9 à 13).
+- **ÉQUITÉ : Genre & représentativité** : Analyse de la parité hommes/femmes, de la représentativité des nationalités et des disciplines sportives, et de l'effet d'âge relatif (Questions 14 à 17).
+- **TEMPORALITÉ : Évolution des JO** : Étude de l'évolution de la participation par saison, de l'âge des médaillés, de l'expérience, de la spécialisation des corps dans le temps et de la longévité de carrière (Questions 18 à 23).
 
 ### Interrogations et objectifs
 
@@ -84,9 +84,9 @@ Pour valider nos hypothèses, nous allons croiser les variables suivantes : 1. *
 
 ## Défis et limites potentiels
 
--   **Hétérogénéité des unités** : La variable `result_value` mélange des secondes, des mètres et des points. Il faudra normaliser ces données ou filtrer l'analyse sport par sport.
--   **Données manquantes** : Les données historiques comportent souvent des valeurs de poids ou de taille manquantes, ce qui pourrait biaiser l'analyse temporelle.
--   **Variables confondantes** : La performance dépend aussi de l'âge, de l'expérience (`total_olympics`) et des infrastructures du pays d'origine.
+- **Hétérogénéité des unités** : La variable `result_value` mélange des secondes, des mètres et des points. Il faudra normaliser ces données ou filtrer l'analyse sport par sport.
+- **Données manquantes** : Les données historiques comportent souvent des valeurs de poids ou de taille manquantes, ce qui pourrait biaiser l'analyse temporelle.
+- **Variables confondantes** : La performance dépend aussi de l'âge, de l'expérience (`total_olympics`) et des infrastructures du pays d'origine.
 
 # Rapport de l'étude de base de données :
 
@@ -200,11 +200,11 @@ ggplot(morpho_sel, aes(x = height_cm, y = weight_kg, colour = sport)) +
 
 Les deux graphiques confirment nettement notre hypothèse : **chaque discipline occupe sa propre région du plan taille × poids**, et les empreintes se chevauchent peu.
 
--   La **Gymnastique (Artistique)** forme une tache compacte en bas à gauche : athlètes petits ($\approx$ 163 cm) et légers ($\approx$ 58 kg), profil idéal pour les figures acrobatiques.
--   Le **Basketball** se situe à l'opposé, en haut à droite : grands ($\approx$ 193 cm) et lourds ($\approx$ 100 kg).
--   L'**Aviron (Rowing)** et la **Natation (Swimming)** dessinent des nuages allongés de grande taille mais de poids modéré (gabarits longs et secs).
--   L'**Haltérophilie (Weightlifting)** est remarquable : taille moyenne ($\approx$ 175 cm) mais poids extrêmement variable (jusqu'à \~150 kg), d'où une empreinte très étirée verticalement - reflet des catégories de poids, des poids plumes aux super-lourds.
--   Le **Ski de fond (Cross-Country Skiing)** occupe une zone d'endurance : gabarit intermédiaire et resserré.
+- La **Gymnastique (Artistique)** forme une tache compacte en bas à gauche : athlètes petits ($\approx$ 163 cm) et légers ($\approx$ 58 kg), profil idéal pour les figures acrobatiques.
+- Le **Basketball** se situe à l'opposé, en haut à droite : grands ($\approx$ 193 cm) et lourds ($\approx$ 100 kg).
+- L'**Aviron (Rowing)** et la **Natation (Swimming)** dessinent des nuages allongés de grande taille mais de poids modéré (gabarits longs et secs).
+- L'**Haltérophilie (Weightlifting)** est remarquable : taille moyenne ($\approx$ 175 cm) mais poids extrêmement variable (jusqu'à \~150 kg), d'où une empreinte très étirée verticalement - reflet des catégories de poids, des poids plumes aux super-lourds.
+- Le **Ski de fond (Cross-Country Skiing)** occupe une zone d'endurance : gabarit intermédiaire et resserré.
 
 Les ellipses de confiance résument ce constat : elles se touchent à peine. Autrement dit, la nuée globale observée en Question 1 était bien la **superposition de plusieurs populations distinctes**. La morphologie n'est pas le fruit du hasard : c'est une signature de la discipline.
 
@@ -257,9 +257,9 @@ ggplot(imc_data, aes(x = imc, y = sport, fill = imc_median)) +
 
 Le classement obtenu est d'une **cohérence frappante** et valide notre hypothèse :
 
--   Tout en bas (IMC le plus faible) : le **Saut à ski** (IMC médian $\approx$ 19,2), suivi du **Cyclisme**, de la **Gymnastique** et du **Patinage artistique** ($\approx$ 21). Ce sont des sports où la légèreté est un avantage mécanique direct (porter, sauter, tourner).
--   Au centre (IMC $\approx$ 22-24) : la majorité des sports « polyvalents » (natation, escrime, tennis, aviron, athlétisme).
--   Tout en haut (IMC le plus élevé) : la **Lutte** ($\approx$ 31,3) et surtout l'**Haltérophilie** ($\approx$ 33,2), où la masse musculaire est directement productrice de performance. La forme très étirée du violon de l'haltérophilie traduit la coexistence de catégories de poids très différentes.
+- Tout en bas (IMC le plus faible) : le **Saut à ski** (IMC médian $\approx$ 19,2), suivi du **Cyclisme**, de la **Gymnastique** et du **Patinage artistique** ($\approx$ 21). Ce sont des sports où la légèreté est un avantage mécanique direct (porter, sauter, tourner).
+- Au centre (IMC $\approx$ 22-24) : la majorité des sports « polyvalents » (natation, escrime, tennis, aviron, athlétisme).
+- Tout en haut (IMC le plus élevé) : la **Lutte** ($\approx$ 31,3) et surtout l'**Haltérophilie** ($\approx$ 33,2), où la masse musculaire est directement productrice de performance. La forme très étirée du violon de l'haltérophilie traduit la coexistence de catégories de poids très différentes.
 
 L'écart entre les deux extrêmes est considérable ($\approx$ 14 points d'IMC), ce qui montre à quel point les exigences physiques diffèrent d'un sport à l'autre.
 
@@ -355,10 +355,10 @@ Contrairement à l’analyse réalisée au niveau des sports globaux réaliser d
 
 Les épreuves présentant les corrélations les plus marquées sont :
 
--   **Gymnastics (Artistic) - Parallel Bars**
--   **Boxing - Lightweight**
--   **Gymnastics (Artistic) - All-Around**
--   **Swimming - 400m Freestyle**
+- **Gymnastics (Artistic) - Parallel Bars**
+- **Boxing - Lightweight**
+- **Gymnastics (Artistic) - All-Around**
+- **Swimming - 400m Freestyle**
 
 Ces résultats montrent qu’une morphologie spécifique peut procurer un avantage mesurable dans certaines épreuves.
 
@@ -584,9 +584,9 @@ ggplot(ratio_pays, aes(x = ratio_or, y = reorder(country_name, ratio_or))) +
 
 Le graphique révèle **trois profils de nations** :
 
--   **Les géants dominateurs** (gros points en haut) : l'Union soviétique (42 %), la **Chine** (41 %) et les **États-Unis** (40 %) cumulent à la fois un énorme volume de médailles et un ratio d'or élevé. Ce sont les vraies puissances : elles ne se contentent pas de participer aux podiums, elles les gagnent.
--   **Les spécialistes** (petits points, ratio élevé) : l'**Éthiopie** (44 %), le **Nigeria** (41 %) ou la **Turquie** (40 %) affichent un ratio d'or aussi haut que les géants, mais sur un volume bien plus faible. Ce sont des nations qui dominent un **petit nombre de disciplines** (l'Éthiopie est historiquement reine du fond), ce qui est cohérent avec la réalité sportive.
--   **Les collectionneuses** (bas du classement) : le **Mexique** (19 %), la **Pologne**, la **Bulgarie** ou le **Brésil** ($\approx$ 24 %) accumulent les podiums mais transforment rarement en or.
+- **Les géants dominateurs** (gros points en haut) : l'Union soviétique (42 %), la **Chine** (41 %) et les **États-Unis** (40 %) cumulent à la fois un énorme volume de médailles et un ratio d'or élevé. Ce sont les vraies puissances : elles ne se contentent pas de participer aux podiums, elles les gagnent.
+- **Les spécialistes** (petits points, ratio élevé) : l'**Éthiopie** (44 %), le **Nigeria** (41 %) ou la **Turquie** (40 %) affichent un ratio d'or aussi haut que les géants, mais sur un volume bien plus faible. Ce sont des nations qui dominent un **petit nombre de disciplines** (l'Éthiopie est historiquement reine du fond), ce qui est cohérent avec la réalité sportive.
+- **Les collectionneuses** (bas du classement) : le **Mexique** (19 %), la **Pologne**, la **Bulgarie** ou le **Brésil** ($\approx$ 24 %) accumulent les podiums mais transforment rarement en or.
 
 On note tout de même que l'éventail des ratios reste resserré ($\approx$ 19 % à 44 %), ce qui invite à la prudence : sur ce jeu de données, la part d'or tourne globalement autour de 30-40 %. La taille des points (le volume) reste donc le meilleur séparateur entre vraies puissances et nations de niche.
 
@@ -680,13 +680,13 @@ ggplot(data_extremes, aes(x = taux_transformation, y = reorder(nationality, taux
   )
 ```
 
-##### Interprétation :
+### Interprétation
 
-Ce nouveau nuage de points permet de distinguer clairement les profils des nations olympiques :
+Ce graphique montre que les grandes délégations, comme les États-Unis ou l’Allemagne, remportent beaucoup de médailles grâce à leur grand nombre d’athlètes, mais n’ont pas forcément le meilleur taux de réussite.
 
-1\. Les géants olympiques : Situés tout à droite et représentés par de très gros points. Malgré la taille immense de leur délégation, ils maintiennent un taux de transformation très élevé.
+À l’inverse, certains pays comme Hong Kong, le Portugal ou le Kenya envoient moins d’athlètes mais affichent un taux de transformation plus élevé, ce qui indique une meilleure efficacité par athlète.
 
-2\. Les petites délégations ultra-efficaces : Situées en haut à gauche ou au centre (points rouges). Ces pays envoient moins d'athlètes mais ont un taux de transformation exceptionnel, optimisant au maximum leurs chances de médailles.
+On distingue donc deux stratégies : certaines nations misent sur le volume, tandis que d’autres se montrent plus performantes avec des délégations plus réduites. Cela suggère que la taille de la délégation n’explique pas à elle seule le succès olympique.
 
 ## Question 12 : Le pays hôte affiche-t-il une augmentation de son ratio de médailles par rapport à sa moyenne historique ?
 
@@ -843,8 +843,8 @@ ggplot(agg_pays, aes(x = meilleur_rang, y = total_medals)) +
 
 Les deux panneaux valident notre hypothèse, avec des forces différentes :
 
--   **Ancienneté (r** $\approx$ -0,37) : la tendance est réelle mais modérée. Les nations fondatrices (États-Unis, France, Grande-Bretagne, Allemagne, toutes présentes dès 1896) figurent bien parmi les plus médaillées. Mais la corrélation est loin d'être parfaite : la **Chine** (1ère participation en 1932) et l'**Union soviétique** (1952) sont arrivées tardivement tout en figurant parmi les toutes premières nations du palmarès. L'ancienneté aide, mais la puissance démographique et l'investissement comptent davantage.
--   **Meilleur rang (r** $\approx$ -0,63) : la corrélation est nettement plus forte. Avoir déjà atteint le rang 1 va presque systématiquement de pair avec un énorme total de médailles. C'est logique : il s'agit de deux mesures de la même domination sportive.
+- **Ancienneté (r** $\approx$ -0,37) : la tendance est réelle mais modérée. Les nations fondatrices (États-Unis, France, Grande-Bretagne, Allemagne, toutes présentes dès 1896) figurent bien parmi les plus médaillées. Mais la corrélation est loin d'être parfaite : la **Chine** (1ère participation en 1932) et l'**Union soviétique** (1952) sont arrivées tardivement tout en figurant parmi les toutes premières nations du palmarès. L'ancienneté aide, mais la puissance démographique et l'investissement comptent davantage.
+- **Meilleur rang (r** $\approx$ -0,63) : la corrélation est nettement plus forte. Avoir déjà atteint le rang 1 va presque systématiquement de pair avec un énorme total de médailles. C'est logique : il s'agit de deux mesures de la même domination sportive.
 
 L'échelle logarithmique est ici indispensable : sans elle, les États-Unis ($\approx$ 2638 médailles) écraseraient à eux seuls tout le graphique.
 
@@ -1359,13 +1359,11 @@ ggplot(data_morpho_temp, aes(x = year, y = taille_moyenne, color = sport)) +
   )
 ```
 
-##### Interprétation :
+### Interprétation
 
-Le graphique confirme notre hypothèse d'ultra-spécialisation des corps, visible à travers la divergence progressive des deux courbes de tendance (en pointillés).
+Ce graphique met en évidence une spécialisation morphologique entre les deux disciplines étudiées. Les basketteurs présentent une taille moyenne nettement plus élevée que les gymnastes, ce qui confirme que certaines caractéristiques physiques sont particulièrement avantageuses selon le sport pratiqué. On observe également une légère augmentation de la taille moyenne en basketball au fil du temps, tandis que celle des gymnastes tend à légèrement diminuer.
 
-Malgré un creux de données entre 1930 et 1980 pour ces disciplines, l'évolution sur plus d'un siècle est marquée : 1. Basketball : La courbe de tendance montre une augmentation globale, passant d'environ 1m91 à plus de 1m94. Sur les éditions récentes (après 2000), on observe même un pic au-dessus de 2 mètres en moyenne, prouvant que les profils de très grande taille sont toujours plus recherchés. 2. Gymnastique (Artistique) : À l'inverse, la tendance est à la baisse. Partant d'environ 1m65 au début du siècle dernier, la taille moyenne diminue pour s'établir autour de 1m61 de nos jours, avec des creux récents sous la barre des 1m60. Un centre de gravité plus bas facilite en effet l'exécution de figures acrobatiques complexes.
-
-Cette évolution opposée met en évidence que les caractéristiques physiques ne sont pas dues au hasard : elles s'optimisent et se spécialisent pour répondre de plus en plus précisément aux exigences spécifiques de chaque discipline de haut niveau.
+Il est important de noter qu’un important trou de données apparaît entre 1924 et 1996. Cela s’explique par le jeu de données utilisé : durant cette période, la base ne contient que des données des Jeux Olympiques d’Hiver, et aucune donnée des Jeux d’Été. Or, le Basketball et la Gymnastique Artistique étant des disciplines exclusivement disputées lors des Jeux d’Été, il est normal qu’aucune donnée n’apparaisse au centre du graphique.
 
 ## Question 21 : Corrélation entre expérience olympique et succès
 
@@ -1497,31 +1495,31 @@ Voici la répartition de la rédaction et de l'analyse des questions du rapport 
 
 ### Simon Pereaux
 
--   **Question 5** : Est-ce que la taille/poids d'un athlète influence sa performance ?
--   **Question 11** : L'efficacité des délégations (Ratio Participation/Succès)
--   **Question 17** : Le phénomène de l'Effet d'Âge Relatif (Relative Age Effect)
--   **Question 20** : L'évolution morphologique temporelle (La spécialisation des corps)
--   **Question 21** : Corrélation entre expérience olympique et succès
+- **Question 5** : Est-ce que la taille/poids d'un athlète influence sa performance ?
+- **Question 11** : L'efficacité des délégations (Ratio Participation/Succès)
+- **Question 17** : Le phénomène de l'Effet d'Âge Relatif (Relative Age Effect)
+- **Question 20** : L'évolution morphologique temporelle (La spécialisation des corps)
+- **Question 21** : Corrélation entre expérience olympique et succès
 
 ### Lucas Gilbert
 
--   **Question 4** : Existe-t-il une différence en terme de poids, enre les athlètes participant aux Jeux D'été, et ceux des Jeux d'hiver ?
--   **Question 9** : Quels sont les pays qui ont accumulé le plus de médailles d’or au cours de l'histoire des Jeux Olympiques ?
--   **Question 12** : Le pays hôte affiche-t-il une augmentation de son ratio de médailles par rapport à sa moyenne historique ?
--   **Question 16** : Quelles sont les disciplines sportives qui comptent le plus grand nombre d'athlètes enregistrés ?
--   **Question 19** : L'âge moyen des athlètes médaillés a-t-il augmenté ou diminué tout au long de l'histoire des Jeux Olympiques ?
+- **Question 4** : Existe-t-il une différence en terme de poids, enre les athlètes participant aux Jeux D'été, et ceux des Jeux d'hiver ?
+- **Question 9** : Quels sont les pays qui ont accumulé le plus de médailles d’or au cours de l'histoire des Jeux Olympiques ?
+- **Question 12** : Le pays hôte affiche-t-il une augmentation de son ratio de médailles par rapport à sa moyenne historique ?
+- **Question 16** : Quelles sont les disciplines sportives qui comptent le plus grand nombre d'athlètes enregistrés ?
+- **Question 19** : L'âge moyen des athlètes médaillés a-t-il augmenté ou diminué tout au long de l'histoire des Jeux Olympiques ?
 
 ### Autres membres de l'équipe (data-squad)
 
--   **Question 1** : Existe-t-il une corrélation visuelle entre la taille et le poids des athlètes, toutes disciplines confondues ?
--   **Question 2** : Chaque discipline possède-t-elle une « empreinte morphologique » qui lui est propre ?
--   **Question 3** : Peut-on classer les disciplines selon un « gabarit type » mesuré par l'IMC ?
--   **Question 6** : La taille des athlètes influence-t-elle davantage les performances mesurées en distance (mètres) que celles mesurées en temps (secondes) ?
--   **Question 7** : L'écart-type de la taille des athlètes au sein d'une même discipline a-t-il diminué entre 1924 et 2024 ?
--   **Question 8** : Application Shiny - un explorateur morphologique interactif
--   **Question 10** : Quelles nations sont des « machines à or » et lesquelles sont des « collectionneuses de médailles » ?
--   **Question 13** : L'ancienneté olympique et le rang historique d'une nation prédisent-ils son palmarès ?
--   **Question 14** : Y a-t-il un genre plus représenté que l'autre ?
--   **Question 18** : Combien d'athlètes participent aux Jeux Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver ?
--   **Question 22** : Sports d'équipe vs Sports individuels : l'âge de l'or
--   **Question 23** : Les athlètes ayant la plus grande longévité sont-ils aussi ceux qui ont participé à la plus grande diversité d’épreuves ?
+- **Question 1** : Existe-t-il une corrélation visuelle entre la taille et le poids des athlètes, toutes disciplines confondues ?
+- **Question 2** : Chaque discipline possède-t-elle une « empreinte morphologique » qui lui est propre ?
+- **Question 3** : Peut-on classer les disciplines selon un « gabarit type » mesuré par l'IMC ?
+- **Question 6** : La taille des athlètes influence-t-elle davantage les performances mesurées en distance (mètres) que celles mesurées en temps (secondes) ?
+- **Question 7** : L'écart-type de la taille des athlètes au sein d'une même discipline a-t-il diminué entre 1924 et 2024 ?
+- **Question 8** : Application Shiny - un explorateur morphologique interactif
+- **Question 10** : Quelles nations sont des « machines à or » et lesquelles sont des « collectionneuses de médailles » ?
+- **Question 13** : L'ancienneté olympique et le rang historique d'une nation prédisent-ils son palmarès ?
+- **Question 14** : Y a-t-il un genre plus représenté que l'autre ?
+- **Question 18** : Combien d'athlètes participent aux Jeux Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver ?
+- **Question 22** : Sports d'équipe vs Sports individuels : l'âge de l'or
+- **Question 23** : Les athlètes ayant la plus grande longévité sont-ils aussi ceux qui ont participé à la plus grande diversité d’épreuves ?
