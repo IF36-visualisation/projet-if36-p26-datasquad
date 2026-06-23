@@ -105,8 +105,7 @@ olympics = dataset
 
 ## Question 1 : Existe-t-il une corrélation visuelle entre la taille et le poids des athlètes, toutes disciplines confondues ?
 
-**Hypothèse :** 
-Nous supposons qu'il existe une corrélation positive entre la taille et le poids des athlètes. En général, les athlètes les plus grands ont également tendance à être plus lourds.
+**Hypothèse :** Nous supposons qu'il existe une corrélation positive entre la taille et le poids des athlètes. En général, les athlètes les plus grands ont également tendance à être plus lourds.
 
 Nous nous attendons donc à observer une tendance croissante reliant ces deux variables. Cette analyse permet également de détecter d'éventuelles valeurs aberrantes ou incohérentes dans le dataset.arquée.
 
@@ -413,8 +412,7 @@ Aussi on remarque que le nombre d'athlètes est assez faible par épreuve étant
 
 ## Question 6 : La taille des athlètes influence-t-elle davantage les performances mesurées en distance (mètres) que celles mesurées en temps (secondes) ?
 
-**Hypothèse :** 
-Nous supposons que la taille constitue un avantage plus important dans les disciplines où la performance est mesurée en distance. Des membres plus longs peuvent favoriser certaines actions comme les lancers ou les sauts.
+**Hypothèse :** Nous supposons que la taille constitue un avantage plus important dans les disciplines où la performance est mesurée en distance. Des membres plus longs peuvent favoriser certaines actions comme les lancers ou les sauts.
 
 À l'inverse, dans les disciplines chronométrées, la performance dépend davantage de facteurs tels que la vitesse, l'endurance ou la technique. L'influence directe de la taille pourrait donc être moins marquée.
 
@@ -943,7 +941,6 @@ Afin d'obtenir une vision globale de la répartition des athlètes, nous avons c
 
 Les résultats montrent une répartition très équilibrée entre les femmes et les hommes. On compte 4 263 participantes contre 4 237 participants, soit un écart de seulement 26 athlètes. Les deux barres ont pratiquement la même hauteur.
 
-
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results='hide'}
 data %>%
   group_by(event, gender) %>%
@@ -1248,8 +1245,7 @@ En filtrant les sports et en isolant la part d'athlètes nés dans le premier tr
 
 ## Question 18 : Combien d'athlètes participent aux Jeux Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver ?
 
-**Hypothèse :**
-Nous supposons que les Jeux Olympiques d'Été rassemblent un plus grand nombre d'athlètes que les Jeux Olympiques d'Hiver.
+**Hypothèse :** Nous supposons que les Jeux Olympiques d'Été rassemblent un plus grand nombre d'athlètes que les Jeux Olympiques d'Hiver.
 
 Cette différence s'explique par le nombre plus élevé de disciplines sportives présentes aux Jeux d'Été ainsi que par la participation d'un plus grand nombre de pays.
 
@@ -1457,8 +1453,7 @@ Les boîtes (l'écart interquartile) montrent également que la grande majorité
 
 ## Question 23 : Les athlètes ayant la plus grande longévité sont-ils aussi ceux qui ont participé à la plus grande diversité d’épreuves ?
 
-**Hypothèse :**
-On suppose que les athlètes les plus polyvalents, c’est-à-dire ceux qui participent à plusieurs sports ou épreuves, peuvent avoir une carrière plus longue.
+**Hypothèse :** On suppose que les athlètes les plus polyvalents, c’est-à-dire ceux qui participent à plusieurs sports ou épreuves, peuvent avoir une carrière plus longue.
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 
@@ -1516,7 +1511,8 @@ Voici la répartition de la rédaction et de l'analyse des questions du rapport 
 - **Question 16** : Quelles sont les disciplines sportives qui comptent le plus grand nombre d'athlètes enregistrés ?
 - **Question 19** : L'âge moyen des athlètes médaillés a-t-il augmenté ou diminué tout au long de l'histoire des Jeux Olympiques ?
 
-### Abdelmoughit OUDINA 
+### Abdelmoughit OUDINA
+
 - **Question 1** : Existe-t-il une corrélation visuelle entre la taille et le poids des athlètes, toutes disciplines confondues ?
 - **Question 6** : La taille des athlètes influence-t-elle davantage les performances mesurées en distance (mètres) que celles mesurées en temps (secondes) ?
 - **Question 7** : L'écart-type de la taille des athlètes au sein d'une même discipline a-t-il diminué entre 1924 et 2024 ?
@@ -1524,12 +1520,14 @@ Voici la répartition de la rédaction et de l'analyse des questions du rapport 
 - **Question 18** : Combien d'athlètes participent aux Jeux Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver ?
 - **Question 23** : Les athlètes ayant la plus grande longévité sont-ils aussi ceux qui ont participé à la plus grande diversité d’épreuves ?
 
-
-### Autres membres de l'équipe (data-squad)
+### ANALLA Ace
 
 - **Question 2** : Chaque discipline possède-t-elle une « empreinte morphologique » qui lui est propre ?
 - **Question 3** : Peut-on classer les disciplines selon un « gabarit type » mesuré par l'IMC ?
-- **Question 8** : Application Shiny - un explorateur morphologique interactif
 - **Question 10** : Quelles nations sont des « machines à or » et lesquelles sont des « collectionneuses de médailles » ?
 - **Question 13** : L'ancienneté olympique et le rang historique d'une nation prédisent-ils son palmarès ?
 - **Question 22** : Sports d'équipe vs Sports individuels : l'âge de l'or
+
+### Application Shiny (Travail de groupe)
+
+- **Question 8** : Application Shiny - un explorateur morphologique interactif
