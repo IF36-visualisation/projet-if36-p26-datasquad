@@ -105,8 +105,7 @@ olympics = dataset
 
 ## Question 1 : Existe-t-il une corrélation visuelle entre la taille et le poids des athlètes, toutes disciplines confondues ?
 
-### Hypothèse
-
+**Hypothèse :** 
 Nous supposons qu'il existe une corrélation positive entre la taille et le poids des athlètes. En général, les athlètes les plus grands ont également tendance à être plus lourds.
 
 Nous nous attendons donc à observer une tendance croissante reliant ces deux variables. Cette analyse permet également de détecter d'éventuelles valeurs aberrantes ou incohérentes dans le dataset.arquée.
@@ -140,7 +139,7 @@ Nous avons choisi un nuage de points car il permet de représenter la relation e
 
 ### Interprétation
 
-Chaque point représente un athlète. L'axe horizontal correspond à sa taille et l'axe vertical à son poids. Si les points suivent globalement une trajectoire ascendante et que la ligne de tendance est croissante, cela indique une corrélation positive entre la taille et le poids. Les athlètes les plus grands ont alors tendance à être également les plus lourds. Le nuage de points permet également d'identifier des valeurs atypiques. Par exemple, un athlète très grand mais extrêmement léger, ou inversement très petit mais particulièrement lourd, apparaîtrait éloigné du reste des observations.
+Ce graphique montre une relation positive entre la taille et le poids . La droite de tendance est croissante, ce qui montre que les athlètes les plus grands ont généralement tendance à être plus lourds. On peut aussi observer une dispersion importante des points autour de cette tendance, ce qui indique que la taille n'est pas le seul facteur influençant le poids. Cette variabilité peut s'expliquer par les différences entre disciplines sportives, certaines favorisant des profils plus légers tandis que d'autres nécessitent davantage de masse corporelle. Malgré cette dispersion, aucune anomalie majeure n'apparaît visuellement et les données semblent globalement cohérentes.
 
 ## Question 2 : Chaque discipline possède-t-elle une « empreinte morphologique » qui lui est propre ?
 
@@ -414,8 +413,7 @@ Aussi on remarque que le nombre d'athlètes est assez faible par épreuve étant
 
 ## Question 6 : La taille des athlètes influence-t-elle davantage les performances mesurées en distance (mètres) que celles mesurées en temps (secondes) ?
 
-#### Hypothèse
-
+**Hypothèse :** 
 Nous supposons que la taille constitue un avantage plus important dans les disciplines où la performance est mesurée en distance. Des membres plus longs peuvent favoriser certaines actions comme les lancers ou les sauts.
 
 À l'inverse, dans les disciplines chronométrées, la performance dépend davantage de facteurs tels que la vitesse, l'endurance ou la technique. L'influence directe de la taille pourrait donc être moins marquée.
@@ -452,11 +450,17 @@ Nous avons choisi un nuage de points car il permet d'étudier la relation entre 
 
 ### Interprétation
 
-Chaque point représente un athlète. L'axe horizontal correspond à sa taille et l'axe vertical à sa performance. Dans les épreuves mesurées en mètres, une tendance croissante entre la taille et le résultat pourrait indiquer qu'une plus grande taille favorise la performance. Cela peut s'expliquer par un avantage biomécanique dans certaines disciplines. Dans les épreuves mesurées en secondes, la relation peut être différente. Une dispersion importante des points ou l'absence de tendance visible suggérerait que la taille n'est pas le principal facteur expliquant la performance. La comparaison des deux graphiques permet ainsi de déterminer si l'influence de la taille est plus forte dans les disciplines de distance que dans les disciplines chronométrées.
+On observe deux nuages de points, l'un pour les épreuves mesurées en mètres et l'autre pour celles mesurées en secondes. Dans les deux cas, les points sont répartis sur une large zone du graphique et ne forment pas de structure particulière. Pour une même taille, on retrouve des athlètes avec des résultats très différents.
+
+Dans le graphique de gauche (metres), les performances sont dispersées sur l'ensemble des tailles observées, entre environ 160 cm et 190 cm. Les meilleurs comme les moins bons résultats sont obtenus par des athlètes de tailles variées.
+
+Dans le graphique de droite (seconds), la dispersion est encore plus importante. La majorité des observations se concentrent dans la partie basse du graphique, mais on observe également plusieurs valeurs très élevées réparties sur presque toutes les tailles.
+
+Visuellement, il est difficile d'identifier une relation claire entre la taille des athlètes et leur performance. Les points ne suivent ni une tendance croissante ni une tendance décroissante marquée. Le graphique met donc surtout en évidence une forte variabilité des résultats pour toutes les tailles observées.
 
 ## Question 7 : L'écart-type de la taille des athlètes au sein d'une même discipline a-t-il diminué entre 1924 et 2024 ?
 
-#### Hypothèse
+**Hypothèse :**
 
 Nous supposons qu'au fil du temps, les athlètes d'une même discipline ont développé des caractéristiques physiques de plus en plus similaires. Cette évolution traduirait une spécialisation progressive vers un profil physique considéré comme optimal pour chaque sport.
 
@@ -858,6 +862,8 @@ Le rang historique est un bien meilleur prédicteur du palmarès que la simple a
 
 Ici, nous cherchons à déterminer s'il existe un déséquilibre de représentation entre les hommes et les femmes dans les Jeux Olympiques.
 
+**Hypothèse :**
+
 Historiquement, les hommes ont été davantage représentés dans le sport de haut niveau. Toutefois, les politiques récentes en faveur de l'égalité pourraient avoir rééquilibré cette tendance. Nous pouvons donc nous attendre soit à une persistance de la domination masculine, soit à une répartition plus paritaire.
 
 Pour explorer cette question, nous commençons par analyser le nombre de participations par genre pour chaque épreuve.
@@ -915,7 +921,9 @@ data %>%
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-Ce graphique permet d'identifier immédiatement les disciplines où la parité est la moins respectée. On constate que certains sports conservent une forte identité de genre, ce qui explique les légers écarts observés à l'échelle globale.
+Ce graphique permet de comparer la participation des hommes et des femmes dans les disciplines où l'écart est le plus marqué. En observant les hauteurs des barres, on remarque par exemple que la luge, le patinage artistique et le hockey sur glace comptent davantage de participantes que de participants dans ce dataset. À l'inverse, des disciplines comme le tir à l'arc, l'aviron ou encore le football présentent une représentation masculine légèrement plus importante.
+
+Le choix d'un diagramme en barres côte à côte facilite la comparaison visuelle entre les deux genres pour chaque sport. Cette représentation permet d'identifier rapidement les disciplines où la parité est la moins respectée et d'évaluer l'importance des écarts observés.
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 data %>%
@@ -931,19 +939,18 @@ data %>%
   theme_minimal()
 ```
 
-Afin d'obtenir une vision d'ensemble, nous comparons le nombre total de participations par genre.
+Afin d'obtenir une vision globale de la répartition des athlètes, nous avons comparé le nombre total de participants selon le genre. Le diagramme en barres est particulièrement adapté à cette comparaison puisqu'il permet de visualiser rapidement les effectifs de chaque catégorie.
 
-Les résultats montrent une répartition très équilibrée :
+Les résultats montrent une répartition très équilibrée entre les femmes et les hommes. On compte 4 263 participantes contre 4 237 participants, soit un écart de seulement 26 athlètes. Les deux barres ont pratiquement la même hauteur.
+
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results='hide'}
 data %>%
-  group_by(event, gender) %>%
+  group_by(event, gender) %>%D
   summarise(nb = n(), .groups = "drop") %>%
   group_by(gender) %>%
   summarise(total = sum(nb))
 ```
-
-Ces valeurs sont extrêmement proches, ce qui suggère une quasi-parité en termes de participations totales.
 
 Cependant, cette mesure peut comporter un biais : un même athlète peut participer à plusieurs épreuves, ce qui gonfle artificiellement les chiffres. Il est donc nécessaire d'affiner l'analyse.
 
@@ -1241,8 +1248,7 @@ En filtrant les sports et en isolant la part d'athlètes nés dans le premier tr
 
 ## Question 18 : Combien d'athlètes participent aux Jeux Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver ?
 
-### Hypothèse
-
+**Hypothèse :**
 Nous supposons que les Jeux Olympiques d'Été rassemblent un plus grand nombre d'athlètes que les Jeux Olympiques d'Hiver.
 
 Cette différence s'explique par le nombre plus élevé de disciplines sportives présentes aux Jeux d'Été ainsi que par la participation d'un plus grand nombre de pays.
@@ -1451,6 +1457,7 @@ Les boîtes (l'écart interquartile) montrent également que la grande majorité
 
 ## Question 23 : Les athlètes ayant la plus grande longévité sont-ils aussi ceux qui ont participé à la plus grande diversité d’épreuves ?
 
+**Hypothèse :**
 On suppose que les athlètes les plus polyvalents, c’est-à-dire ceux qui participent à plusieurs sports ou épreuves, peuvent avoir une carrière plus longue.
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
@@ -1509,17 +1516,20 @@ Voici la répartition de la rédaction et de l'analyse des questions du rapport 
 - **Question 16** : Quelles sont les disciplines sportives qui comptent le plus grand nombre d'athlètes enregistrés ?
 - **Question 19** : L'âge moyen des athlètes médaillés a-t-il augmenté ou diminué tout au long de l'histoire des Jeux Olympiques ?
 
-### Autres membres de l'équipe (data-squad)
-
+### Abdelmoughit OUDINA 
 - **Question 1** : Existe-t-il une corrélation visuelle entre la taille et le poids des athlètes, toutes disciplines confondues ?
-- **Question 2** : Chaque discipline possède-t-elle une « empreinte morphologique » qui lui est propre ?
-- **Question 3** : Peut-on classer les disciplines selon un « gabarit type » mesuré par l'IMC ?
 - **Question 6** : La taille des athlètes influence-t-elle davantage les performances mesurées en distance (mètres) que celles mesurées en temps (secondes) ?
 - **Question 7** : L'écart-type de la taille des athlètes au sein d'une même discipline a-t-il diminué entre 1924 et 2024 ?
+- **Question 14** : Y a-t-il un genre plus représenté que l'autre ?
+- **Question 18** : Combien d'athlètes participent aux Jeux Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver ?
+- **Question 23** : Les athlètes ayant la plus grande longévité sont-ils aussi ceux qui ont participé à la plus grande diversité d’épreuves ?
+
+
+### Autres membres de l'équipe (data-squad)
+
+- **Question 2** : Chaque discipline possède-t-elle une « empreinte morphologique » qui lui est propre ?
+- **Question 3** : Peut-on classer les disciplines selon un « gabarit type » mesuré par l'IMC ?
 - **Question 8** : Application Shiny - un explorateur morphologique interactif
 - **Question 10** : Quelles nations sont des « machines à or » et lesquelles sont des « collectionneuses de médailles » ?
 - **Question 13** : L'ancienneté olympique et le rang historique d'une nation prédisent-ils son palmarès ?
-- **Question 14** : Y a-t-il un genre plus représenté que l'autre ?
-- **Question 18** : Combien d'athlètes participent aux Jeux Olympiques d'Été par rapport aux Jeux Olympiques d'Hiver ?
 - **Question 22** : Sports d'équipe vs Sports individuels : l'âge de l'or
-- **Question 23** : Les athlètes ayant la plus grande longévité sont-ils aussi ceux qui ont participé à la plus grande diversité d’épreuves ?
