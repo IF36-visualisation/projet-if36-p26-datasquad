@@ -946,7 +946,7 @@ Les résultats montrent une répartition très équilibrée entre les femmes et 
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, results='hide'}
 data %>%
-  group_by(event, gender) %>%D
+  group_by(event, gender) %>%
   summarise(nb = n(), .groups = "drop") %>%
   group_by(gender) %>%
   summarise(total = sum(nb))
